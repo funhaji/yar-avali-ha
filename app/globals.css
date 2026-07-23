@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Persian fonts */
+@font-face {
+  font-family: 'IRANSans';
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/IRANSans.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/IRANSans-Bold.woff2') format('woff2');
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  direction: rtl;
+  font-family: 'IRANSans', 'Tahoma', sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* Fix number display in RTL */
+.ltr-numbers {
+  direction: ltr;
+  display: inline-block;
+}
+
+/* Content protection - disable right-click and text selection on protected content */
+.no-context-menu {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Video watermark overlay */
+.video-watermark {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Bright, child-friendly colors for curriculum section */
+.child-friendly {
+  --primary: #FF6B6B;
+  --secondary: #4ECDC4;
+  --accent: #FFE66D;
+  --success: #95E1D3;
+  --info: #A8E6CF;
+}
+
+/* Progress ring animation */
+@keyframes progress-ring {
+  0% {
+    stroke-dashoffset: 100;
+  }
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
