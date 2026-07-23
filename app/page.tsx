@@ -7,8 +7,10 @@ import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 
 export default async function HomePage() {
   const token = (await cookies()).get('session_token')?.value
-  const user = token ? await validateSession(token) : null
-  const teachers = await getVisibleTeachers()
+  const [user, teachers] = await Promise.all([
+    token ? validateSession(token).catch(() => null) : Promise.resolve(null),
+    getVisibleTeachers().catch(() => []),
+  ])
 
   return (
     <div className="page">
