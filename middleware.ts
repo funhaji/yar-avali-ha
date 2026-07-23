@@ -13,8 +13,6 @@ const PUBLIC_ROUTES = [
   '/subscription',
 ]
 
-const ADMIN_ROUTES = ['/admin']
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
