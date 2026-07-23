@@ -66,7 +66,7 @@ export async function uploadToPixeldrain(
           'Content-Type': 'application/octet-stream',
           'Authorization': `Basic ${Buffer.from(`:${apiKey}`).toString('base64')}`
         },
-        body: fileBuffer
+        body: new Uint8Array(fileBuffer)
       }
     );
     
