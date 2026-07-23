@@ -11,9 +11,6 @@ const PUBLIC_ROUTES = [
   '/workshops',
   '/teachers',
   '/subscription',
-  '/curriculum',
-  '/entertainment',
-  '/store',
 ]
 
 const ADMIN_ROUTES = ['/admin']
@@ -26,8 +23,7 @@ export async function middleware(request: NextRequest) {
     PUBLIC_ROUTES.includes(pathname) ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
-    pathname.includes('.') ||
-    pathname.startsWith('/watch')
+    pathname.includes('.')
   ) {
     return NextResponse.next()
   }
@@ -40,8 +36,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
   
-  // For now, just pass through - we'll validate in the actual pages
-  // This allows the UI to load without database connection
+  // Allow all authenticated routes
   return NextResponse.next()
 }
 

@@ -61,7 +61,6 @@ export default async function DashboardPage() {
               <Link href="/dashboard" className="text-purple-600 font-medium">داشبورد</Link>
               <Link href="/curriculum" className="text-gray-700 hover:text-purple-600">آموزش</Link>
               <Link href="/entertainment" className="text-gray-700 hover:text-purple-600">سرگرمی</Link>
-              <Link href="/store" className="text-gray-700 hover:text-purple-600">فروشگاه</Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -141,7 +140,7 @@ export default async function DashboardPage() {
         {/* Quick Access */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">دسترسی سریع</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link
               href="/curriculum"
               className="bg-gradient-to-br from-pink-400 to-red-400 p-8 rounded-xl text-white hover:scale-105 transition-transform"
@@ -158,15 +157,6 @@ export default async function DashboardPage() {
               <div className="text-5xl mb-4">🎬</div>
               <h3 className="text-2xl font-bold mb-2">سرگرمی</h3>
               <p>انیمه‌ها و فیلم‌های کودکانه</p>
-            </Link>
-            
-            <Link
-              href="/store"
-              className="bg-gradient-to-br from-yellow-400 to-orange-400 p-8 rounded-xl text-white hover:scale-105 transition-transform"
-            >
-              <div className="text-5xl mb-4">🛍️</div>
-              <h3 className="text-2xl font-bold mb-2">فروشگاه</h3>
-              <p>لوازم و محصولات آموزشی</p>
             </Link>
           </div>
         </section>

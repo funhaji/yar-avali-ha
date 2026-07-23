@@ -19,7 +19,6 @@ export default async function HomePage() {
             <div className="hidden md:flex gap-6">
               <Link href="/curriculum" className="text-gray-700 hover:text-purple-600">آموزش</Link>
               <Link href="/entertainment" className="text-gray-700 hover:text-purple-600">سرگرمی</Link>
-              <Link href="/store" className="text-gray-700 hover:text-purple-600">فروشگاه</Link>
               <Link href="/teachers" className="text-gray-700 hover:text-purple-600">همکاری معلمان</Link>
               <Link href="/workshops" className="text-gray-700 hover:text-purple-600">کارگاه‌ها</Link>
               <Link href="/blog" className="text-gray-700 hover:text-purple-600">بلاگ</Link>
