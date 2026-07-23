@@ -1,5 +1,4 @@
 import { randomBytes, createHmac } from 'crypto';
-import axios from 'axios';
 
 // Generate signed token for video access
 export function generateVideoToken(contentId: string, userId: string): string {
@@ -59,18 +58,24 @@ export async function uploadToPixeldrain(
       return { success: false, error: 'Pixeldrain API key not configured' };
     }
     
-    const response = await axios.put(
+    const response = await fetch(
       `https://pixeldrain.com/api/file/${filename}`,
-      fileBuffer,
       {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/octet-stream',
           'Authorization': `Basic ${Buffer.from(`:${apiKey}`).toString('base64')}`
-        }
+        },
+        body: fileBuffer
       }
     );
     
-    return { success: true, id: response.data.id };
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return { success: true, id: data.id };
   } catch (error: any) {
     console.error('Pixeldrain upload error:', error.message);
     return { success: false, error: error.message };
