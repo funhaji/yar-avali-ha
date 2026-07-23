@@ -15,15 +15,13 @@
     "next": "^15.3.0",
     "nodemailer": "^6.9.15",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "ws": "^8.18.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.16",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/ws": "^8.5.13",
     "autoprefixer": "^10.5.4",
     "eslint": "^9",
     "eslint-config-next": "^15.3.0",

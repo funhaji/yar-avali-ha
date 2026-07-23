@@ -1,26 +1,21 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import ws from 'ws';
+import { neon } from '@neondatabase/serverless';
 
-// Configure Neon to use WebSocket
-neonConfig.webSocketConstructor = ws;
+let connectionString: string | undefined;
 
-let pool: Pool | null = null;
-
-export function getPool(): Pool {
-  if (!pool) {
-    const connectionString = process.env.DATABASE_URL;
+export function getConnectionString(): string {
+  if (!connectionString) {
+    connectionString = process.env.DATABASE_URL;
     if (!connectionString) {
       throw new Error('DATABASE_URL environment variable is not set');
     }
-    pool = new Pool({ connectionString });
   }
-  return pool;
+  return connectionString;
 }
 
 export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
-  const pool = getPool();
-  const result = await pool.query(text, params);
-  return result.rows as T[];
+  const sql = neon(getConnectionString());
+  const result = await sql(text, params || []);
+  return result as T[];
 }
 
 // Database schema creation

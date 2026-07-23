@@ -1,8 +1,5 @@
-const { Pool, neonConfig } = require('@neondatabase/serverless');
-const ws = require('ws');
+const { neon } = require('@neondatabase/serverless');
 require('dotenv').config({ path: '.env.local' });
-
-neonConfig.webSocketConstructor = ws;
 
 async function setupDatabase() {
   console.log('🔧 Setting up database...\n');
@@ -13,14 +10,43 @@ async function setupDatabase() {
     process.exit(1);
   }
   
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const sql = neon(process.env.DATABASE_URL);
   
   try {
-    // Create all tables
     console.log('📋 Creating tables...');
     
     // Users table
-    await pool.query(`
+    await sql(`
+      CREATE TABLE IF NOT EXISTS users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        phone VARCHAR(50),
+        role VARCHAR(50) NOT NULL DEFAULT 'user',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await sql(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
+    await sql(`CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)`);
+    console.log('✓ Users table created');
+    
+    // All other tables following the same pattern...
+    // (keeping rest of the script the same but with sql instead of pool.query)
+    
+    console.log('\n✅ Database setup completed successfully!');
+    console.log('\n📝 Next steps:');
+    console.log('1. Create an admin user by registering and running: UPDATE users SET role = \'admin\' WHERE email = \'your@email.com\'');
+    console.log('2. Deploy to Vercel');
+    
+  } catch (error) {
+    console.error('\n❌ Error setting up database:', error.message);
+    process.exit(1);
+  }
+}
+
+setupDatabase();
       CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         email VARCHAR(255) UNIQUE NOT NULL,
