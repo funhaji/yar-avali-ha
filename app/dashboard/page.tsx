@@ -1,7 +1,9 @@
-import { cookies, headers } from 'next/headers'
+import { cookies } from 'next/headers'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { query } from '@/lib/db'
 import { hasActiveSubscription } from '@/lib/subscriptions'
+import { validateSession } from '@/lib/auth'
 
 async function getDashboardData(userId: string) {
   // Get subscription status
@@ -10,8 +12,8 @@ async function getDashboardData(userId: string) {
   // Get recent viewing history
   const history = await query(`
     SELECT vh.*, c.title, c.thumbnail_url, c.duration_seconds, c.content_type
-    FROM viewing_history vh
-    JOIN content_items c ON vh.content_id = c.id
+    FROM yar_viewing_history vh
+    JOIN yar_content_items c ON vh.content_id = c.id
     WHERE vh.user_id = $1
     ORDER BY vh.last_watched_at DESC
     LIMIT 6
@@ -20,8 +22,8 @@ async function getDashboardData(userId: string) {
   // Get continue watching (incomplete items)
   const continueWatching = await query(`
     SELECT vh.*, c.title, c.thumbnail_url, c.duration_seconds, c.content_type
-    FROM viewing_history vh
-    JOIN content_items c ON vh.content_id = c.id
+    FROM yar_viewing_history vh
+    JOIN yar_content_items c ON vh.content_id = c.id
     WHERE vh.user_id = $1 AND vh.completed = false AND vh.progress_seconds > 0
     ORDER BY vh.last_watched_at DESC
     LIMIT 4
@@ -31,15 +33,20 @@ async function getDashboardData(userId: string) {
 }
 
 export default async function DashboardPage() {
-  const headersList = await headers()
-  const userId = headersList.get('x-user-id')
-  const userName = headersList.get('x-user-name')
+  const cookieStore = await cookies()
+  const token = cookieStore.get('session_token')?.value
   
-  if (!userId) {
-    return <div>خطا در دریافت اطلاعات کاربر</div>
+  if (!token) {
+    redirect('/login')
   }
   
-  const { hasSubscription, history, continueWatching } = await getDashboardData(userId)
+  const user = await validateSession(token)
+  
+  if (!user) {
+    redirect('/login')
+  }
+  
+  const { hasSubscription, history, continueWatching } = await getDashboardData(user.id)
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -58,7 +65,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-gray-700">سلام، {userName}</span>
+            <span className="text-gray-700">سلام، {user.name}</span>
             <Link href="/profile" className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
               پروفایل
             </Link>

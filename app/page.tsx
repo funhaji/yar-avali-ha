@@ -1,6 +1,12 @@
 import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { validateSession } from '@/lib/auth'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('session_token')?.value
+  const user = token ? await validateSession(token) : null
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       {/* Header / Navigation */}
@@ -22,12 +28,23 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex gap-4">
-            <Link href="/login" className="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg">
-              ورود
-            </Link>
-            <Link href="/register" className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg">
-              ثبت‌نام
-            </Link>
+            {user ? (
+              <>
+                <span className="px-4 py-2 text-gray-700">سلام، {user.name}</span>
+                <Link href="/dashboard" className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg">
+                  داشبورد
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg">
+                  ورود
+                </Link>
+                <Link href="/register" className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg">
+                  ثبت‌نام
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </header>
