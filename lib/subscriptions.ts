@@ -19,7 +19,7 @@ export interface SubscriptionLink {
 // Check if user has active subscription
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   const subs = await query<Subscription>(
-    `SELECT * FROM subscriptions 
+    `SELECT * FROM yar_subscriptions 
      WHERE user_id = $1 AND end_date > NOW() 
      ORDER BY end_date DESC 
      LIMIT 1`,
@@ -32,7 +32,7 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
 // Get user's active subscription
 export async function getActiveSubscription(userId: string): Promise<Subscription | null> {
   const subs = await query<Subscription>(
-    `SELECT * FROM subscriptions 
+    `SELECT * FROM yar_subscriptions 
      WHERE user_id = $1 AND end_date > NOW() 
      ORDER BY end_date DESC 
      LIMIT 1`,
@@ -61,7 +61,7 @@ export async function createSubscriptionLink(
   const code = generateLinkCode();
   
   const result = await query<SubscriptionLink>(
-    `INSERT INTO subscription_links (code, expires_at, max_redemptions, created_by) 
+    `INSERT INTO yar_subscription_links (code, expires_at, max_redemptions, created_by) 
      VALUES ($1, $2, $3, $4) 
      RETURNING *`,
     [code, expiresAt, maxRedemptions, createdBy]
@@ -77,7 +77,7 @@ export async function redeemSubscriptionLink(
 ): Promise<{ success: boolean; message: string; subscription?: Subscription }> {
   // Check if link exists and is valid
   const links = await query<SubscriptionLink>(
-    `SELECT * FROM subscription_links WHERE code = $1`,
+    `SELECT * FROM yar_subscription_links WHERE code = $1`,
     [code]
   );
   
@@ -99,7 +99,7 @@ export async function redeemSubscriptionLink(
   
   // Check if user already redeemed this link
   const existing = await query(
-    `SELECT * FROM subscriptions WHERE user_id = $1 AND subscription_link_id = $2`,
+    `SELECT * FROM yar_subscriptions WHERE user_id = $1 AND subscription_link_id = $2`,
     [userId, link.id]
   );
   
@@ -113,7 +113,7 @@ export async function redeemSubscriptionLink(
   endDate.setMonth(endDate.getMonth() + 6);
   
   const subscription = await query<Subscription>(
-    `INSERT INTO subscriptions (user_id, subscription_link_id, start_date, end_date) 
+    `INSERT INTO yar_subscriptions (user_id, subscription_link_id, start_date, end_date) 
      VALUES ($1, $2, $3, $4) 
      RETURNING *`,
     [userId, link.id, startDate, endDate]
@@ -121,7 +121,7 @@ export async function redeemSubscriptionLink(
   
   // Increment redemption count
   await query(
-    `UPDATE subscription_links SET current_redemptions = current_redemptions + 1 WHERE id = $1`,
+    `UPDATE yar_subscription_links SET current_redemptions = current_redemptions + 1 WHERE id = $1`,
     [link.id]
   );
   
@@ -135,7 +135,7 @@ export async function redeemSubscriptionLink(
 // Get subscription link details (admin only)
 export async function getSubscriptionLinkDetails(linkId: string) {
   const link = await query<SubscriptionLink>(
-    `SELECT * FROM subscription_links WHERE id = $1`,
+    `SELECT * FROM yar_subscription_links WHERE id = $1`,
     [linkId]
   );
   
@@ -143,8 +143,8 @@ export async function getSubscriptionLinkDetails(linkId: string) {
   
   // Get redemptions
   const redemptions = await query(
-    `SELECT s.*, u.email, u.name FROM subscriptions s
-     JOIN users u ON s.user_id = u.id
+    `SELECT s.*, u.email, u.name FROM yar_subscriptions s
+     JOIN yar_users u ON s.user_id = u.id
      WHERE s.subscription_link_id = $1
      ORDER BY s.created_at DESC`,
     [linkId]
@@ -159,6 +159,6 @@ export async function getSubscriptionLinkDetails(linkId: string) {
 // Get all subscription links (admin only)
 export async function getAllSubscriptionLinks() {
   return await query<SubscriptionLink>(
-    `SELECT * FROM subscription_links ORDER BY created_at DESC`
+    `SELECT * FROM yar_subscription_links ORDER BY created_at DESC`
   );
 }

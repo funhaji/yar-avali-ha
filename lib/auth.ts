@@ -49,7 +49,7 @@ export async function createSession(userId: string): Promise<string> {
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
   
   await query(
-    'INSERT INTO sessions (user_id, token, expires_at) VALUES ($1, $2, $3)',
+    'INSERT INTO yar_sessions (user_id, token, expires_at) VALUES ($1, $2, $3)',
     [userId, token, expiresAt]
   );
   
@@ -62,8 +62,8 @@ export async function validateSession(token: string): Promise<User | null> {
   
   const sessions = await query<Session & User>(
     `SELECT s.*, u.id, u.email, u.name, u.phone, u.role 
-     FROM sessions s 
-     JOIN users u ON s.user_id = u.id 
+     FROM yar_sessions s 
+     JOIN yar_users u ON s.user_id = u.id 
      WHERE s.token = $1 AND s.expires_at > NOW()`,
     [token]
   );
@@ -84,12 +84,12 @@ export async function validateSession(token: string): Promise<User | null> {
 
 // Delete session (logout)
 export async function deleteSession(token: string): Promise<void> {
-  await query('DELETE FROM sessions WHERE token = $1', [token]);
+  await query('DELETE FROM yar_sessions WHERE token = $1', [token]);
 }
 
 // Clean up expired sessions (run periodically)
 export async function cleanExpiredSessions(): Promise<void> {
-  await query('DELETE FROM sessions WHERE expires_at < NOW()');
+  await query('DELETE FROM yar_sessions WHERE expires_at < NOW()');
 }
 
 // Password validation

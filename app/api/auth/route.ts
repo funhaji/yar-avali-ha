@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       
       // Check if user exists
       const existing = await query<User>(
-        'SELECT id FROM users WHERE email = $1',
+        'SELECT id FROM yar_users WHERE email = $1',
         [email]
       )
       
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       // Hash password and create user
       const passwordHash = await hashPassword(password)
       const result = await query<{ id: string }>(
-        'INSERT INTO users (email, password_hash, name, phone, role) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+        'INSERT INTO yar_users (email, password_hash, name, phone, role) VALUES ($1, $2, $3, $4, $5) RETURNING id',
         [email, passwordHash, name, phone || null, 'user']
       )
       
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     // LOGIN
     if (action === 'login') {
       const users = await query<User>(
-        'SELECT id, password_hash, role FROM users WHERE email = $1',
+        'SELECT id, password_hash, role FROM yar_users WHERE email = $1',
         [email]
       )
       

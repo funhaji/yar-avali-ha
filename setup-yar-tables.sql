@@ -1,25 +1,22 @@
-import { neon } from '@neondatabase/serverless';
+-- Run this SQL in your Neon database to create all tables with yar_ prefix
 
-let connectionString: string | undefined;
+-- Drop existing yar tables if they exist (uncomment if needed)
+-- DROP TABLE IF EXISTS yar_viewing_history CASCADE;
+-- DROP TABLE IF EXISTS yar_order_items CASCADE;
+-- DROP TABLE IF EXISTS yar_orders CASCADE;
+-- DROP TABLE IF EXISTS yar_pdf_purchases CASCADE;
+-- DROP TABLE IF EXISTS yar_subscriptions CASCADE;
+-- DROP TABLE IF EXISTS yar_subscription_links CASCADE;
+-- DROP TABLE IF EXISTS yar_sessions CASCADE;
+-- DROP TABLE IF EXISTS yar_blog_posts CASCADE;
+-- DROP TABLE IF EXISTS yar_workshops CASCADE;
+-- DROP TABLE IF EXISTS yar_teacher_requests CASCADE;
+-- DROP TABLE IF EXISTS yar_teachers CASCADE;
+-- DROP TABLE IF EXISTS yar_store_items CASCADE;
+-- DROP TABLE IF NOT EXISTS yar_pdf_store_items CASCADE;
+-- DROP TABLE IF EXISTS yar_content_items CASCADE;
+-- DROP TABLE IF EXISTS yar_users CASCADE;
 
-export function getConnectionString(): string {
-  if (!connectionString) {
-    connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error('DATABASE_URL environment variable is not set');
-    }
-  }
-  return connectionString;
-}
-
-export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
-  const sql = neon(getConnectionString());
-  const result = await sql(text, params || []);
-  return result as T[];
-}
-
-// Database schema creation
-export const DB_SCHEMA = `
 -- Users table
 CREATE TABLE IF NOT EXISTS yar_users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -74,7 +71,7 @@ CREATE TABLE IF NOT EXISTS yar_subscriptions (
 CREATE INDEX IF NOT EXISTS idx_yar_subscriptions_user_id ON yar_subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS idx_yar_subscriptions_end_date ON yar_subscriptions(end_date);
 
--- Content items table (curriculum + entertainment)
+-- Content items table
 CREATE TABLE IF NOT EXISTS yar_content_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(500) NOT NULL,
@@ -107,7 +104,21 @@ CREATE INDEX IF NOT EXISTS idx_yar_content_genre ON yar_content_items(genre);
 CREATE INDEX IF NOT EXISTS idx_yar_content_series ON yar_content_items(series_title);
 CREATE INDEX IF NOT EXISTS idx_yar_content_published ON yar_content_items(published);
 
--- PDF store items table
+-- Viewing history
+CREATE TABLE IF NOT EXISTS yar_viewing_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES yar_users(id) ON DELETE CASCADE,
+  content_id UUID NOT NULL REFERENCES yar_content_items(id) ON DELETE CASCADE,
+  progress_seconds INT DEFAULT 0,
+  completed BOOLEAN DEFAULT false,
+  last_watched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, content_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_yar_viewing_history_user ON yar_viewing_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_yar_viewing_history_content ON yar_viewing_history(content_id);
+
+-- PDF store items
 CREATE TABLE IF NOT EXISTS yar_pdf_store_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(500) NOT NULL,
@@ -119,7 +130,7 @@ CREATE TABLE IF NOT EXISTS yar_pdf_store_items (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- PDF purchases table
+-- PDF purchases
 CREATE TABLE IF NOT EXISTS yar_pdf_purchases (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES yar_users(id) ON DELETE CASCADE,
@@ -128,7 +139,7 @@ CREATE TABLE IF NOT EXISTS yar_pdf_purchases (
   UNIQUE(user_id, pdf_item_id)
 );
 
--- Store items table (stationery, digital goods)
+-- Store items
 CREATE TABLE IF NOT EXISTS yar_store_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(500) NOT NULL,
@@ -143,7 +154,7 @@ CREATE TABLE IF NOT EXISTS yar_store_items (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Orders table
+-- Orders
 CREATE TABLE IF NOT EXISTS yar_orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES yar_users(id),
@@ -156,7 +167,7 @@ CREATE TABLE IF NOT EXISTS yar_orders (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Order items table
+-- Order items
 CREATE TABLE IF NOT EXISTS yar_order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID NOT NULL REFERENCES yar_orders(id) ON DELETE CASCADE,
@@ -165,7 +176,7 @@ CREATE TABLE IF NOT EXISTS yar_order_items (
   price_cents INT NOT NULL
 );
 
--- Teachers table
+-- Teachers
 CREATE TABLE IF NOT EXISTS yar_teachers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
@@ -176,7 +187,7 @@ CREATE TABLE IF NOT EXISTS yar_teachers (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Teacher collaboration requests table
+-- Teacher requests
 CREATE TABLE IF NOT EXISTS yar_teacher_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
@@ -187,7 +198,7 @@ CREATE TABLE IF NOT EXISTS yar_teacher_requests (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Blog posts table
+-- Blog posts
 CREATE TABLE IF NOT EXISTS yar_blog_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(500) NOT NULL,
@@ -205,7 +216,7 @@ CREATE TABLE IF NOT EXISTS yar_blog_posts (
 CREATE INDEX IF NOT EXISTS idx_yar_blog_slug ON yar_blog_posts(slug);
 CREATE INDEX IF NOT EXISTS idx_yar_blog_published ON yar_blog_posts(published);
 
--- Workshops table
+-- Workshops
 CREATE TABLE IF NOT EXISTS yar_workshops (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(500) NOT NULL,
@@ -217,18 +228,3 @@ CREATE TABLE IF NOT EXISTS yar_workshops (
   rating INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- Viewing history / progress tracking
-CREATE TABLE IF NOT EXISTS yar_viewing_history (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES yar_users(id) ON DELETE CASCADE,
-  content_id UUID NOT NULL REFERENCES yar_content_items(id) ON DELETE CASCADE,
-  progress_seconds INT DEFAULT 0,
-  completed BOOLEAN DEFAULT false,
-  last_watched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(user_id, content_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_yar_viewing_history_user ON yar_viewing_history(user_id);
-CREATE INDEX IF NOT EXISTS idx_yar_viewing_history_content ON yar_viewing_history(content_id);
-`;
