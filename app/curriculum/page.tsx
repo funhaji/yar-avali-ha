@@ -1,14 +1,16 @@
-import { headers } from 'next/headers'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { query } from '@/lib/db'
 import { hasActiveSubscription } from '@/lib/subscriptions'
+import { validateSession } from '@/lib/auth'
 
 async function getCurriculumContent(userId: string) {
   const hasSubscription = await hasActiveSubscription(userId)
   
   // Get all curriculum content grouped by grade
   const content = await query(`
-    SELECT * FROM content_items
+    SELECT * FROM yar_content_items
     WHERE content_type IN ('lesson', 'worksheet', 'reading')
       AND published = true
     ORDER BY grade_level, category, title
@@ -28,23 +30,20 @@ async function getCurriculumContent(userId: string) {
 }
 
 export default async function CurriculumPage() {
-  const headersList = await headers()
-  const userId = headersList.get('x-user-id')
+  const cookieStore = await cookies()
+  const token = cookieStore.get('session_token')?.value
   
-  if (!userId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">لطفاً وارد شوید</h1>
-          <Link href="/login" className="text-purple-600 hover:underline">
-            ورود به حساب کاربری
-          </Link>
-        </div>
-      </div>
-    )
+  if (!token) {
+    redirect('/login')
   }
   
-  const { content, hasSubscription } = await getCurriculumContent(userId)
+  const user = await validateSession(token)
+  
+  if (!user) {
+    redirect('/login')
+  }
+  
+  const { content: byGrade, hasSubscription } = await getCurriculumContent(user.id)
   
   const grades = ['class-1', 'class-2', 'class-3']
   const gradeNames: Record<string, string> = {
@@ -106,9 +105,9 @@ export default async function CurriculumPage() {
               {gradeNames[grade]}
             </h2>
             
-            {content[grade] && content[grade].length > 0 ? (
+            {byGrade[grade] && byGrade[grade].length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {content[grade].map((item: any) => {
+                {byGrade[grade].map((item: any) => {
                   const isLocked = item.tier_requirement !== 'free' && !hasSubscription
                   
                   return (

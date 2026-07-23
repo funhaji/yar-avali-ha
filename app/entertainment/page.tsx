@@ -1,7 +1,9 @@
-import { headers } from 'next/headers'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { query } from '@/lib/db'
 import { hasActiveSubscription } from '@/lib/subscriptions'
+import { validateSession } from '@/lib/auth'
 
 async function getEntertainmentContent(userId: string) {
   const hasSubscription = await hasActiveSubscription(userId)
@@ -13,7 +15,7 @@ async function getEntertainmentContent(userId: string) {
            MIN(genre) as genre,
            MIN(age_tag) as age_tag,
            COUNT(*) as episode_count
-    FROM content_items
+    FROM yar_content_items
     WHERE content_type = 'anime' 
       AND series_title IS NOT NULL
       AND published = true
@@ -23,7 +25,7 @@ async function getEntertainmentContent(userId: string) {
   
   // Get standalone movies
   const movies = await query(`
-    SELECT * FROM content_items
+    SELECT * FROM yar_content_items
     WHERE content_type = 'movie'
       AND published = true
     ORDER BY created_at DESC
@@ -33,23 +35,20 @@ async function getEntertainmentContent(userId: string) {
 }
 
 export default async function EntertainmentPage() {
-  const headersList = await headers()
-  const userId = headersList.get('x-user-id')
+  const cookieStore = await cookies()
+  const token = cookieStore.get('session_token')?.value
   
-  if (!userId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">لطفاً وارد شوید</h1>
-          <Link href="/login" className="text-purple-600 hover:underline">
-            ورود به حساب کاربری
-          </Link>
-        </div>
-      </div>
-    )
+  if (!token) {
+    redirect('/login')
   }
   
-  const { series, movies, hasSubscription } = await getEntertainmentContent(userId)
+  const user = await validateSession(token)
+  
+  if (!user) {
+    redirect('/login')
+  }
+  
+  const { series, movies, hasSubscription } = await getEntertainmentContent(user.id)
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 to-black text-white">
