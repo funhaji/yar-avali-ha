@@ -169,12 +169,19 @@ CREATE TABLE IF NOT EXISTS yar_order_items (
 CREATE TABLE IF NOT EXISTS yar_teachers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
+  specialty VARCHAR(255),
   bio TEXT,
   photo_url VARCHAR(1000),
   sample_work_url VARCHAR(1000),
   display_order INT DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  is_visible BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE yar_teachers ADD COLUMN IF NOT EXISTS specialty VARCHAR(255);
+ALTER TABLE yar_teachers ADD COLUMN IF NOT EXISTS is_visible BOOLEAN DEFAULT true;
+ALTER TABLE yar_teachers ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 -- Teacher collaboration requests table
 CREATE TABLE IF NOT EXISTS yar_teacher_requests (

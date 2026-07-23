@@ -60,10 +60,11 @@ export async function createSession(userId: string): Promise<string> {
 export async function validateSession(token: string): Promise<User | null> {
   if (!token) return null;
   
-  const sessions = await query<Session & User>(
-    `SELECT s.*, u.id, u.email, u.name, u.phone, u.role 
-     FROM yar_sessions s 
-     JOIN yar_users u ON s.user_id = u.id 
+  const sessions = await query<Session & User & { user_account_id: string }>(
+    `SELECT s.id AS session_id, s.user_id, s.token, s.expires_at,
+            u.id AS user_account_id, u.email, u.name, u.phone, u.role, u.created_at
+     FROM yar_sessions s
+     JOIN yar_users u ON s.user_id = u.id
      WHERE s.token = $1 AND s.expires_at > NOW()`,
     [token]
   );
@@ -72,7 +73,7 @@ export async function validateSession(token: string): Promise<User | null> {
   
   const session = sessions[0];
   return {
-    id: session.id,
+    id: session.user_account_id,
     email: session.email,
     password_hash: '',
     name: session.name,

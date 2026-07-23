@@ -1,25 +1,17 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { Vazirmatn } from 'next/font/google'
 import './globals.css'
 
+const vazirmatn = Vazirmatn({ subsets: ['arabic', 'latin'], variable: '--font-vazir', display: 'swap' })
+
 export const metadata: Metadata = {
-  title: 'یار اولی‌ها - پلتفرم آموزشی و سرگرمی کودکان',
-  description: 'پلتفرم آموزشی و سرگرمی برای کودکان پیش‌دبستانی و کلاس اول با محتوای درسی و سرگرمی',
-  keywords: 'آموزش کودکان، پیش‌دبستانی، کلاس اول، انیمه، فیلم کودکان، آموزش فارسی',
+  title: { default: 'یار اولی‌ها | یادگیری که مزه دارد', template: '%s | یار اولی‌ها' },
+  description: 'دنیای خلاق آموزش و سرگرمی برای کودکان دبستانی؛ با درس‌های تصویری، تمرین‌های جذاب و معلم‌های دوست‌داشتنی.',
+  keywords: ['آموزش کودکان', 'کلاس اول', 'محتوای آموزشی', 'سرگرمی کودک'],
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="fa" dir="rtl">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-      </head>
-      <body>
-        {children}
-      </body>
-    </html>
-  )
+export const viewport: Viewport = { themeColor: '#fbf3e4', width: 'device-width', initialScale: 1, maximumScale: 5 }
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <html lang="fa" dir="rtl" className="bg-background"><body className={`${vazirmatn.variable} font-sans`}>{children}</body></html>
 }
