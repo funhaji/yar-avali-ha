@@ -48,7 +48,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
   }
 
   return (
-    <div style={{ display: 'grid', gap: '1.6rem', gridTemplateColumns: '1fr', alignItems: 'start' }}>
+    <div className="teacher-manager-layout" style={{ display: 'grid', gap: '1.6rem', gridTemplateColumns: '1fr', alignItems: 'start' }}>
       <section className="card account-panel">
         <div className="section-kicker"><Plus /> {editing ? 'ویرایش معلم' : 'افزودن معلم'}</div>
         <form onSubmit={save} className="form-stack">
@@ -57,11 +57,14 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           <label>معرفی کوتاه<textarea rows={3} value={form.bio || ''} onChange={e => setForm({ ...form, bio: e.target.value })} /></label>
           <label>ترتیب نمایش<input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: Number(e.target.value) })} /></label>
           <label style={{ flexDirection: 'row', alignItems: 'center', gap: '.6rem' }}><input type="checkbox" style={{ width: 'auto' }} checked={form.is_visible} onChange={e => setForm({ ...form, is_visible: e.target.checked })} /> نمایش در صفحه اصلی</label>
-          <div>
-            <span style={{ fontWeight: 700, display: 'block', marginBottom: '.5rem' }}>عکس معلم</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              {form.photo_url && <img src={form.photo_url || "/placeholder.svg"} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 14, border: '2.5px solid var(--line)' }} />}
-              <label className="button button-ghost" style={{ cursor: 'pointer' }}><ImagePlus /> {uploading ? 'در حال آپلود...' : 'انتخاب تصویر'}<input type="file" accept="image/*" hidden onChange={e => e.target.files?.[0] && upload(e.target.files[0])} /></label>
+          <div className="form-stack">
+            <label>نشانی تصویر <small className="muted">برای میزبان‌های بدون Vercel Blob نیز قابل استفاده است.</small><input type="url" inputMode="url" value={form.photo_url || ''} onChange={e => setForm({ ...form, photo_url: e.target.value })} placeholder="https://example.com/teacher.jpg" /></label>
+            <div>
+              <span style={{ fontWeight: 700, display: 'block', marginBottom: '.5rem' }}>یا آپلود مستقیم</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                {form.photo_url && <img src={form.photo_url || "/placeholder.svg"} alt="پیش‌نمایش تصویر معلم" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 14, border: '2.5px solid var(--line)' }} />}
+                <label className="button button-ghost" style={{ cursor: 'pointer' }}><ImagePlus /> {uploading ? 'در حال آپلود...' : 'انتخاب تصویر'}<input type="file" accept="image/*" hidden disabled={uploading} onChange={e => e.target.files?.[0] && upload(e.target.files[0])} /></label>
+              </div>
             </div>
           </div>
           {error && <div className="alert-error">{error}</div>}

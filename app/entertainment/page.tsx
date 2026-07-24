@@ -1,221 +1,31 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Clapperboard, Crown, Film, LockKeyhole, Play, Sparkles, Tv } from 'lucide-react'
 import { query } from '@/lib/db'
 import { hasActiveSubscription } from '@/lib/subscriptions'
 import { validateSession } from '@/lib/auth'
+import { SiteFooter, SiteHeader } from '@/components/SiteHeader'
 
-async function getEntertainmentContent(userId: string) {
-  const hasSubscription = await hasActiveSubscription(userId)
-  
-  // Get all anime series (grouped by series_title)
-  const series = await query(`
-    SELECT DISTINCT series_title, 
-           MIN(thumbnail_url) as thumbnail_url,
-           MIN(genre) as genre,
-           MIN(age_tag) as age_tag,
-           COUNT(*) as episode_count
-    FROM yar_content_items
-    WHERE content_type = 'anime' 
-      AND series_title IS NOT NULL
-      AND published = true
-    GROUP BY series_title
-    ORDER BY series_title
-  `)
-  
-  // Get standalone movies
-  const movies = await query(`
-    SELECT * FROM yar_content_items
-    WHERE content_type = 'movie'
-      AND published = true
-    ORDER BY created_at DESC
-  `)
-  
-  return { series, movies, hasSubscription }
+async function getContent(userId: string) {
+  const [hasSubscription, series, movies] = await Promise.all([
+    hasActiveSubscription(userId),
+    query<any>(`SELECT DISTINCT series_title, MIN(thumbnail_url) as thumbnail_url, MIN(genre) as genre, MIN(age_tag) as age_tag, COUNT(*) as episode_count FROM yar_content_items WHERE content_type = 'anime' AND series_title IS NOT NULL AND published = true GROUP BY series_title ORDER BY series_title`),
+    query<any>(`SELECT * FROM yar_content_items WHERE content_type = 'movie' AND published = true ORDER BY created_at DESC`),
+  ])
+  return { hasSubscription, series, movies }
 }
 
 export default async function EntertainmentPage() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('session_token')?.value
-  
-  if (!token) {
-    redirect('/login')
-  }
-  
-  const user = await validateSession(token)
-  
-  if (!user) {
-    redirect('/login')
-  }
-  
-  const { series, movies, hasSubscription } = await getEntertainmentContent(user.id)
-  
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 to-black text-white">
-      {/* Header */}
-      <header className="bg-black bg-opacity-50 backdrop-blur-sm sticky top-0 z-50">
-        <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-2xl font-bold text-purple-400">
-              یار اولی‌ها
-            </Link>
-            <div className="hidden md:flex gap-6">
-              <Link href="/dashboard" className="text-gray-300 hover:text-white">داشبورد</Link>
-              <Link href="/curriculum" className="text-gray-300 hover:text-white">آموزش</Link>
-              <Link href="/entertainment" className="text-purple-400 font-medium">سرگرمی</Link>
-              <Link href="/store" className="text-gray-300 hover:text-white">فروشگاه</Link>
-            </div>
-          </div>
-        </nav>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        {/* Hero */}
-        <div className="mb-12">
-          <div className="text-6xl mb-4">🎬</div>
-          <h1 className="text-5xl font-bold mb-4">کتابخانه سرگرمی</h1>
-          <p className="text-xl text-gray-300 max-w-2xl">
-            انیمه‌ها و فیلم‌های کودکانه با محتوای مناسب سن
-          </p>
-        </div>
-
-        {!hasSubscription && (
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-xl mb-12">
-            <h2 className="text-xl font-bold mb-2">
-              🎁 تمام فیلم‌ها و انیمه‌ها را با اشتراک ببینید
-            </h2>
-            <p className="mb-4 text-purple-100">
-              بدون محدودیت، بدون وقفه - تجربه‌ای کامل برای کودک شما
-            </p>
-            <Link href="/subscription" className="inline-block bg-white text-purple-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-100">
-              خرید اشتراک
-            </Link>
-          </div>
-        )}
-
-        {/* Anime Series */}
-        {series.length > 0 && (
-          <section className="mb-16">
-            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-              <span>📺</span>
-              سریال‌های انیمه
-            </h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {series.map((item: any) => (
-                <Link
-                  key={item.series_title}
-                  href={`/series/${encodeURIComponent(item.series_title)}`}
-                  className="group"
-                >
-                  <div className="relative rounded-lg overflow-hidden mb-3 aspect-[2/3] bg-gray-800">
-                    <img
-                      src={item.thumbnail_url || '/placeholder.jpg'}
-                      alt={item.series_title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <div className="flex items-center gap-2 text-sm">
-                          {item.age_tag && (
-                            <span className="bg-purple-600 px-2 py-1 rounded text-xs">
-                              {item.age_tag}
-                            </span>
-                          )}
-                          <span className="bg-white bg-opacity-20 px-2 py-1 rounded text-xs">
-                            {item.episode_count} قسمت
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="font-bold group-hover:text-purple-400 transition-colors">
-                    {item.series_title}
-                  </h3>
-                  {item.genre && (
-                    <p className="text-sm text-gray-400">{item.genre}</p>
-                  )}
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Movies */}
-        {movies.length > 0 && (
-          <section>
-            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-              <span>🎞️</span>
-              فیلم‌ها
-            </h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {movies.map((item: any) => {
-                const isLocked = item.tier_requirement !== 'free' && !hasSubscription
-                
-                return (
-                  <div key={item.id} className="group">
-                    <Link href={isLocked ? '/subscription' : `/watch/${item.id}`}>
-                      <div className="relative rounded-lg overflow-hidden mb-3 aspect-[2/3] bg-gray-800">
-                        <img
-                          src={item.thumbnail_url || '/placeholder.jpg'}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                        {isLocked && (
-                          <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                            <div className="text-center">
-                              <div className="text-4xl mb-2">🔒</div>
-                              <div className="text-sm">نیاز به اشتراک</div>
-                            </div>
-                          </div>
-                        )}
-                        {item.tier_requirement === 'free' && (
-                          <div className="absolute top-2 right-2 bg-green-500 px-2 py-1 rounded text-xs font-medium">
-                            رایگان
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <div className="flex items-center gap-2 text-sm">
-                              {item.age_tag && (
-                                <span className="bg-purple-600 px-2 py-1 rounded text-xs">
-                                  {item.age_tag}
-                                </span>
-                              )}
-                              {item.duration_seconds && (
-                                <span className="bg-white bg-opacity-20 px-2 py-1 rounded text-xs">
-                                  {Math.floor(item.duration_seconds / 60)} دقیقه
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <h3 className="font-bold group-hover:text-purple-400 transition-colors line-clamp-2">
-                        {item.title}
-                      </h3>
-                      {item.genre && (
-                        <p className="text-sm text-gray-400">{item.genre}</p>
-                      )}
-                    </Link>
-                  </div>
-                )
-              })}
-            </div>
-          </section>
-        )}
-
-        {series.length === 0 && movies.length === 0 && (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🎬</div>
-            <h3 className="text-2xl font-bold mb-2">به زودی!</h3>
-            <p className="text-gray-400">
-              محتوای سرگرمی به زودی اضافه خواهد شد
-            </p>
-          </div>
-        )}
-      </main>
-    </div>
-  )
+  const token = (await cookies()).get('session_token')?.value
+  const user = token ? await validateSession(token) : null
+  if (!user) redirect('/login')
+  const { hasSubscription, series, movies } = await getContent(user.id)
+  return <div className="page"><SiteHeader userName={user.name} isAdmin={user.role === 'admin'} dark /><main>
+    <section className="section entertainment-hero"><div className="shell"><span className="section-kicker"><Clapperboard /> وقت تفریح</span><h1 className="display text-balance">قصه‌هایی برای خندیدن و خیال‌پردازی</h1><p className="lead page-lead">فیلم‌ها و مجموعه‌های کودکانه، انتخاب‌شده برای یک تماشای امن و شاد.</p></div></section>
+    {!hasSubscription && <div className="shell"><aside className="card subscription-banner"><div><Crown /><h2>کتابخانه کامل را باز کن</h2><p>بدون محدودیت به همه فیلم‌ها و مجموعه‌ها دسترسی داشته باش.</p></div><Link href="/subscription" className="button button-primary">فعال‌سازی اشتراک</Link></aside></div>}
+    <div className="shell entertainment-content">{series.length > 0 && <section className="media-section"><div className="content-heading"><Tv /><h2 className="section-title">مجموعه‌ها</h2></div><div className="poster-grid">{series.map((item) => <Link key={item.series_title} href={`/series/${encodeURIComponent(item.series_title)}`} className="card card-hover poster-card"><div className="content-poster">{item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.series_title} /> : <Film />}</div><div className="poster-body"><h3>{item.series_title}</h3><div className="lesson-tags">{item.age_tag && <span className="chip">{item.age_tag}</span>}<span className="chip chip-teal">{item.episode_count} قسمت</span></div>{item.genre && <p className="muted">{item.genre}</p>}</div></Link>)}</div></section>}
+    {movies.length > 0 && <section className="media-section"><div className="content-heading"><Film /><h2 className="section-title">فیلم‌ها</h2></div><div className="poster-grid">{movies.map((item) => { const locked = item.tier_requirement !== 'free' && !hasSubscription; return <Link key={item.id} href={locked ? '/subscription' : `/watch/${item.id}`} className="card card-hover poster-card"><div className="content-poster">{item.thumbnail_url ? <img src={item.thumbnail_url} alt={item.title} /> : <Clapperboard />}{locked && <div className="poster-lock"><LockKeyhole /><span>نیاز به اشتراک</span></div>}<span className={`chip poster-chip ${item.tier_requirement === 'free' ? 'chip-free' : 'chip-lock'}`}>{item.tier_requirement === 'free' ? 'رایگان' : 'ویژه'}</span></div><div className="poster-body"><h3>{item.title}</h3>{item.genre && <p className="muted">{item.genre}</p>}<span className="watch-link">{locked ? <LockKeyhole /> : <Play />}{locked ? 'باز کردن' : 'تماشا'}</span></div></Link>})}</div></section>}
+    {series.length === 0 && movies.length === 0 && <div className="card empty-state"><Sparkles /><h2>به‌زودی</h2><p className="muted">کتابخانه سرگرمی در حال آماده‌شدن است.</p></div>}</div>
+  </main><SiteFooter /></div>
 }

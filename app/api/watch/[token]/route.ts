@@ -31,7 +31,7 @@ export async function GET(
     
     // Get content details
     const content = await query(`
-      SELECT * FROM content_items WHERE id = $1
+      SELECT * FROM yar_content_items WHERE id = $1
     `, [contentId])
     
     if (content.length === 0) {

@@ -18,10 +18,10 @@ export default async function HomePage() {
 
       {/* HERO */}
       <section className="hero section">
-        <div className="blob" style={{ width: 320, height: 320, background: 'var(--sunflower)', top: -60, left: -80, opacity: .55 }} />
-        <div className="blob" style={{ width: 260, height: 260, background: 'var(--teal)', bottom: -90, right: -60, opacity: .4 }} />
+        <div className="blob ambient-blob" style={{ width: 320, height: 320, background: 'var(--sunflower)', top: -60, left: -80, opacity: .55 }} />
+        <div className="blob ambient-blob" style={{ width: 260, height: 260, background: 'var(--teal)', bottom: -90, right: -60, opacity: .4 }} />
         <div className="shell hero-grid" style={{ position: 'relative', zIndex: 1 }}>
-          <div>
+          <div className="hero-copy">
             <span className="section-kicker"><Sparkles /> مدرسه‌ای که بوی خلاقیت می‌دهد</span>
             <h1 className="display text-balance">یادگیری برای بچه‌ها،
               <br /><span className="hl">مثل بازی</span> جذاب می‌شود</h1>
@@ -35,7 +35,7 @@ export default async function HomePage() {
               <span style={{ display: 'inline-flex', gap: '.4rem', alignItems: 'center' }}><Star style={{ width: 20, color: 'var(--tangerine)' }} /> مناسب سن</span>
             </div>
           </div>
-          <div style={{ position: 'relative', minHeight: 320 }}>
+          <div className="hero-art" style={{ position: 'relative', minHeight: 320 }}>
             <div className="card" style={{ padding: '1.6rem', transform: 'rotate(-3deg)', background: 'var(--tangerine)', color: 'var(--paper)' }}>
               <BookOpen style={{ width: 40, height: 40 }} />
               <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '.6rem' }}>درس‌های تصویری</h3>
@@ -53,7 +53,7 @@ export default async function HomePage() {
       </section>
 
       {/* FEATURES */}
-      <section className="section" style={{ paddingBlock: '2rem' }}>
+      <section className="section reveal-section" style={{ paddingBlock: '2rem' }}>
         <div className="shell">
           <div className="tiles">
             <div className="card card-hover tile">
@@ -76,7 +76,7 @@ export default async function HomePage() {
       </section>
 
       {/* TEACHERS */}
-      <section className="section" id="teachers">
+      <section className="section reveal-section" id="teachers">
         <div className="shell">
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
             <div>
@@ -113,7 +113,7 @@ export default async function HomePage() {
       </section>
 
       {/* SUBSCRIPTION CTA */}
-      <section className="section" style={{ paddingTop: 0 }}>
+      <section className="section reveal-section" style={{ paddingTop: 0 }}>
         <div className="shell">
           <div className="card" style={{ padding: 'clamp(2rem, 5vw, 3.5rem)', background: 'var(--ink)', color: 'var(--paper)', display: 'grid', gap: '1.4rem', gridTemplateColumns: '1fr', alignItems: 'center' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center', justifyContent: 'space-between' }}>
