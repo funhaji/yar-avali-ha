@@ -1,18 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { validateSession } from '@/lib/auth'
 import { redeemSubscriptionLink } from '@/lib/subscriptions'
 
 export async function POST(request: NextRequest) {
   try {
-    const { code, userId } = await request.json()
+    // Get user from session
+    const token = (await cookies()).get('session_token')?.value
+    const user = token ? await validateSession(token) : null
     
-    if (!code || !userId) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'کد و شناسه کاربر الزامی است' },
+        { error: 'لطفاً ابتدا وارد حساب کاربری خود شوید' },
+        { status: 401 }
+      )
+    }
+    
+    const { code } = await request.json()
+    
+    if (!code) {
+      return NextResponse.json(
+        { error: 'کد اشتراک الزامی است' },
         { status: 400 }
       )
     }
     
-    const result = await redeemSubscriptionLink(code, userId)
+    const result = await redeemSubscriptionLink(code, user.id)
     
     if (!result.success) {
       return NextResponse.json(

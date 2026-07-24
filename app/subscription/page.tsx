@@ -23,6 +23,11 @@ export default function SubscriptionPage() {
     try {
       const response = await fetch('/api/subscription/redeem', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) })
       const data = await response.json()
+      if (response.status === 401) {
+        // Not logged in - redirect to login with return URL
+        router.push(`/login?redirect=/subscription&code=${code}`)
+        return
+      }
       if (!response.ok) throw new Error(data.error || 'خطا در فعال‌سازی اشتراک')
       setMessage({ type: 'success', text: data.message })
       window.setTimeout(() => router.push('/dashboard'), 1600)
