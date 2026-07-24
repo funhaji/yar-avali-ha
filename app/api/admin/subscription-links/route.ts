@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { validateSession } from '@/lib/auth'
 import { createSubscriptionLink } from '@/lib/subscriptions'
 
 export async function POST(request: NextRequest) {
   try {
-    const userRole = request.headers.get('x-user-role')
-    const userId = request.headers.get('x-user-id')
+    // Get session token from cookies
+    const token = (await cookies()).get('session_token')?.value
+    const user = token ? await validateSession(token) : null
     
-    if (userRole !== 'admin' || !userId) {
+    if (!user || user.role !== 'admin') {
       return NextResponse.json(
         { error: 'دسترسی غیرمجاز' },
         { status: 403 }
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest) {
     const link = await createSubscriptionLink(
       expiresAt,
       parseInt(maxRedemptions),
-      userId,
+      user.id,
       parseInt(subscriptionDays)
     )
     
