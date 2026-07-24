@@ -6,7 +6,7 @@ import { ArrowRight, CheckCircle2, Clipboard, Info, Link2, Plus } from 'lucide-r
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function NewSubscriptionLinkPage() {
-  const [formData, setFormData] = useState({ expiresAt: '', maxRedemptions: '1' })
+  const [formData, setFormData] = useState({ keyExpiryDays: '30', subscriptionDays: '180', maxRedemptions: '1' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState('')
@@ -26,7 +26,11 @@ export default function NewSubscriptionLinkPage() {
       const response = await fetch('/api/admin/subscription-links', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ expiresAt: new Date(formData.expiresAt).toISOString(), maxRedemptions: Number.parseInt(formData.maxRedemptions, 10) }),
+        body: JSON.stringify({ 
+          keyExpiryDays: Number.parseInt(formData.keyExpiryDays, 10),
+          subscriptionDays: Number.parseInt(formData.subscriptionDays, 10),
+          maxRedemptions: Number.parseInt(formData.maxRedemptions, 10) 
+        }),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'خطا در ساخت لینک')
@@ -63,12 +67,13 @@ export default function NewSubscriptionLinkPage() {
           <section className="card account-panel">
             <span className="section-kicker"><Link2 aria-hidden="true" /> اشتراک تازه</span>
             <h1 className="section-title text-balance">ساخت کد اشتراک جدید</h1>
-            <p className="muted form-intro">یک کد محدود بسازید که با فعال‌شدن، شش ماه دسترسی کامل می‌دهد.</p>
+            <p className="muted form-intro">یک کد محدود بسازید که برای کاربران اشتراک فعال می‌کند.</p>
             {error && <div className="alert-error" role="alert">{error}</div>}
             <form onSubmit={handleSubmit} className="form-stack">
-              <label>تاریخ انقضا<input type="datetime-local" value={formData.expiresAt} onChange={(e) => setFormData((prev) => ({ ...prev, expiresAt: e.target.value }))} required dir="ltr" /><small className="muted">بعد از این زمان، کد دیگر قابل استفاده نیست.</small></label>
+              <label>اعتبار کد (روز)<input type="number" min="1" value={formData.keyExpiryDays} onChange={(e) => setFormData((prev) => ({ ...prev, keyExpiryDays: e.target.value }))} required /><small className="muted">کد تا چند روز آینده قابل استفاده است؟</small></label>
+              <label>مدت اشتراک (روز)<input type="number" min="1" value={formData.subscriptionDays} onChange={(e) => setFormData((prev) => ({ ...prev, subscriptionDays: e.target.value }))} required /><small className="muted">کاربر چند روز اشتراک دریافت می‌کند؟ (۳۰ = یک ماه، ۱۸۰ = شش ماه)</small></label>
               <label>تعداد استفاده مجاز<input type="number" min="1" value={formData.maxRedemptions} onChange={(e) => setFormData((prev) => ({ ...prev, maxRedemptions: e.target.value }))} required /><small className="muted">حداکثر تعداد کاربرانی که می‌توانند کد را فعال کنند.</small></label>
-              <div className="form-note"><Info aria-hidden="true" /><p>هر کاربر با این کد، شش ماه اشتراک فعال دریافت می‌کند.</p></div>
+              <div className="form-note"><Info aria-hidden="true" /><p>کد پس از {formData.keyExpiryDays} روز منقضی می‌شود و هر کاربر {formData.subscriptionDays} روز اشتراک دریافت می‌کند.</p></div>
               <div className="button-row"><button type="submit" className="button button-primary" disabled={loading}>{loading ? 'در حال ساخت...' : 'ساخت لینک'}</button><Link href="/admin" className="button button-ghost">انصراف</Link></div>
             </form>
           </section>

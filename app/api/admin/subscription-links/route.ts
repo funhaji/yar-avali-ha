@@ -13,19 +13,24 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const { expiresAt, maxRedemptions } = await request.json()
+    const { keyExpiryDays, subscriptionDays, maxRedemptions } = await request.json()
     
-    if (!expiresAt || !maxRedemptions) {
+    if (!keyExpiryDays || !subscriptionDays || !maxRedemptions) {
       return NextResponse.json(
         { error: 'اطلاعات ناقص است' },
         { status: 400 }
       )
     }
     
+    // Calculate expiry date from days
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + parseInt(keyExpiryDays))
+    
     const link = await createSubscriptionLink(
-      new Date(expiresAt),
+      expiresAt,
       parseInt(maxRedemptions),
-      userId
+      userId,
+      parseInt(subscriptionDays)
     )
     
     return NextResponse.json({

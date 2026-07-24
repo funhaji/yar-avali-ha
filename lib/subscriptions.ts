@@ -13,6 +13,7 @@ export interface SubscriptionLink {
   expires_at: Date;
   max_redemptions: number;
   current_redemptions: number;
+  subscription_days: number;
   created_by?: string;
 }
 
@@ -56,15 +57,16 @@ export function generateLinkCode(): string {
 export async function createSubscriptionLink(
   expiresAt: Date,
   maxRedemptions: number,
-  createdBy: string
+  createdBy: string,
+  subscriptionDays: number = 180
 ): Promise<SubscriptionLink> {
   const code = generateLinkCode();
   
   const result = await query<SubscriptionLink>(
-    `INSERT INTO yar_subscription_links (code, expires_at, max_redemptions, created_by) 
-     VALUES ($1, $2, $3, $4) 
+    `INSERT INTO yar_subscription_links (code, expires_at, max_redemptions, subscription_days, created_by) 
+     VALUES ($1, $2, $3, $4, $5) 
      RETURNING *`,
-    [code, expiresAt, maxRedemptions, createdBy]
+    [code, expiresAt, maxRedemptions, subscriptionDays, createdBy]
   );
   
   return result[0];
@@ -107,10 +109,11 @@ export async function redeemSubscriptionLink(
     return { success: false, message: 'شما قبلاً از این کد استفاده کرده‌اید' };
   }
   
-  // Create subscription (6 months from now)
+  // Create subscription using the subscription_days from the link
   const startDate = new Date();
   const endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + 6);
+  const daysToAdd = link.subscription_days || 180; // Default to 180 days if not set
+  endDate.setDate(endDate.getDate() + daysToAdd);
   
   const subscription = await query<Subscription>(
     `INSERT INTO yar_subscriptions (user_id, subscription_link_id, start_date, end_date) 
