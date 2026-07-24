@@ -52,6 +52,9 @@ a { color: inherit; text-decoration: none; }
 /* ---------- Header ---------- */
 .site-header { position: sticky; top: 0; z-index: 50; background: var(--paper); border-bottom: 3px solid var(--line); }
 .site-header-dark { background: var(--ink); border-bottom-color: var(--sunflower); color: var(--paper); }
+.site-header-dark .button-ghost { background: var(--paper); color: var(--ink); }
+.site-header-dark .icon-button { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.site-header-dark .icon-button:hover { background: var(--sunflower); }
 .site-nav { width: min(1200px, 92vw); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .85rem; }
 .brand { display: flex; align-items: center; gap: .6rem; font-weight: 800; font-size: 1.35rem; }
 .brand-mark { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; background: var(--tangerine); color: var(--paper); border: 2.5px solid var(--line); border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-6deg); }
@@ -259,6 +262,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .empty-state svg { width: 40px; height: 40px; color: var(--tangerine); }
 .entertainment-hero { background: var(--ink); color: var(--paper); }
 .entertainment-hero .lead { color: color-mix(in srgb, var(--paper) 72%, transparent); }
+.entertainment-hero .section-kicker { background: var(--paper); color: var(--ink); }
+.entertainment-content { background: var(--cream); color: var(--ink); }
+.entertainment-content .card { background: var(--paper); }
+.entertainment-content .section-title { color: var(--ink); }
+.entertainment-content .muted { color: var(--ink-soft); }
 .poster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 1.3rem; }
 .poster-card { display: flex; flex-direction: column; }
 .content-poster { display: grid; place-items: center; }
