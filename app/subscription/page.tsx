@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { BookOpen, CheckCircle2, Clapperboard, FileText, KeyRound, ShieldCheck, Sparkles } from 'lucide-react'
 import { SiteFooter, SiteHeader } from '@/components/SiteHeader'
 
@@ -14,9 +14,25 @@ const benefits = [
 
 export default function SubscriptionPage() {
   const router = useRouter()
-  const [code, setCode] = useState('')
+  const searchParams = useSearchParams()
+  const [code, setCode] = useState(searchParams.get('code') || '')
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
   const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<{ name: string; role: string } | null>(null)
+  const [checkingSession, setCheckingSession] = useState(true)
+
+  useEffect(() => {
+    // Check if user is logged in by trying to fetch a protected resource
+    fetch('/api/auth/session')
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setUser(data.user)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setCheckingSession(false))
+  }, [])
 
   async function handleRedeem(e: React.FormEvent) {
     e.preventDefault(); setMessage(null); setLoading(true)
@@ -36,7 +52,7 @@ export default function SubscriptionPage() {
     } finally { setLoading(false) }
   }
 
-  return <div className="page"><SiteHeader /><main>
+  return <div className="page"><SiteHeader userName={user?.name} isAdmin={user?.role === 'admin'} /><main>
     <section className="section subscription-hero"><div className="shell subscription-hero-grid"><div><span className="section-kicker"><Sparkles /> شش ماه یادگیری و شادی</span><h1 className="display text-balance">یک کد، دنیایی از محتوا</h1><p className="lead page-lead">با اشتراک یار اولی‌ها، همه درس‌ها و سرگرمی‌های مناسب سن در دسترس کودک شماست.</p></div><div className="card plan-card"><p className="muted">مدت دسترسی</p><strong>۶ ماه</strong><span className="chip chip-teal">دسترسی کامل</span></div></div></section>
     <section className="shell benefits-grid">{benefits.map(({ icon: Icon, title, text }) => <article className="card benefit-card" key={title}><div className="tile-ico"><Icon /></div><div><h2>{title}</h2><p className="muted">{text}</p></div></article>)}</section>
     <section className="section"><div className="shell narrow-shell"><div className="card account-panel redeem-card"><span className="section-kicker"><KeyRound /> فعال‌سازی</span><h2 className="section-title text-balance">کد اشتراکت را وارد کن</h2><p className="muted form-intro">کدی که از پشتیبانی دریافت کرده‌ای اینجا بنویس.</p>{message && <div className={message.type === 'success' ? 'alert-ok' : 'alert-error'} role="status">{message.type === 'success' && <CheckCircle2 />}{message.text}</div>}<form onSubmit={handleRedeem} className="form-stack"><label>کد اشتراک<input className="subscription-code" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="XXXX-XXXX-XXXX" required dir="ltr" autoComplete="off" /></label><button type="submit" className="button button-primary button-lg" disabled={loading}>{loading ? 'در حال فعال‌سازی...' : 'فعال‌سازی اشتراک'}</button></form></div></div></section>
