@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { BookOpen, CheckCircle2, Clapperboard, FileText, KeyRound, ShieldCheck, Sparkles } from 'lucide-react'
 import { SiteFooter, SiteHeader } from '@/components/SiteHeader'
@@ -12,7 +12,7 @@ const benefits = [
   { icon: ShieldCheck, title: 'محیط امن و آرام', text: 'تجربه‌ای مناسب کودک، بدون تبلیغات مزاحم' },
 ]
 
-export default function SubscriptionPage() {
+function SubscriptionContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [code, setCode] = useState(searchParams.get('code') || '')
@@ -57,4 +57,12 @@ export default function SubscriptionPage() {
     <section className="shell benefits-grid">{benefits.map(({ icon: Icon, title, text }) => <article className="card benefit-card" key={title}><div className="tile-ico"><Icon /></div><div><h2>{title}</h2><p className="muted">{text}</p></div></article>)}</section>
     <section className="section"><div className="shell narrow-shell"><div className="card account-panel redeem-card"><span className="section-kicker"><KeyRound /> فعال‌سازی</span><h2 className="section-title text-balance">کد اشتراکت را وارد کن</h2><p className="muted form-intro">کدی که از پشتیبانی دریافت کرده‌ای اینجا بنویس.</p>{message && <div className={message.type === 'success' ? 'alert-ok' : 'alert-error'} role="status">{message.type === 'success' && <CheckCircle2 />}{message.text}</div>}<form onSubmit={handleRedeem} className="form-stack"><label>کد اشتراک<input className="subscription-code" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="XXXX-XXXX-XXXX" required dir="ltr" autoComplete="off" /></label><button type="submit" className="button button-primary button-lg" disabled={loading}>{loading ? 'در حال فعال‌سازی...' : 'فعال‌سازی اشتراک'}</button></form></div></div></section>
   </main><SiteFooter /></div>
+}
+
+export default function SubscriptionPage() {
+  return (
+    <Suspense fallback={<div className="page"><SiteHeader /><main><div className="shell section"><p>در حال بارگذاری...</p></div></main><SiteFooter /></div>}>
+      <SubscriptionContent />
+    </Suspense>
+  )
 }
