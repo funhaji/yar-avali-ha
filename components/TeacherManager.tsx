@@ -48,7 +48,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
   }
 
   return (
-    <div style={{ display: 'grid', gap: '1.6rem', gridTemplateColumns: '1fr', alignItems: 'start' }}>
+    <div className="teacher-manager-layout" style={{ display: 'grid', gap: '1.6rem', gridTemplateColumns: '1fr', alignItems: 'start' }}>
       <section className="card account-panel">
         <div className="section-kicker"><Plus /> {editing ? 'ویرایش معلم' : 'افزودن معلم'}</div>
         <form onSubmit={save} className="form-stack">

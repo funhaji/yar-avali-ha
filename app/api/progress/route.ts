@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/db'
+import { validateSession } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = request.headers.get('x-user-id')
-    
+    const token = request.cookies.get('session_token')?.value
+    const user = token ? await validateSession(token) : null
+    const userId = user?.id
+
     if (!userId) {
       return NextResponse.json(
         { error: 'احراز هویت نشده' },
@@ -23,7 +26,7 @@ export async function POST(request: NextRequest) {
     
     // Update or insert viewing history
     await query(`
-      INSERT INTO viewing_history (user_id, content_id, progress_seconds, completed, last_watched_at)
+      INSERT INTO yar_viewing_history (user_id, content_id, progress_seconds, completed, last_watched_at)
       VALUES ($1, $2, $3, $4, NOW())
       ON CONFLICT (user_id, content_id)
       DO UPDATE SET
@@ -35,7 +38,7 @@ export async function POST(request: NextRequest) {
     // Increment view count if this is the first time or if completed
     if (progress < 30 || completed) {
       await query(`
-        UPDATE content_items
+        UPDATE yar_content_items
         SET view_count = view_count + 1
         WHERE id = $1
       `, [contentId])
