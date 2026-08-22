@@ -26,6 +26,7 @@ export function BlogManager({ initialPosts }: Props) {
     slug: '',
     content: '',
     excerpt: '',
+    category: '',
     thumbnail_url: '',
     images: [] as string[],
     video_url: '',
@@ -47,6 +48,7 @@ export function BlogManager({ initialPosts }: Props) {
           slug: data.post.slug,
           content: data.post.content,
           excerpt: data.post.excerpt || '',
+          category: data.post.category || '',
           thumbnail_url: data.post.thumbnail_url || '',
           images: data.post.images || [],
           video_url: data.post.video_url || '',
@@ -64,6 +66,7 @@ export function BlogManager({ initialPosts }: Props) {
       slug: '',
       content: '',
       excerpt: '',
+      category: '',
       thumbnail_url: '',
       images: [] as string[],
       video_url: '',
@@ -209,11 +212,22 @@ export function BlogManager({ initialPosts }: Props) {
           </div>
 
           <div>
-            <label className="block font-medium mb-2">خلاصه</label>
+            <label className="block font-medium mb-2">خلاصه مطلب</label>
             <textarea
               value={formData.excerpt}
               onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
               rows={3}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+            />
+          </div>
+          
+          <div>
+            <label className="block font-medium mb-2">دسته بندی</label>
+            <input
+              type="text"
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              placeholder="مثلا: اخبار، اطلاعیه، ..."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             />
           </div>

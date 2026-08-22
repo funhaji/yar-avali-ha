@@ -98,7 +98,7 @@ export const getCachedTeachers = unstable_cache(
 export const getCachedBlogPosts = unstable_cache(
   async () => {
     return query(`
-      SELECT p.id, p.title, p.slug, p.excerpt, p.thumbnail_url, p.created_at, p.view_count, p.redirect_url, u.name as author_name 
+      SELECT p.id, p.title, p.slug, p.excerpt, p.category, p.thumbnail_url, p.created_at, p.view_count, p.redirect_url, u.name as author_name 
       FROM yar_blog_posts p 
       LEFT JOIN yar_users u ON p.author_id = u.id 
       WHERE p.published = true 

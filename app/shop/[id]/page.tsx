@@ -48,9 +48,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <div className="card p-6 md:p-8 slide-up">
           <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
             
-            {/* Gallery */}
+            {/* Gallery & Video */}
             <div className="w-full md:w-1/2 lg:w-5/12 shrink-0 flex flex-col gap-4">
-              <div className="aspect-square bg-paper border border-line-soft rounded-2xl overflow-hidden relative">
+              {product.video_url && (
+                <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-lg relative border-4 border-line-soft">
+                  <iframe src={product.video_url} className="w-full h-full border-none" allowFullScreen></iframe>
+                </div>
+              )}
+              <div className="aspect-square bg-paper border border-line-soft rounded-2xl overflow-hidden relative shadow-sm">
                 {gallery.length > 0 ? (
                   <img src={gallery[0]} alt={product.title} className="w-full h-full object-cover" />
                 ) : (
@@ -64,13 +69,10 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                   </div>
                 )}
               </div>
-              
               {gallery.length > 1 && (
-                <div className="grid grid-cols-4 gap-3">
-                  {gallery.slice(1, 5).map((img, i) => (
-                    <div key={i} className="aspect-square border border-line-soft rounded-xl overflow-hidden bg-paper cursor-pointer hover:border-teal transition-colors">
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </div>
+                <div className="flex gap-2 overflow-x-auto pb-2 snap-x hide-scrollbar">
+                  {gallery.map((img, i) => (
+                    <img key={i} src={img} alt="" className="w-20 h-20 rounded-xl object-cover border border-line-soft shrink-0 snap-start" />
                   ))}
                 </div>
               )}
@@ -100,6 +102,16 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               <div className="prose prose-slate rtl text-ink/90 leading-relaxed mb-8 max-w-none whitespace-pre-wrap">
                 {product.description || 'هنوز توضیحی برای این محصول نوشته نشده.'}
               </div>
+
+              {product.category === 'کتاب' && (
+                <div className="bg-teal/10 border border-teal text-teal p-4 rounded-xl mb-8 font-medium">
+                  برای ثبت سفارش با آیدی زیر یا شماره زیر مراجعه کنید:
+                  <br />
+                  آیدی تلگرام: @yar_avali_ha
+                  <br />
+                  تلفن: 09120000000
+                </div>
+              )}
               
               <div className="mt-auto pt-6 border-t border-line-soft flex flex-col sm:flex-row gap-6 sm:items-center justify-between">
                 {product.price_cents === null ? (

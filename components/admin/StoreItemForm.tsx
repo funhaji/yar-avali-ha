@@ -173,6 +173,7 @@ export function StoreItemForm({ initialData, defaultCategory }: { initialData?: 
       is_published: isPublished,
       display_order: displayOrder,
       thumbnail_url: formData.get('thumbnail_url') || null,
+      video_url: formData.get('teaser_video_url') || null,
       images,
       category: formData.get('category') || null,
       tags,
@@ -405,6 +406,19 @@ export function StoreItemForm({ initialData, defaultCategory }: { initialData?: 
         </div>
         
         <div className="mt-4 border-t border-line-soft pt-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label>عکس‌های دیگر (با ویرگول جدا کنید)
+                <input name="images" defaultValue={initialData?.images?.join(',') || ''} placeholder="https://..., https://..." />
+              </label>
+            </div>
+            
+            <div>
+              <label>لینک ویدیو معرفی (آپارات و ...)
+                <input name="teaser_video_url" dir="ltr" defaultValue={initialData?.video_url || ''} placeholder="https://www.aparat.com/v/..." />
+              </label>
+            </div>
+          </div>
           <label>برچسب‌ها (با کاما جدا بشن)
             <input name="tags" defaultValue={initialData?.tags?.join(', ') || ''} placeholder="کودک, آموزشی, ریاضی" />
           </label>

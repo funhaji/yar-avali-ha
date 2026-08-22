@@ -10,12 +10,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'دسترسی غیرمجاز' }, { status: 403 })
-  const { name, specialty, bio, photo_url, display_order, is_visible } = await request.json()
-  if (!name) return NextResponse.json({ error: 'نام معلم الزامی است.' }, { status: 400 })
+  const { name, specialty, bio, photo_url, display_order, is_visible, video_url } = await request.json()
+  if (!name) return NextResponse.json({ error: 'نام الزامی است' }, { status: 400 })
   try {
     const rows = await query(
-      'INSERT INTO yar_teachers (name, specialty, bio, photo_url, display_order, is_visible) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
-      [name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true]
+      'INSERT INTO yar_teachers (name, specialty, bio, photo_url, display_order, is_visible, video_url) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
+      [name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, video_url || null]
     )
     revalidateTag('teachers')
     return NextResponse.json({ teacher: rows[0] })
@@ -26,12 +26,12 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'دسترسی غیرمجاز' }, { status: 403 })
-  const { id, name, specialty, bio, photo_url, display_order, is_visible } = await request.json()
-  if (!id) return NextResponse.json({ error: 'شناسه الزامی است.' }, { status: 400 })
+  const { id, name, specialty, bio, photo_url, display_order, is_visible, video_url } = await request.json()
+  if (!id) return NextResponse.json({ error: 'ایدی الزامی است' }, { status: 400 })
   try {
     const rows = await query(
-      'UPDATE yar_teachers SET name=$1, specialty=$2, bio=$3, photo_url=$4, display_order=$5, is_visible=$6, updated_at=NOW() WHERE id=$7 RETURNING *',
-      [name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, id]
+      'UPDATE yar_teachers SET name=$1, specialty=$2, bio=$3, photo_url=$4, display_order=$5, is_visible=$6, video_url=$7, updated_at=NOW() WHERE id=$8 RETURNING *',
+      [name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, video_url || null, id]
     )
     revalidateTag('teachers')
     return NextResponse.json({ teacher: rows[0] })

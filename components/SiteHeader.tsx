@@ -67,6 +67,7 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
           <Link href="/worksheets" onClick={() => setMobileOpen(false)}>کاربرگ‌ها</Link>
           <Link href="/blog" onClick={() => setMobileOpen(false)}>وبلاگ</Link>
           <Link href="/books" onClick={() => setMobileOpen(false)}><BookOpen /> کتاب‌ها</Link>
+          <Link href="/gallery" onClick={() => setMobileOpen(false)}>گالری</Link>
           <Link href="/about" onClick={() => setMobileOpen(false)}>درباره ما</Link>
         </div>
         <div className="nav-actions">

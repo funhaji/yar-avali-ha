@@ -18,6 +18,7 @@ export type StoreItem = {
   gdrive_id: string | null
   r2_key: string | null
   thumbnail_url: string | null
+  video_url: string | null
   images: string[] | null
   category: string | null
   tags: string[] | null
@@ -92,7 +93,7 @@ export async function createStoreItem(data: Partial<StoreItem>): Promise<StoreIt
     'stock_quantity', 'is_digital', 'is_free', 'is_downloadable', 
     'is_published', 'display_order',
     'content_type', 'storage_provider', 'pixeldrain_id', 'gdrive_id', 'r2_key',
-    'thumbnail_url', 'images', 'category', 'tags', 'file_url'
+    'thumbnail_url', 'video_url', 'images', 'category', 'tags', 'file_url'
   ]
   
   const values = []
@@ -125,7 +126,7 @@ export async function updateStoreItem(id: string, data: Partial<StoreItem>): Pro
     'stock_quantity', 'is_digital', 'is_free', 'is_downloadable', 
     'is_published', 'display_order',
     'content_type', 'storage_provider', 'pixeldrain_id', 'gdrive_id', 'r2_key',
-    'thumbnail_url', 'images', 'category', 'tags', 'file_url'
+    'thumbnail_url', 'video_url', 'images', 'category', 'tags', 'file_url'
   ]
   
   const values = []

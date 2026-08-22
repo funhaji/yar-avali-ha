@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { Eye, EyeOff, ImagePlus, Pencil, Plus, Trash2, X } from 'lucide-react'
 
-interface Teacher { id: string; name: string; specialty: string | null; bio: string | null; photo_url: string | null; display_order: number; is_visible: boolean }
-const empty = { id: '', name: '', specialty: '', bio: '', photo_url: '', display_order: 0, is_visible: true }
+interface Teacher { id: string; name: string; specialty: string | null; bio: string | null; photo_url: string | null; video_url: string | null; display_order: number; is_visible: boolean }
+const empty = { id: '', name: '', specialty: '', bio: '', photo_url: '', video_url: '', display_order: 0, is_visible: true }
 
 export function TeacherManager({ initial }: { initial: Teacher[] }) {
   const [teachers, setTeachers] = useState<Teacher[]>(initial)
@@ -56,18 +56,22 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           <label>تخصص <small className="muted">مثلاً معلم ریاضی</small><input value={form.specialty || ''} onChange={e => setForm({ ...form, specialty: e.target.value })} /></label>
           <label>معرفی کوتاه<textarea rows={3} value={form.bio || ''} onChange={e => setForm({ ...form, bio: e.target.value })} /></label>
           <label>ترتیب نمایش<input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: Number(e.target.value) })} /></label>
-          <label style={{ flexDirection: 'row', alignItems: 'center', gap: '.6rem' }}><input type="checkbox" style={{ width: 'auto' }} checked={form.is_visible} onChange={e => setForm({ ...form, is_visible: e.target.checked })} /> نمایش در صفحه اصلی</label>
+          <label>لینک ویدیو معرفی (آپارات)<input type="url" placeholder="مثال: https://www.aparat.com/v/..." value={form.video_url || ''} onChange={e => setForm({ ...form, video_url: e.target.value })} /></label>
+          <label style={{ flexDirection: 'row', alignItems: 'center', gap: '.6rem' }}><input type="checkbox" style={{ width: 'auto' }} checked={form.is_visible} onChange={e => setForm({ ...form, is_visible: e.target.checked })} /> نمایش در سایت</label>
           <div>
             <span style={{ fontWeight: 700, display: 'block', marginBottom: '.5rem' }}>عکس معلم</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              {form.photo_url && <img src={form.photo_url || "/placeholder.svg"} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 14, border: '2.5px solid var(--line)' }} />}
-              <label className="button button-ghost" style={{ cursor: 'pointer' }}><ImagePlus /> {uploading ? 'در حال آپلود...' : 'انتخاب تصویر'}<input type="file" accept="image/*" hidden onChange={e => e.target.files?.[0] && upload(e.target.files[0])} /></label>
+              {form.photo_url && <img src={form.photo_url} alt="پروفایل" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }} />}
+              <label className="button button-ghost" style={{ cursor: 'pointer' }}>
+                {uploading ? 'در حال آپلود...' : 'انتخاب عکس'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => e.target.files?.[0] && upload(e.target.files[0])} disabled={uploading} />
+              </label>
             </div>
           </div>
-          {error && <div className="alert-error">{error}</div>}
+          {error && <div className="note error">{error}</div>}
           <div className="button-row">
-            <button className="button button-primary" disabled={saving || uploading}>{saving ? 'در حال ذخیره...' : editing ? 'ذخیره تغییرات' : 'افزودن معلم'}</button>
-            {editing && <button type="button" className="button button-ghost" onClick={reset}><X /> انصراف</button>}
+            <button type="submit" className="button button-primary" disabled={saving}>{saving ? '...' : 'ذخیره'}</button>
+            {editing && <button type="button" className="button button-ghost" onClick={reset}>انصراف</button>}
           </div>
         </form>
       </section>
@@ -77,13 +81,13 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
         {teachers.length === 0 ? <div className="card" style={{ padding: '2rem', textAlign: 'center' }}><p className="muted">هنوز معلمی اضافه نشده است.</p></div> : (
           <div className="teacher-grid">
             {teachers.map(t => (
-              <article key={t.id} className="card teacher-card" style={{ opacity: t.is_visible ? 1 : .55 }}>
+              <article key={t.id} className="card teacher-card" style={{ opacity: t.is_visible ? 1 : 0.6 }}>
                 {t.photo_url ? <img src={t.photo_url || "/placeholder.svg"} alt={t.name} className="teacher-photo" /> : <div className="teacher-photo" style={{ display: 'grid', placeItems: 'center' }}><ImagePlus /></div>}
                 <div className="teacher-body">
                   <h3 className="teacher-name">{t.name}</h3>
                   {t.specialty && <span className="chip teacher-specialty">{t.specialty}</span>}
                   <div className="button-row" style={{ marginTop: '.6rem' }}>
-                    <button className="icon-button" aria-label="ویرایش" onClick={() => { setForm({ ...t, specialty: t.specialty || '', bio: t.bio || '', photo_url: t.photo_url || '' }); setEditing(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }}><Pencil /></button>
+                    <button className="icon-button" aria-label="ویرایش" onClick={() => { setForm({ ...t, specialty: t.specialty || '', bio: t.bio || '', photo_url: t.photo_url || '', video_url: t.video_url || '' }); setEditing(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }}><Pencil /></button>
                     <button className="icon-button" aria-label="نمایش" onClick={() => toggle(t)}>{t.is_visible ? <Eye /> : <EyeOff />}</button>
                     <button className="icon-button" aria-label="حذف" onClick={() => remove(t.id)}><Trash2 /></button>
                   </div>

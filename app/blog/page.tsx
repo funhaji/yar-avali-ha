@@ -12,7 +12,7 @@ export const metadata = {
   description: 'مقالات و نکات آموزشی برای کودکان و والدین'
 }
 
-export default async function BlogPage() {
+export default async function BlogPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const headersList = await headers()
   const token = headersList.get('cookie')?.split('session_token=')[1]?.split(';')[0]
   const user = token ? await validateSession(token).catch(() => null) : null
@@ -23,6 +23,12 @@ export default async function BlogPage() {
   ])
   
   const siteName = settings.site_name || 'یار اولی‌ها'
+  
+  const sp = await searchParams
+  const activeCategory = sp.category || 'all'
+  
+  const categories = Array.from(new Set(posts.map((p: any) => p.category).filter(Boolean))) as string[]
+  const filteredPosts = activeCategory === 'all' ? posts : posts.filter((p: any) => p.category === activeCategory)
   
   return (
     <div className="min-h-screen bg-background">
@@ -36,11 +42,24 @@ export default async function BlogPage() {
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold mb-3">وبلاگ {siteName}</h1>
-          <p className="text-lg text-gray-600 mb-12">
-            مقالات و نکات آموزشی برای کودکان و والدین
+          <p className="text-lg text-gray-600 mb-6">
+            مقالات و نکات آموزشی برای معلمان و والدین
           </p>
 
-          {posts.length === 0 ? (
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-12">
+              <Link href="/blog" className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors ${activeCategory === 'all' ? 'bg-teal text-white border-teal' : 'bg-white text-ink-soft border-line-soft hover:border-teal'}`}>
+                همه
+              </Link>
+              {categories.map(cat => (
+                <Link key={cat} href={`/blog?category=${encodeURIComponent(cat)}`} className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors ${activeCategory === cat ? 'bg-teal text-white border-teal' : 'bg-white text-ink-soft border-line-soft hover:border-teal'}`}>
+                  {cat}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {filteredPosts.length === 0 ? (
             <div className="text-center py-20">
               <div className="text-6xl mb-4">📝</div>
               <h3 className="text-2xl font-bold mb-2">مقاله‌ای موجود نیست</h3>
@@ -48,7 +67,7 @@ export default async function BlogPage() {
             </div>
           ) : (
             <div className="grid gap-8">
-              {posts.map((post: any) => (
+              {filteredPosts.map((post: any) => (
                 <Link
                   key={post.id}
                   href={`/blog/${post.slug}`}

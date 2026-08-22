@@ -219,9 +219,9 @@ export default async function HomePage() {
             <Link href="/shop" className="muted" style={{ fontWeight: 700 }}>مشاهده همه <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
           </div>
           {storeItems.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
               {storeItems.map((item: any) => (
-                <Link key={item.id} href={`/shop/${item.id}`} className="card card-hover rail-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                <Link key={item.id} href={`/shop/${item.id}`} className="card card-hover rail-card max-md:min-w-[80vw] max-md:snap-center shrink-0" style={{ display: 'flex', flexDirection: 'column' }}>
                   <div className="rail-poster" style={{ 
                     backgroundImage: item.thumbnail_url ? `url(${item.thumbnail_url})` : 'none',
                     backgroundSize: 'cover',
@@ -408,7 +408,12 @@ export default async function HomePage() {
                   <div className="teacher-body">
                     <h3 className="teacher-name">{t.name}</h3>
                     {t.specialty && <span className="chip teacher-specialty">{t.specialty}</span>}
-                    {t.bio && <p className="muted" style={{ lineHeight: 1.7, fontSize: '.95rem' }}>{t.bio}</p>}
+                    {t.bio && <p className="muted" style={{ lineHeight: 1.7, fontSize: '.95rem', marginBottom: t.video_url ? '1rem' : 0 }}>{t.bio}</p>}
+                    {t.video_url && (
+                      <a href={t.video_url} target="_blank" rel="noopener noreferrer" className="button button-ghost" style={{ alignSelf: 'flex-start', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+                        <Clapperboard style={{ width: 14, height: 14 }} /> ویدیو معرفی
+                      </a>
+                    )}
                   </div>
                 </article>
               ))}

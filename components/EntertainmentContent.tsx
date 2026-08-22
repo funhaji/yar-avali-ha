@@ -20,10 +20,9 @@ type Props = {
 
 export function EntertainmentContent({ byType, hasSubscription, initialQuery, initialCategory, types, typeNames, categoryImages }: Props) {
   const CATEGORY_CARDS = [
-    { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '✏️', bg: categoryImages?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${categoryImages.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
+    { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '📝', bg: categoryImages?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${categoryImages.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
     { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '🔤', bg: categoryImages?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${categoryImages.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
-    { id: 'علوم', title: 'علوم', icon: '🔬', bg: categoryImages?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${categoryImages.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
-    { id: 'سایر', title: 'سایر محتوا', icon: '📺', bg: categoryImages?.ent_cat4_image ? `linear-gradient(135deg, rgba(236,72,153,0.6), rgba(190,24,93,0.8)), url(${categoryImages.ent_cat4_image}) center/cover` : 'linear-gradient(135deg, #ec4899, #be185d)' }
+    { id: 'علوم', title: 'علوم', icon: '🔬', bg: categoryImages?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${categoryImages.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }
   ]
   const [searchQuery, setSearchQuery] = useState(initialQuery || '')
   const [tierFilter, setTierFilter] = useState<FilterOption>('all')
@@ -98,11 +97,28 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
       {initialCategory && (
         <button 
           onClick={handleBackToCategories}
-          className="flex items-center gap-2 text-teal-600 hover:text-teal-800 font-medium mb-8 transition-colors bg-teal-50 px-4 py-2 rounded-full w-fit"
+          className="flex items-center gap-2 text-teal font-bold mb-8 transition-colors bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-line-soft shadow-sm hover:border-teal w-fit"
         >
           <ArrowRight className="w-5 h-5" />
           بازگشت به دسته‌بندی‌ها
         </button>
+      )}
+
+      {/* Category Teaser Video */}
+      {initialCategory && (
+        <div className="mb-12 bg-paper border border-line-soft rounded-2xl p-6 shadow-sm flex flex-col md:flex-row gap-8 items-center">
+          <div className="w-full md:w-1/2 aspect-video bg-black rounded-xl overflow-hidden shadow-md">
+            {/* Hardcoded placeholder for teaser, can be dynamic later */}
+            <iframe src="https://www.aparat.com/video/video/embed/videohash/dummy3" className="w-full h-full border-none" allowFullScreen></iframe>
+          </div>
+          <div className="w-full md:w-1/2">
+            <h2 className="text-3xl font-black mb-4 text-ink">محتوای آموزشی {initialCategory}</h2>
+            <p className="text-lg text-ink-soft leading-relaxed">
+              در این بخش می‌توانید تمامی ویدیوها و محتوای آموزشی مرتبط با {initialCategory} را مشاهده کنید. 
+              این آموزش‌ها به گونه‌ای طراحی شده‌اند که یادگیری را برای دانش‌آموزان جذاب و ماندگار کنند.
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Search Bar */}

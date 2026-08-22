@@ -25,10 +25,10 @@ export async function POST(request: Request) {
     }
 
     const result = await query(`
-      INSERT INTO yar_blog_posts (title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, author_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      INSERT INTO yar_blog_posts (title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, author_id, category)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *
-    `, [title, slug, content, excerpt, thumbnail_url, images || [], video_url || null, video_provider || 'direct', redirect_url || null, published, user.id])
+    `, [title, slug, content, excerpt, thumbnail_url, images || [], video_url || null, video_provider || 'direct', redirect_url || null, published, user.id, body.category || null])
 
     revalidateTag('blog')
     return NextResponse.json({ post: result[0] })

@@ -1,30 +1,25 @@
 import Link from 'next/link'
-import { ArrowRight, PlayCircle } from 'lucide-react'
+import { ArrowRight, PlayCircle, GraduationCap, Users } from 'lucide-react'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { cookies } from 'next/headers'
 import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
+
+export const metadata = {
+  title: 'تربیت معلم و معلم خصوصی'
+}
 
 export default async function TeacherTrainingPage() {
   const token = (await cookies()).get('session_token')?.value
   const user = token ? await validateSession(token).catch(() => null) : null
   
   const settingsData = await getSettings([
-    'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone',
-    'tt_title', 'tt_subtitle', 'tt_content', 'tt_image', 'tt_video_url', 'tt_button_text', 'tt_button_link'
+    'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone'
   ])
   const s = settingsData as Record<string, string | null>
   
-  const title = s?.tt_title || 'دوره جامع تربیت معلم و معلم خصوصی'
-  const subtitle = s?.tt_subtitle || 'تدریس برای دانش‌آموزان دبستانی نیازمند مهارت‌ها، صبر و تکنیک‌های خاصی است. در این دوره، ما تمام تجربیات خود را برای تبدیل شدن به یک معلم حرفه‌ای و محبوب در اختیار شما قرار می‌دهیم.'
-  const content = s?.tt_content || 'این صفحه در حال آماده‌سازی است. به زودی اطلاعات کامل دوره، سرفصل‌ها، هزینه ثبت‌نام و نمونه تدریس‌ها در این بخش قرار خواهد گرفت.'
-  const image = s?.tt_image || 'https://images.unsplash.com/photo-1544717302-de2939b7ef71?q=80&w=2000&auto=format&fit=crop'
-  const videoUrl = s?.tt_video_url
-  const buttonText = s?.tt_button_text || 'ثبت‌نام به زودی فعال می‌شود'
-  const buttonLink = s?.tt_button_link || '#'
-  
   return (
-    <div className="page bg-cream text-ink">
+    <div className="page bg-cream text-ink flex flex-col min-h-screen">
       <SiteHeader 
         userName={user?.name} 
         isAdmin={user?.role === 'admin'} 
@@ -32,77 +27,77 @@ export default async function TeacherTrainingPage() {
         siteName={s?.site_name || undefined}
       />
       
-      <main className="shell py-12 min-h-[70vh]">
-        <div className="max-w-4xl mx-auto">
+      <main className="shell flex-1 py-12">
+        <div className="max-w-6xl mx-auto">
           <Link href="/" className="inline-flex items-center gap-2 text-ink-soft hover:text-teal font-bold mb-8 transition-colors">
             <ArrowRight className="w-5 h-5" /> بازگشت به صفحه اصلی
           </Link>
           
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-line-soft slide-up">
-            <div className="aspect-video bg-ink w-full relative flex items-center justify-center overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
-              {videoUrl ? (
-                videoUrl.includes('youtube') || videoUrl.includes('aparat') || videoUrl.includes('pixeldrain') ? (
-                  <iframe src={videoUrl} className="absolute inset-0 w-full h-full z-20" allowFullScreen></iframe>
-                ) : (
-                  <video src={videoUrl} controls className="absolute inset-0 w-full h-full z-20 object-cover" />
-                )
-              ) : (
-                <>
-                  <img 
-                    src={image} 
-                    alt={title} 
-                    className="absolute inset-0 w-full h-full object-cover opacity-60"
-                  />
-                  <div className="z-20 text-center text-paper">
-                    <button className="w-20 h-20 bg-teal text-white rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform shadow-[0_0_30px_rgba(20,184,166,0.5)]">
-                      <PlayCircle className="w-10 h-10" />
-                    </button>
-                    <div className="font-bold text-xl">دوره آموزشی</div>
-                  </div>
-                </>
-              )}
+          <div className="text-center mb-16 slide-up">
+            <h1 className="text-4xl md:text-5xl font-black mb-6 text-ink">آموزش و تدریس خصوصی</h1>
+            <p className="text-xl text-ink-soft max-w-2xl mx-auto leading-relaxed">
+              با استفاده از بهترین متدهای آموزشی و کادری مجرب، آماده ارائه خدمات آموزشی متمایز هستیم.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* تربیت معلم */}
+            <div className="card p-8 flex flex-col items-center text-center slide-up" style={{ animationDelay: '0.1s' }}>
+              <div className="w-20 h-20 bg-teal/10 text-teal rounded-full flex items-center justify-center mb-6">
+                <GraduationCap className="w-10 h-10" />
+              </div>
+              <h2 className="text-3xl font-black mb-4">دوره تربیت معلم</h2>
+              <p className="text-ink-soft leading-relaxed mb-8">
+                در دوره‌های تربیت معلم یار اولی‌ها، شما با جدیدترین شیوه‌های تدریس و روانشناسی کودک آشنا می‌شوید. 
+                این دوره مناسب علاقه‌مندان به تدریس مقطع ابتدایی می‌باشد.
+              </p>
+              
+              <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
+                {/* Placeholder video, client can update in DB later if we add settings for it, or use hardcoded Aparat link */}
+                <iframe src="https://www.aparat.com/video/video/embed/videohash/dummy" className="w-full h-full border-none" allowFullScreen></iframe>
+              </div>
+
+              <div className="bg-teal text-white w-full p-6 rounded-2xl shadow-sm mt-auto">
+                <h3 className="text-xl font-bold mb-2">ثبت نام به زودی!</h3>
+                <p className="mb-4 text-white/90">ظرفیت دوره محدود است. برای رزرو و پیش‌ثبت‌نام پیام دهید.</p>
+                <div className="bg-white/20 p-3 rounded-xl font-mono text-lg font-bold tracking-wider" dir="ltr">
+                  @yar_avali_ha
+                </div>
+              </div>
             </div>
-            
-            <div className="p-8 md:p-12">
-              <div className="inline-block bg-teal/10 text-teal px-4 py-1.5 rounded-full font-bold text-sm mb-6 border border-teal/20">
-                ویژه معلمان و علاقه‌مندان به تدریس
+
+            {/* معلم خصوصی */}
+            <div className="card p-8 flex flex-col items-center text-center slide-up" style={{ animationDelay: '0.2s' }}>
+              <div className="w-20 h-20 bg-tangerine/10 text-tangerine rounded-full flex items-center justify-center mb-6">
+                <Users className="w-10 h-10" />
               </div>
+              <h2 className="text-3xl font-black mb-4">معلم خصوصی</h2>
+              <p className="text-ink-soft leading-relaxed mb-8">
+                درخواست معلم خصوصی برای دانش‌آموزان عزیز. با اساتید مجرب یار اولی‌ها، 
+                یادگیری شیرین‌تر و عمیق‌تری را تجربه کنید. رفع اشکال و تقویت پایه‌ای دروس.
+              </p>
               
-              <h1 className="text-3xl md:text-5xl font-black mb-6 leading-tight">
-                {title}
-              </h1>
-              
-              <div className="prose prose-lg text-ink-soft max-w-none">
-                <p className="lead text-xl leading-relaxed mb-6 whitespace-pre-wrap">
-                  {subtitle}
-                </p>
-                <div 
-                  className="mb-4 whitespace-pre-wrap leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br>') }}
-                />
+              <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
+                <iframe src="https://www.aparat.com/video/video/embed/videohash/dummy2" className="w-full h-full border-none" allowFullScreen></iframe>
               </div>
-              
-              <div className="mt-12 flex flex-wrap gap-4">
-                {buttonLink !== '#' && buttonLink !== '' ? (
-                  <Link href={buttonLink} className="button button-primary button-lg">
-                    {buttonText}
-                  </Link>
-                ) : (
-                  <button className="button button-primary button-lg" disabled>
-                    {buttonText}
-                  </button>
-                )}
+
+              <div className="bg-tangerine text-white w-full p-6 rounded-2xl shadow-sm mt-auto">
+                <h3 className="text-xl font-bold mb-2">درخواست معلم</h3>
+                <p className="mb-4 text-white/90">برای هماهنگی و درخواست معلم خصوصی با آیدی زیر در ارتباط باشید.</p>
+                <div className="bg-white/20 p-3 rounded-xl font-mono text-lg font-bold tracking-wider" dir="ltr">
+                  @yar_avali_ha
+                </div>
               </div>
             </div>
           </div>
         </div>
       </main>
-
+      
       <SiteFooter 
         footerText={s?.footer_text || undefined}
         contactEmail={s?.contact_email || undefined}
         contactPhone={s?.contact_phone || undefined}
+        siteName={s?.site_name || undefined}
       />
     </div>
   )

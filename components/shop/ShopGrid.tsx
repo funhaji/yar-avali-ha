@@ -50,9 +50,9 @@ export function ShopGrid({ items, category, search }: { items: StoreItem[], cate
 
   return (
     <>
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
         {items.slice(0, displayed).map((item, i) => (
-          <div key={item.id} className={`stagger-${(i % 5) + 1}`}>
+          <div key={item.id} className={`stagger-${(i % 5) + 1} max-md:min-w-[80vw] max-md:snap-center shrink-0`}>
             <ProductCard product={item} />
           </div>
         ))}

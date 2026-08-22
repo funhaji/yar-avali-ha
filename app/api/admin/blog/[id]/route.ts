@@ -54,15 +54,15 @@ export async function PUT(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published } = await request.json()
+    const { title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, category } = await request.json()
 
     const result = await query(`
       UPDATE yar_blog_posts
       SET title = $1, slug = $2, content = $3, excerpt = $4, 
-          thumbnail_url = $5, images = $6, video_url = $7, video_provider = $8, redirect_url = $9, published = $10, updated_at = NOW()
+          thumbnail_url = $5, images = $6, video_url = $7, video_provider = $8, redirect_url = $9, published = $10, category = $12, updated_at = NOW()
       WHERE id = $11
       RETURNING *
-    `, [title, slug, content, excerpt, thumbnail_url, images || [], video_url || null, video_provider || 'direct', redirect_url || null, published, id])
+    `, [title, slug, content, excerpt, thumbnail_url, images || [], video_url || null, video_provider || 'direct', redirect_url || null, published, id, category || null])
 
     if (result.length === 0) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 })
