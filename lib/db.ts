@@ -178,8 +178,13 @@ CREATE TABLE IF NOT EXISTS yar_orders (
   total_cents INT NOT NULL,
   status VARCHAR(50) DEFAULT 'pending',
   payment_gateway_ref VARCHAR(255),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  notes TEXT
 );
+
+ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50);
+ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS postal_code VARCHAR(50);
+ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS receipt_url VARCHAR(1000);
 
 -- Order items table
 CREATE TABLE IF NOT EXISTS yar_order_items (

@@ -118,17 +118,17 @@ export function CartDrawer() {
         {items.length > 0 && !checkoutSuccess && !isLoading && (
           <div className="p-5 bg-cream border-t border-line-soft">
             <div className="flex items-center justify-between font-bold text-lg mb-4">
-              <span>جمع کل:</span>
+              <span>مبلغ کل:</span>
               <span className="text-teal-deep">{totalPrice / 10} تومان</span>
             </div>
-            <button 
-              onClick={handleCheckout} 
-              disabled={checkoutLoading}
+            <Link 
+              href="/shop/checkout"
+              onClick={() => setDrawerOpen(false)}
               className="button button-primary w-full justify-center button-lg shadow-lg hover:shadow-xl"
             >
-              {checkoutLoading ? <Loader2 className="animate-spin w-5 h-5" /> : 'نهایی کردن خرید'} 
-              {!checkoutLoading && <ArrowLeft className="w-5 h-5" />}
-            </button>
+              ادامه جهت تسویه حساب
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
           </div>
         )}
       </div>

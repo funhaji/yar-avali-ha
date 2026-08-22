@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { full_name, phone, shipping_address, notes } = body
+    const { full_name, phone, shipping_address, notes, payment_method, postal_code, receipt_url } = body
 
     // Calculate total
     let total_cents = 0
@@ -28,11 +28,24 @@ export async function POST(request: Request) {
       total_cents += price * item.quantity
     }
 
+    const initialStatus = payment_method === 'gateway' ? 'pending_payment' : 'pending_approval'
+
     // 1. Create order
     const orderResult = await query(
-      `INSERT INTO yar_orders (user_id, full_name, phone, shipping_address, total_cents, notes)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [user.id, full_name || user.name, phone || user.phone || '000', shipping_address || '', total_cents, notes || '']
+      `INSERT INTO yar_orders (user_id, full_name, phone, shipping_address, total_cents, notes, payment_method, postal_code, receipt_url, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+      [
+        user.id, 
+        full_name || user.name, 
+        phone || user.phone || '000', 
+        shipping_address || '', 
+        total_cents, 
+        notes || '',
+        payment_method || 'card2card',
+        postal_code || '',
+        receipt_url || '',
+        initialStatus
+      ]
     )
     const orderId = orderResult[0].id
 
