@@ -259,7 +259,19 @@ export function ContentManager({ initialItems }: { initialItems: ContentItem[] }
             )}
           </div>
           <div className="form-grid">
-            <label>دسته‌بندی<input value={form.category} onChange={(event) => setField('category', event.target.value)} placeholder="ریاضی، فارسی، علوم..." /></label>
+            <div>
+              <label>دسته بندی<input value={form.category} onChange={(event) => setField('category', event.target.value)} placeholder="مثلاً: لوحه نویسی، علوم..." /></label>
+              {form.content_type !== 'pdf' && form.content_type !== 'image' && (
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--ink-soft)', alignSelf: 'center' }}>پیشنهادی:</span>
+                  {['لوحه نویسی', 'نشانه های ۱/۲', 'علوم', 'سایر'].map(cat => (
+                    <button type="button" key={cat} onClick={() => setField('category', cat)} className="chip" style={{ cursor: 'pointer', background: form.category === cat ? 'var(--teal)' : 'var(--cream)', color: form.category === cat ? 'white' : 'inherit', border: '1px solid var(--line-soft)' }}>
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             {form.content_type !== 'pdf' && form.content_type !== 'image' && (
               <>
                 <label>ژانر<input value={form.genre} onChange={(event) => setField('genre', event.target.value)} placeholder="کمدی، آموزشی، ماجراجویی..." /></label>
