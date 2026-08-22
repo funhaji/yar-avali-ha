@@ -152,7 +152,7 @@ export function BlogManager({ initialPosts }: Props) {
     
     const formDataData = new FormData()
     formDataData.append('file', file)
-    formDataData.append('type', 'image')
+    formDataData.append('kind', 'thumbnail')
     
     try {
       const res = await fetch('/api/admin/content/upload', {
