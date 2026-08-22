@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ShoppingBag, Image as ImageIcon, Percent } from 'lucide-react'
+import { ShoppingBag, Image as ImageIcon, Percent, Loader2, CheckCircle2, Plus } from 'lucide-react'
 import type { StoreItem } from '@/lib/store'
 import { useCart } from '@/lib/store-context'
 import { useState } from 'react'
