@@ -18,6 +18,7 @@ async function getBlogPost(slug: string) {
       p.images,
       p.video_url,
       p.video_provider,
+      p.redirect_url,
       p.created_at,
       p.view_count,
       u.name as author_name
@@ -99,6 +100,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           
           <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
           
+          {post.redirect_url && (
+            <div className="mb-8">
+              <a 
+                href={post.redirect_url.startsWith('http') ? post.redirect_url : 'https://' + post.redirect_url} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="button button-primary"
+                style={{ display: 'inline-flex', padding: '0.6rem 1.2rem', borderRadius: '8px', fontSize: '1rem', background: 'var(--teal)', color: 'white', fontWeight: 'bold' }}
+              >
+                باز کردن لینک
+              </a>
+            </div>
+          )}
+          
           <div className="flex items-center gap-4 text-gray-600 mb-8 pb-8 border-b">
             {post.author_name && (
               <>
@@ -120,7 +135,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div 
             className="prose prose-lg max-w-none text-ink text-lg leading-relaxed mb-12"
             style={{ direction: 'rtl' }}
-            dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br>') }}
+            dangerouslySetInnerHTML={{ __html: post.content
+              // Parse Bold text **bold**
+              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+              // Parse images ![alt](url)
+              .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px; margin: 1.5rem auto; display: block;" />')
+              // Parse links [text](url)
+              .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match: string, text: string, url: string) => {
+                const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+                return '<a href="' + finalUrl + '" target="_blank" rel="noopener noreferrer" style="color:#0ea5e9; text-decoration:underline; font-weight:600;">' + text + '</a>';
+              })
+              // Parse newlines
+              .replace(/\n/g, '<br>') 
+            }}
           />
 
           {post.video_url && (

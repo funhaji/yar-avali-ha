@@ -51,9 +51,7 @@ export default async function BlogPage() {
               {posts.map((post: any) => (
                 <Link
                   key={post.id}
-                  href={post.redirect_url || `/blog/${post.slug}`}
-                  target={post.redirect_url ? "_blank" : undefined}
-                  rel={post.redirect_url ? "noopener noreferrer" : undefined}
+                  href={`/blog/${post.slug}`}
                   className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all border border-gray-200"
                 >
                   <div className="grid md:grid-cols-3 gap-6">
