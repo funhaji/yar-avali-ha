@@ -13,13 +13,19 @@ export async function POST(request: Request) {
     const user = await validateSession(token)
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const cart = await getCart(user.id)
+    const fullCart = await getCart(user.id)
+
+    const body = await request.json()
+    const { full_name, phone, shipping_address, notes, payment_method, postal_code, receipt_url, selected_item_ids } = body
+
+    let cart = fullCart
+    if (selected_item_ids && Array.isArray(selected_item_ids) && selected_item_ids.length > 0) {
+      cart = fullCart.filter(item => selected_item_ids.includes(item.id))
+    }
+
     if (cart.length === 0) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
     }
-
-    const body = await request.json()
-    const { full_name, phone, shipping_address, notes, payment_method, postal_code, receipt_url } = body
 
     // Calculate total
     let total_cents = 0
@@ -60,7 +66,13 @@ export async function POST(request: Request) {
     }
 
     // 3. Clear cart
-    await clearCart(user.id)
+    if (selected_item_ids && Array.isArray(selected_item_ids) && selected_item_ids.length > 0) {
+      for (const item of cart) {
+        await query('DELETE FROM yar_cart_items WHERE id = $1 AND user_id = $2', [item.id, user.id])
+      }
+    } else {
+      await clearCart(user.id)
+    }
 
     // 4. Create admin notification
     await query(

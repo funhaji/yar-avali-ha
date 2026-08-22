@@ -9,7 +9,9 @@ import { SiteHeader } from '@/components/SiteHeader'
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, totalPrice, clearCart, isLoading: cartLoading } = useCart()
+  const { items: allItems, selectedItemIds, selectedTotalPrice, removeFromCart, isLoading: cartLoading } = useCart()
+  const items = allItems.filter(item => selectedItemIds.includes(item.id))
+  const totalPrice = selectedTotalPrice
   
   const hasPhysicalItems = items.some(item => !item.is_digital)
   
@@ -83,21 +85,25 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          selected_item_ids: selectedItemIds,
           full_name: form.fullName,
           phone: form.phone,
           shipping_address: form.address,
           postal_code: form.postalCode,
           payment_method: form.paymentMethod,
-          receipt_url: form.receiptUrl
+          receipt_url: form.receiptUrl,
+          notes: ''
         })
       })
       
       const data = await res.json()
-      if (data.success) {
+      if (res.ok) {
         if (form.paymentMethod === 'gateway') {
           alert('درگاه پرداخت در آینده اضافه خواهد شد. سفارش شما فعلا ثبت شد.')
         }
-        await clearCart()
+        for (const id of selectedItemIds) {
+          await removeFromCart(id)
+        }
         setStep(3)
       } else {
         alert(data.error || 'خطا در ثبت سفارش')

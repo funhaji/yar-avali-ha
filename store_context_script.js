@@ -1,4 +1,6 @@
-'use client'
+const fs = require('fs');
+
+const code = \'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 
@@ -118,7 +120,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   async function removeFromCart(cart_item_id: string) {
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/cart?cart_item_id=${cart_item_id}`, { method: 'DELETE' })
+      const res = await fetch(\/api/cart?cart_item_id=\\, { method: 'DELETE' })
       if (res.ok) await fetchCart()
     } finally {
       setIsLoading(false)
@@ -195,3 +197,6 @@ export function useCart() {
   }
   return context
 }
+\
+
+fs.writeFileSync('lib/store-context.tsx', code);
