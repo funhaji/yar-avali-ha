@@ -327,14 +327,14 @@ export default async function HomePage() {
             <Link href="/blog" className="muted" style={{ fontWeight: 700 }}>مشاهده همه <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
           </div>
           {news.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
               {news.map((item: any) => (
                 <Link 
                   key={item.id} 
                   href={item.redirect_url || `/blog/${item.slug}`} 
                   target={item.redirect_url ? "_blank" : undefined}
                   rel={item.redirect_url ? "noopener noreferrer" : undefined}
-                  className="card card-hover p-0 overflow-hidden flex flex-col"
+                  className="card card-hover p-0 overflow-hidden flex flex-col max-md:w-[280px] max-md:snap-center shrink-0"
                 >
                   <div className="aspect-video" style={{ 
                     backgroundImage: item.thumbnail_url ? `url(${item.thumbnail_url})` : 'none',
@@ -397,9 +397,9 @@ export default async function HomePage() {
           </div>
 
           {teachers.length > 0 ? (
-            <div className="teacher-grid">
+            <div className="teacher-grid max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch', gap: '1rem' }}>
               {teachers.map((t) => (
-                <article key={t.id} className="card card-hover teacher-card">
+                <article key={t.id} className="card card-hover teacher-card max-md:w-[260px] max-md:snap-center shrink-0">
                   {t.photo_url ? (
                     <img src={t.photo_url || "/placeholder.svg"} alt={t.name} className="teacher-photo" />
                   ) : (
