@@ -5,9 +5,15 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { ArrowLeft, BookOpen, Clapperboard, LayoutDashboard, LogOut, Menu, ShoppingBag, X } from 'lucide-react'
 import { useCart } from '@/lib/store-context'
+import { useSettings } from '@/lib/settings-context'
 
-export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo, siteName }: { userName?: string; isAdmin?: boolean; dark?: boolean; siteLogo?: string; siteName?: string }) {
+export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: propLogo, siteName: propName }: { userName?: string; isAdmin?: boolean; dark?: boolean; siteLogo?: string; siteName?: string }) {
   const router = useRouter()
+  const { siteLogo: ctxLogo, siteName: ctxName } = useSettings()
+  
+  const siteLogo = propLogo || ctxLogo
+  const siteName = propName || ctxName
+  
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   
@@ -52,7 +58,6 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo, 
           className="icon-button mobile-menu-btn" 
           onClick={() => setMobileOpen(!mobileOpen)} 
           aria-label="منو"
-          style={{ display: 'none' }}
         >
           {mobileOpen ? <X /> : <Menu />}
         </button>
@@ -92,7 +97,12 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo, 
   )
 }
 
-export function SiteFooter({ footerText, contactEmail, contactPhone, siteLogo, siteName }: { footerText?: string; contactEmail?: string; contactPhone?: string; siteLogo?: string; siteName?: string }) {
+export function SiteFooter({ footerText, contactEmail, contactPhone, siteLogo: propLogo, siteName: propName }: { footerText?: string; contactEmail?: string; contactPhone?: string; siteLogo?: string; siteName?: string }) {
+  const { siteLogo: ctxLogo, siteName: ctxName } = useSettings()
+  
+  const siteLogo = propLogo || ctxLogo
+  const siteName = propName || ctxName
+
   return (
     <footer className="site-footer">
       <div>
