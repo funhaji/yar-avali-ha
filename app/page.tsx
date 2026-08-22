@@ -221,7 +221,7 @@ export default async function HomePage() {
           {storeItems.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
               {storeItems.map((item: any) => (
-                <Link key={item.id} href={`/shop/${item.id}`} className="card card-hover rail-card max-md:min-w-[80vw] max-md:snap-center shrink-0" style={{ display: 'flex', flexDirection: 'column' }}>
+                <Link key={item.id} href={`/shop/${item.id}`} className="card card-hover rail-card max-md:w-[200px] max-md:snap-center shrink-0" style={{ display: 'flex', flexDirection: 'column' }}>
                   <div className="rail-poster" style={{ 
                     backgroundImage: item.thumbnail_url ? `url(${item.thumbnail_url})` : 'none',
                     backgroundSize: 'cover',
