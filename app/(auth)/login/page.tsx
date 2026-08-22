@@ -1,0 +1,94 @@
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft, LogIn, Sparkles } from 'lucide-react'
+import { ClientSiteBrand } from '@/components/ClientSiteName'
+
+export default function LoginPage() {
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    
+    try {
+      const r = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', email, password })
+      })
+      const d = await r.json()
+      
+      if (!r.ok) {
+        setError(d.error || 'خطا در ورود')
+        setLoading(false)
+        return
+      }
+      
+      router.push(d.role === 'admin' ? '/admin' : '/dashboard')
+      router.refresh()
+    } catch {
+      setError('خطا در برقراری ارتباط')
+      setLoading(false)
+    }
+  }
+  
+  return (
+    <main className="auth-wrap">
+      <div className="blob" style={{ width: 360, height: 360, background: 'var(--teal)', top: -120, right: -100 }} />
+      <div className="blob" style={{ width: 300, height: 300, background: 'var(--sunflower)', bottom: -100, left: -80 }} />
+      
+      <section className="card auth-card">
+        <ClientSiteBrand />
+        
+        <span className="section-kicker"><LogIn /> خوش برگشتی</span>
+        <h1 className="section-title">دوباره شروع کنیم؟</h1>
+        <p className="muted" style={{ marginTop: '.5rem', marginBottom: '1.5rem' }}>
+          حسابت منتظر توست.
+        </p>
+        
+        {error && <div className="alert-error" role="alert">{error}</div>}
+        
+        <form onSubmit={submit} className="form-stack" style={{ marginTop: '1rem' }}>
+          <label>
+            ایمیل
+            <input 
+              type="email" 
+              dir="ltr" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              placeholder="name@example.com" 
+              required 
+            />
+          </label>
+          
+          <label>
+            رمز عبور
+            <input 
+              type="password" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              required 
+            />
+          </label>
+          
+          <button className="button button-primary button-lg" disabled={loading}>
+            {loading ? 'در حال ورود...' : 'ورود به حساب'}
+            <ArrowLeft />
+          </button>
+        </form>
+        
+        <p style={{ marginTop: '1.4rem', textAlign: 'center' }}>
+          حساب نداری؟ <a href="/register" style={{ fontWeight: 800, color: 'var(--tangerine)' }}>همین حالا بساز</a>
+        </p>
+        
+        <Sparkles style={{ position: 'absolute', left: 24, top: 24, color: 'var(--sunflower)' }} />
+      </section>
+    </main>
+  )
+}

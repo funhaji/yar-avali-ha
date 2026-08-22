@@ -1,0 +1,130 @@
+'use client'
+
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { ArrowLeft, BookOpen, Clapperboard, LayoutDashboard, LogOut, Menu, ShoppingBag, X } from 'lucide-react'
+import { useCart } from '@/lib/store-context'
+
+export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo, siteName }: { userName?: string; isAdmin?: boolean; dark?: boolean; siteLogo?: string; siteName?: string }) {
+  const router = useRouter()
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  
+  // Need to handle hydration mismatch for cart by only rendering after mount
+  const [mounted, setMounted] = useState(false)
+  const { totalItems, setDrawerOpen } = useCart()
+
+  useEffect(() => {
+    setMounted(true)
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  async function logout() {
+    await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'logout' }) })
+    router.push('/')
+    router.refresh()
+  }
+
+  const headerClass = [
+    'site-header',
+    dark ? 'site-header-dark' : '',
+    scrolled ? 'is-scrolled' : '',
+  ].filter(Boolean).join(' ')
+
+  return (
+    <header className={headerClass}>
+      <nav className="site-nav" aria-label="ناوبری اصلی">
+        <Link href="/" className="brand">
+          {siteLogo ? (
+            <img src={siteLogo} alt={siteName || 'یارِ اولی‌ها'} style={{ maxHeight: '40px', objectFit: 'contain' }} />
+          ) : (
+            <>
+              <span className="brand-mark">۱</span>
+              <span>{siteName || 'یارِ اولی‌ها'}</span>
+            </>
+          )}
+        </Link>
+        <button 
+          className="icon-button mobile-menu-btn" 
+          onClick={() => setMobileOpen(!mobileOpen)} 
+          aria-label="منو"
+          style={{ display: 'none' }}
+        >
+          {mobileOpen ? <X /> : <Menu />}
+        </button>
+        <div className={`nav-links ${mobileOpen ? 'open' : ''}`}>
+          <Link href="/shop" className="font-bold text-teal" onClick={() => setMobileOpen(false)}><ShoppingBag /> فروشگاه</Link>
+          <Link href="/entertainment" onClick={() => setMobileOpen(false)}><Clapperboard /> سرگرمی</Link>
+          <Link href="/worksheets" onClick={() => setMobileOpen(false)}>کاربرگ‌ها</Link>
+          <Link href="/blog" onClick={() => setMobileOpen(false)}>وبلاگ</Link>
+          <Link href="/books" onClick={() => setMobileOpen(false)}><BookOpen /> کتاب‌ها</Link>
+          <Link href="/about" onClick={() => setMobileOpen(false)}>درباره ما</Link>
+        </div>
+        <div className="nav-actions">
+          {userName && (
+            <button 
+              onClick={() => setDrawerOpen(true)}
+              className="icon-button relative ml-2" 
+              aria-label="سبد خرید"
+            >
+              <ShoppingBag className="w-5 h-5 text-ink" />
+              {mounted && totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-tangerine text-paper rounded-full text-[10px] font-bold flex items-center justify-center scale-in">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          )}
+          {userName ? <>
+            <Link href={isAdmin ? '/admin' : '/dashboard'} className="button button-ghost"><LayoutDashboard /> {isAdmin ? 'مدیریت' : 'داشبورد'}</Link>
+            <button className="icon-button" onClick={logout} aria-label="خروج"><LogOut /></button>
+          </> : <>
+            <Link href="/login" className="button button-ghost">ورود</Link>
+            <Link href="/register" className="button button-primary">شروع کن <ArrowLeft /></Link>
+          </>}
+        </div>
+      </nav>
+    </header>
+  )
+}
+
+export function SiteFooter({ footerText, contactEmail, contactPhone, siteLogo, siteName }: { footerText?: string; contactEmail?: string; contactPhone?: string; siteLogo?: string; siteName?: string }) {
+  return (
+    <footer className="site-footer">
+      <div>
+        <Link href="/" className="brand">
+          {siteLogo ? (
+            <img src={siteLogo} alt={siteName || 'یارِ اولی‌ها'} style={{ maxHeight: '40px', objectFit: 'contain' }} />
+          ) : (
+            <>
+              <span className="brand-mark">۱</span>
+              <span>{siteName || 'یارِ اولی‌ها'}</span>
+            </>
+          )}
+        </Link>
+        <p>{footerText || 'یادگیری‌ای که بچه‌ها دلشان می‌خواهد ادامه‌اش بدهند.'}</p>
+        {(contactEmail || contactPhone) && (
+          <div style={{ marginTop: '1rem', fontSize: '.9rem', opacity: 0.8 }}>
+            {contactEmail && <div>ایمیل: {contactEmail}</div>}
+            {contactPhone && <div>تلفن: {contactPhone}</div>}
+          </div>
+        )}
+      </div>
+      <div className="footer-links">
+        <Link href="/shop">فروشگاه</Link>
+        <Link href="/entertainment">سرگرمی</Link>
+        <Link href="/worksheets">کاربرگ‌ها</Link>
+        <Link href="/books">کتاب‌ها</Link>
+        <Link href="/blog">وبلاگ</Link>
+        <Link href="/about">درباره ما</Link>
+        <Link href="/subscription">اشتراک</Link>
+        <Link href="/#teachers">معلم‌ها</Link>
+      </div>
+      <small>تمام حقوق برای {siteName || 'یار اولی‌ها'} محفوظ است.</small>
+    </footer>
+  )
+}

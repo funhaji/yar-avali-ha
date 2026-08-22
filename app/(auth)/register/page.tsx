@@ -1,0 +1,107 @@
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft, UserPlus } from 'lucide-react'
+import { ClientSiteBrand } from '@/components/ClientSiteName'
+
+export default function RegisterPage() {
+  const router = useRouter()
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  
+  function set(key: string, value: string) {
+    setForm(p => ({ ...p, [key]: value }))
+  }
+  
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    
+    if (form.password !== form.confirmPassword) {
+      return setError('رمز عبور و تکرار آن یکسان نیستند')
+    }
+    
+    setLoading(true)
+    
+    try {
+      const r = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'register', ...form })
+      })
+      const d = await r.json()
+      
+      if (!r.ok) {
+        setError(d.error || 'خطا در ثبت‌نام')
+        setLoading(false)
+        return
+      }
+      
+      router.push('/dashboard')
+      router.refresh()
+    } catch {
+      setError('خطا در برقراری ارتباط')
+      setLoading(false)
+    }
+  }
+  
+  return (
+    <main className="auth-wrap">
+      <div className="blob" style={{ width: 390, height: 390, background: 'var(--berry)', top: -170, left: -80, opacity: .8 }} />
+      <div className="blob" style={{ width: 280, height: 280, background: 'var(--sunflower)', bottom: -80, right: -80 }} />
+      
+      <section className="card auth-card">
+        <ClientSiteBrand />
+        
+        <span className="section-kicker"><UserPlus /> عضویت رایگان</span>
+        <h1 className="section-title">یک حساب تازه بساز</h1>
+        
+        {error && <div className="alert-error" role="alert" style={{ marginTop: '1rem' }}>{error}</div>}
+        
+        <form onSubmit={submit} className="form-stack" style={{ marginTop: '1.2rem' }}>
+          <label>
+            نام و نام خانوادگی
+            <input value={form.name} onChange={e => set('name', e.target.value)} required />
+          </label>
+          
+          <label>
+            ایمیل
+            <input type="email" dir="ltr" value={form.email} onChange={e => set('email', e.target.value)} required />
+          </label>
+          
+          <label>
+            شماره تلفن <small className="muted">اختیاری</small>
+            <input type="tel" dir="ltr" value={form.phone} onChange={e => set('phone', e.target.value)} />
+          </label>
+          
+          <label>
+            رمز عبور
+            <input type="password" value={form.password} onChange={e => set('password', e.target.value)} minLength={8} required />
+            <small className="muted">حداقل ۸ کاراکتر، شامل حرف و عدد</small>
+          </label>
+          
+          <label>
+            تکرار رمز
+            <input type="password" value={form.confirmPassword} onChange={e => set('confirmPassword', e.target.value)} required />
+          </label>
+          
+          <button className="button button-primary button-lg" disabled={loading}>
+            {loading ? 'در حال ساخت...' : 'ساخت حساب'}
+            <ArrowLeft />
+          </button>
+        </form>
+        
+        <p style={{ marginTop: '1.2rem', textAlign: 'center' }}>
+          قبلاً عضو شدی؟ <a href="/login" style={{ fontWeight: 800, color: 'var(--tangerine)' }}>وارد شو</a>
+        </p>
+      </section>
+    </main>
+  )
+}

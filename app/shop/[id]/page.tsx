@@ -1,0 +1,142 @@
+import { notFound } from 'next/navigation'
+import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
+import { getStoreItemById, getRelatedStoreItems } from '@/lib/store'
+import { ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Download, Image as ImageIcon } from 'lucide-react'
+import { ProductCard } from '@/components/shop/ProductCard'
+import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { validateSession } from '@/lib/auth'
+import { getSettings } from '@/lib/settings'
+import { AddToCartButton } from './AddToCartButton'
+
+export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const product = await getStoreItemById(id)
+  
+  if (!product) notFound()
+
+  const hasDiscount = product.discount_price_cents !== null
+  const price = hasDiscount ? product.discount_price_cents! : product.price_cents
+  
+  // Combine thumbnail and images
+  const gallery = []
+  if (product.thumbnail_url) gallery.push(product.thumbnail_url)
+  if (product.images && product.images.length > 0) {
+    gallery.push(...product.images)
+  }
+
+  const relatedItems = await getRelatedStoreItems(product.id, 3)
+
+  const token = (await cookies()).get('session_token')?.value
+  const user = token ? await validateSession(token).catch(() => null) : null
+  const settings = await getSettings(['site_name', 'site_logo_url'])
+
+  return (
+    <div className="page bg-cream">
+      <SiteHeader 
+        userName={user?.name} 
+        isAdmin={user?.role === 'admin'} 
+        siteName={settings.site_name || undefined}
+        siteLogo={settings.site_logo_url || undefined}
+      />
+      
+      <main className="shell py-8 md:py-12 flex-1">
+        <Link href="/shop" className="inline-flex items-center gap-2 text-ink-soft hover:text-teal mb-6 font-bold slide-up">
+          <ArrowRight className="w-5 h-5" /> بازگشت به فروشگاه
+        </Link>
+        
+        <div className="card p-6 md:p-8 slide-up">
+          <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+            
+            {/* Gallery */}
+            <div className="w-full md:w-1/2 lg:w-5/12 shrink-0 flex flex-col gap-4">
+              <div className="aspect-square bg-paper border border-line-soft rounded-2xl overflow-hidden relative">
+                {gallery.length > 0 ? (
+                  <img src={gallery[0]} alt={product.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-ink-soft opacity-30">
+                    <ImageIcon className="w-24 h-24" />
+                  </div>
+                )}
+                {product.is_digital && (
+                  <div className="absolute top-4 right-4 badge bg-teal text-paper shadow-lg scale-in">
+                    محصول دیجیتال
+                  </div>
+                )}
+              </div>
+              
+              {gallery.length > 1 && (
+                <div className="grid grid-cols-4 gap-3">
+                  {gallery.slice(1, 5).map((img, i) => (
+                    <div key={i} className="aspect-square border border-line-soft rounded-xl overflow-hidden bg-paper cursor-pointer hover:border-teal transition-colors">
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 flex flex-col">
+              <div className="mb-2">
+                <Link href={`/shop?category=${product.category}`} className="text-teal font-bold hover:underline">
+                  {product.category || 'بدون دسته'}
+                </Link>
+              </div>
+              
+              <h1 className="display" style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>{product.title}</h1>
+              
+              <div className="flex items-center gap-4 text-sm font-bold text-ink-soft mb-6 pb-6 border-b border-line-soft">
+                <span className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-teal" /> تضمین کیفیت</span>
+                {product.is_downloadable && (
+                  <span className="flex items-center gap-1.5"><Download className="w-4 h-4 text-teal" /> دانلود فوری</span>
+                )}
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-teal" /> 
+                  {product.stock_quantity === 0 && !product.is_digital ? <span className="text-berry">تموم شده</span> : 'موجوده'}
+                </span>
+              </div>
+              
+              <div className="prose prose-slate rtl text-ink/90 leading-relaxed mb-8 max-w-none whitespace-pre-wrap">
+                {product.description || 'هنوز توضیحی برای این محصول نوشته نشده.'}
+              </div>
+              
+              <div className="mt-auto pt-6 border-t border-line-soft flex flex-col sm:flex-row gap-6 sm:items-center justify-between">
+                <div>
+                  {hasDiscount ? (
+                    <div className="flex flex-col">
+                      <span className="text-sm text-ink-soft line-through mb-1">{product.price_cents / 10} تومان</span>
+                      <span className="font-bold text-teal-deep text-3xl">{price / 10} تومان</span>
+                    </div>
+                  ) : (
+                    <span className="font-bold text-ink text-3xl">{price / 10} تومان</span>
+                  )}
+                </div>
+                
+                <AddToCartButton product={product} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Related Products */}
+        {relatedItems.length > 0 && (
+          <div className="mt-12 slide-up" style={{ animationDelay: '0.2s' }}>
+            <h2 className="font-bold text-2xl mb-6 flex items-center gap-2">
+              <ShoppingBag className="w-6 h-6 text-teal" /> شاید اینا رو هم دوست داشته باشی
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedItems.map((item, i) => (
+                <div key={item.id} className={`stagger-${i + 1}`}>
+                  <ProductCard product={item} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+      
+      <SiteFooter />
+    </div>
+  )
+}
