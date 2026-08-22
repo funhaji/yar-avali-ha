@@ -14,8 +14,8 @@ async function getEntertainmentContent(userId?: string, searchQuery?: string) {
   // Get all content from cache
   const allContent = await getCachedContent()
   
-  // Filter for anime and movie
-  let content = allContent.filter(item => item.content_type === 'anime' || item.content_type === 'movie')
+  // The admin uploads 'lesson' or other video types to these categories
+  let content = allContent.filter(item => item.content_type !== 'pdf' && item.content_type !== 'image')
   
   // Apply search filter if provided
   if (searchQuery && searchQuery.trim()) {
