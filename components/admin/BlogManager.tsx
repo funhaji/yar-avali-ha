@@ -400,6 +400,12 @@ export function BlogManager({ initialPosts }: Props) {
                 <h3 className="font-bold text-lg">{post.title}</h3>
                 <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
                   <span>{new Date(post.created_at).toLocaleDateString('fa-IR')}</span>
+                  {post.category && (
+                    <>
+                      <span>•</span>
+                      <span className="font-bold text-teal-600">{post.category}</span>
+                    </>
+                  )}
                   <span>•</span>
                   <span>{post.view_count} بازدید</span>
                   {post.author_name && (
@@ -409,7 +415,7 @@ export function BlogManager({ initialPosts }: Props) {
                     </>
                   )}
                   <span className={`px-2 py-1 rounded text-xs ${post.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                    {post.published ? 'منتشر شده' : 'پیش‌نویس'}
+                    {post.published ? 'منتشر شده' : 'پیشنویس'}
                   </span>
                 </div>
               </div>

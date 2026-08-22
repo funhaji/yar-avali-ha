@@ -14,7 +14,8 @@ export default async function TeacherTrainingPage() {
   const user = token ? await validateSession(token).catch(() => null) : null
   
   const settingsData = await getSettings([
-    'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone'
+    'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone',
+    'tt_video_url', 'tt_video_url_2'
   ])
   const s = settingsData as Record<string, string | null>
   
@@ -52,10 +53,11 @@ export default async function TeacherTrainingPage() {
                 این دوره مناسب علاقه‌مندان به تدریس مقطع ابتدایی می‌باشد.
               </p>
               
-              <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
-                {/* Placeholder video, client can update in DB later if we add settings for it, or use hardcoded Aparat link */}
-                <iframe src="https://www.aparat.com/video/video/embed/videohash/dummy" className="w-full h-full border-none" allowFullScreen></iframe>
-              </div>
+              {s?.tt_video_url && (
+                <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
+                  <iframe src={s.tt_video_url} className="w-full h-full border-none" allowFullScreen></iframe>
+                </div>
+              )}
 
               <div className="bg-teal text-white w-full p-6 rounded-2xl shadow-sm mt-auto">
                 <h3 className="text-xl font-bold mb-2">ثبت نام به زودی!</h3>
@@ -77,9 +79,11 @@ export default async function TeacherTrainingPage() {
                 یادگیری شیرین‌تر و عمیق‌تری را تجربه کنید. رفع اشکال و تقویت پایه‌ای دروس.
               </p>
               
-              <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
-                <iframe src="https://www.aparat.com/video/video/embed/videohash/dummy2" className="w-full h-full border-none" allowFullScreen></iframe>
-              </div>
+              {s?.tt_video_url_2 && (
+                <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
+                  <iframe src={s.tt_video_url_2} className="w-full h-full border-none" allowFullScreen></iframe>
+                </div>
+              )}
 
               <div className="bg-tangerine text-white w-full p-6 rounded-2xl shadow-sm mt-auto">
                 <h3 className="text-xl font-bold mb-2">درخواست معلم</h3>

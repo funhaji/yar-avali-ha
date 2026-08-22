@@ -89,13 +89,10 @@ const DEFAULT_SETTINGS = [
   { key: 'about_image', label: 'تصویر اصلی (URL)', type: 'url', category: 'about' },
 
   // Teacher Training Page
-  { key: 'tt_title', label: 'عنوان صفحه', type: 'text', placeholder: 'دوره جامع تربیت معلم', category: 'teacher_training' },
-  { key: 'tt_subtitle', label: 'زیرعنوان (متن کوتاه)', type: 'textarea', placeholder: 'توضیحات اولیه دوره...', category: 'teacher_training' },
-  { key: 'tt_content', label: 'متن اصلی کامل', type: 'textarea', placeholder: 'این صفحه در حال آماده‌سازی است...', category: 'teacher_training' },
-  { key: 'tt_image', label: 'تصویر پس‌زمینه کاور (URL)', type: 'url', category: 'teacher_training' },
-  { key: 'tt_video_url', label: 'لینک ویدیوی معرفی (اختیاری)', type: 'url', category: 'teacher_training' },
-  { key: 'tt_button_text', label: 'متن دکمه', type: 'text', placeholder: 'ثبت‌نام به زودی فعال می‌شود', category: 'teacher_training' },
-  { key: 'tt_button_link', label: 'لینک دکمه', type: 'text', placeholder: '#', category: 'teacher_training' },
+  { key: 'tt_title', label: 'عنوان اصلی صفحه', type: 'text', placeholder: 'آموزش و تدریس خصوصی', category: 'teacher_training' },
+  { key: 'tt_subtitle', label: 'زیرنویس صفحه', type: 'textarea', placeholder: 'با استفاده از بهترین متدها...', category: 'teacher_training' },
+  { key: 'tt_video_url', label: 'لینک ویدیو تربیت معلم (آپارات)', type: 'url', category: 'teacher_training' },
+  { key: 'tt_video_url_2', label: 'لینک ویدیو معلم خصوصی (آپارات)', type: 'url', category: 'teacher_training' },
 ]
 
 export function SettingsManager({ initialSettings }: Props) {
