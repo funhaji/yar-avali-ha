@@ -194,18 +194,16 @@ export default async function WatchPage({ params }: { params: Promise<{ id: stri
       ) : (
         <>
           {/* Main Content Area */}
-          <div className="bg-black/40 border-b border-white/10">
+          <div className={content.content_type === 'pdf' ? 'bg-ink border-b border-white/10' : 'bg-black/40 border-b border-white/10'}>
             <div className="shell max-w-[1400px] mx-auto">
-              <div className="aspect-video w-full relative bg-black rounded-b-2xl overflow-hidden shadow-2xl">
+              <div className={`w-full relative overflow-hidden shadow-2xl ${content.content_type === 'pdf' ? 'rounded-b-xl' : 'aspect-video bg-black rounded-b-2xl'}`} style={content.content_type === 'pdf' ? { height: 'calc(100vh - 80px)' } : undefined}>
                 {content.content_type === 'pdf' ? (
-                  <div className="w-full h-full bg-cream text-ink">
-                    <SecurePDFViewerCanvas
-                      pdfUrl={directVideoUrl}
-                      title={content.title}
-                    />
-                  </div>
+                  <SecurePDFViewerCanvas
+                    pdfUrl={directVideoUrl}
+                    title={content.title}
+                  />
                 ) : content.content_type === 'image' ? (
-                  <div className="w-full h-full p-4 flex items-center justify-center">
+                  <div className="w-full h-full p-4 flex items-center justify-center bg-black">
                     <img 
                       src={directVideoUrl} 
                       alt={content.title}

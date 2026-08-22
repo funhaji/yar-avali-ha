@@ -442,7 +442,7 @@ export default function VideoPlayer({
               onChange={handleSeek}
               className="w-full mb-4 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, #9333ea 0%, #9333ea ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) 100%)`,
+                background: `linear-gradient(to right, #14b8a6 0%, #14b8a6 ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) 100%)`,
               }}
             />
             
@@ -607,7 +607,7 @@ export default function VideoPlayer({
               onChange={handleSeek}
               className="w-full mb-4 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, #9333ea 0%, #9333ea ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) 100%)`,
+                background: `linear-gradient(to right, #14b8a6 0%, #14b8a6 ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) 100%)`,
               }}
             />
             
