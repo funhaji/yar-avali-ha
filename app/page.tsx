@@ -45,7 +45,9 @@ async function getHomePageContent() {
   
   // Get featured store items from cache
   const allStoreItems = await getCachedStoreItems();
-  const storeItems = allStoreItems.slice(0, 4);
+  // Filter out products that are free, have no price, or are just for introducing
+  const validStoreItems = allStoreItems.filter(i => !i.is_free && i.price_cents !== 0 && i.price_cents !== null);
+  const storeItems = validStoreItems.slice(0, 4);
   
   // Get latest blog/news posts
   const allBlogs = await getCachedBlogPosts();

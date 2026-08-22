@@ -17,7 +17,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   
   const allItems = await getCachedStoreItems()
   
-  let items = allItems
+  // Filter out products that are free, have no price, or are just for introducing
+  let items = allItems.filter(i => !i.is_free && i.price_cents !== 0 && i.price_cents !== null)
+  
   if (category !== 'all') {
     items = items.filter(i => i.category === category)
   }
