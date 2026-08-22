@@ -6,6 +6,7 @@ import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { Reveal } from '@/components/Reveal'
 import { getCachedSettings, getCachedTeachers, getCachedStoreItems, getCachedContent, getCachedBlogPosts } from '@/lib/cache'
 import { query } from '@/lib/db'
+import { ProductCard } from '@/components/shop/ProductCard'
 
 export const revalidate = 60; // ISR: 1 minute
 
@@ -221,28 +222,9 @@ export default async function HomePage() {
           {storeItems.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
               {storeItems.map((item: any) => (
-                <Link key={item.id} href={`/shop/${item.id}`} className="card card-hover rail-card max-md:w-[200px] max-md:snap-center shrink-0" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div className="rail-poster" style={{ 
-                    backgroundImage: item.thumbnail_url ? `url(${item.thumbnail_url})` : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    background: !item.thumbnail_url ? 'linear-gradient(150deg, var(--teal), var(--teal-deep))' : undefined,
-                    display: 'grid', 
-                    placeItems: 'center', 
-                    color: '#fff', 
-                    fontWeight: 800, 
-                    fontSize: '.85rem',
-                    aspectRatio: '1/1'
-                  }}>
-                    {!item.thumbnail_url && item.title}
-                  </div>
-                  <div className="rail-body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <div className="rail-title" style={{ marginBottom: '0.5rem', flex: 1 }}>{item.title}</div>
-                    <div className="font-bold text-teal text-lg">
-                      {item.price_cents / 10} تومان
-                    </div>
-                  </div>
-                </Link>
+                <div key={item.id} className="max-md:w-[200px] max-md:snap-center shrink-0">
+                  <ProductCard product={item} />
+                </div>
               ))}
             </div>
           ) : (
