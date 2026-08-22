@@ -220,6 +220,17 @@ export function BlogManager({ initialPosts }: Props) {
 
           <div>
             <label className="block font-medium mb-2">محتوا *</label>
+            <div className="flex gap-2 mb-2">
+              <button type="button" onClick={() => setFormData({ ...formData, content: formData.content + '\n\n[متن لینک](https://...)' })} className="px-3 py-1 bg-gray-100 border border-gray-300 rounded text-sm hover:bg-gray-200 text-gray-800">
+                🔗 افزودن لینک
+              </button>
+              <button type="button" onClick={() => setFormData({ ...formData, content: formData.content + '\n\n![توضیح تصویر](https://...)' })} className="px-3 py-1 bg-gray-100 border border-gray-300 rounded text-sm hover:bg-gray-200 text-gray-800">
+                🖼️ افزودن تصویر در متن
+              </button>
+              <button type="button" onClick={() => setFormData({ ...formData, content: formData.content + '\n\n**متن بولد**' })} className="px-3 py-1 bg-gray-100 border border-gray-300 rounded text-sm hover:bg-gray-200 text-gray-800">
+                ضخیم
+              </button>
+            </div>
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}

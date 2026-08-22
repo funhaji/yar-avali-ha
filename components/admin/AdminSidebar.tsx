@@ -21,6 +21,7 @@ const MENU_ITEMS = [
   { href: '/admin/support', label: 'پشتیبانی تیکت', icon: MessageCircle },
   { href: '/admin/comments', label: 'نظرات', icon: MessageSquare },
   { href: '/admin/store', label: 'فروشگاه', icon: BookOpen },
+  { href: '/admin/books', label: 'کتاب‌ها', icon: BookOpen },
   { href: '/admin/blog', label: 'وبلاگ', icon: FileText },
   { href: '/admin/news', label: 'اخبار', icon: Newspaper },
 ]
