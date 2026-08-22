@@ -11,7 +11,7 @@ export default async function AdminBooksPage() {
 
   // Fetch only books
   const allItems = await getStoreItems()
-  const books = allItems.filter((i: any) => i.category === '????')
+  const books = allItems.filter((i: any) => i.category === 'کتاب')
 
   return (
     <div className="page fade-in">
@@ -20,12 +20,12 @@ export default async function AdminBooksPage() {
         <div className="flex flex-col gap-6 slide-up">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <span className="section-kicker"><BookOpen /> ?????? ???????</span>
-              <h1 className="display" style={{ fontSize: '2.5rem' }}>???????? ???????</h1>
-              <p className="lead" style={{ marginTop: '0.5rem' }}>????? ???????? ?????? ? ???????? ??? ?? ?? ????? ?????? ????.</p>
+              <span className="section-kicker"><BookOpen /> مدیریت کتاب‌ها</span>
+              <h1 className="display" style={{ fontSize: '2.5rem' }}>کتاب‌های فروشگاه</h1>
+              <p className="lead" style={{ marginTop: '0.5rem' }}>تمامی کتاب‌های فیزیکی و دیجیتالی خود را از اینجا مدیریت کنید.</p>
             </div>
-            <Link href="/admin/store/new?category=????" className="button button-primary">
-              <Plus /> ?????? ???? ????
+            <Link href="/admin/store/new?category=کتاب" className="button button-primary">
+              <Plus /> افزودن کتاب جدید
             </Link>
           </div>
 
@@ -34,17 +34,17 @@ export default async function AdminBooksPage() {
               <table className="w-full text-right border-collapse">
                 <thead className="bg-cream border-b border-line-soft text-ink-soft">
                   <tr>
-                    <th className="p-4 font-bold text-sm">?????</th>
-                    <th className="p-4 font-bold text-sm">????? ????</th>
-                    <th className="p-4 font-bold text-sm">???</th>
-                    <th className="p-4 font-bold text-sm">????</th>
-                    <th className="p-4 font-bold text-sm text-center">??????</th>
+                    <th className="p-4 font-bold text-sm">تصویر</th>
+                    <th className="p-4 font-bold text-sm">عنوان کتاب</th>
+                    <th className="p-4 font-bold text-sm">نوع</th>
+                    <th className="p-4 font-bold text-sm">قیمت</th>
+                    <th className="p-4 font-bold text-sm text-center">عملیات</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line-soft">
                   {books.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-ink-soft">??? ????? ???? ???.</td>
+                      <td colSpan={5} className="p-8 text-center text-ink-soft">هیچ کتابی یافت نشد.</td>
                     </tr>
                   ) : (
                     books.map((book: any) => (
@@ -55,15 +55,15 @@ export default async function AdminBooksPage() {
                         <td className="p-4 font-bold">{book.title}</td>
                         <td className="p-4">
                           {book.is_digital ? (
-                            <span className="badge bg-purple-100 text-purple-700 border-purple-200" style={{background: '#f3e8ff', color: '#7e22ce', borderColor: '#e9d5ff'}}>??????? (PDF/????)</span>
+                            <span className="badge" style={{background: '#f3e8ff', color: '#7e22ce', borderColor: '#e9d5ff'}}>دیجیتال (PDF/لینک)</span>
                           ) : (
-                            <span className="badge bg-green-100 text-green-700 border-green-200" style={{background: '#dcfce7', color: '#15803d', borderColor: '#bbf7d0'}}>??????</span>
+                            <span className="badge" style={{background: '#dcfce7', color: '#15803d', borderColor: '#bbf7d0'}}>فیزیکی</span>
                           )}
                         </td>
-                        <td className="p-4 font-bold text-teal">{book.is_free ? '??????' : (book.price_cents / 10).toLocaleString() + ' ?????'}</td>
+                        <td className="p-4 font-bold text-teal">{book.is_free ? 'رایگان' : (book.price_cents / 10).toLocaleString() + ' تومان'}</td>
                         <td className="p-4 text-center">
-                          <Link href={\/admin/store/\\} className="button button-ghost" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-                            ??????
+                          <Link href={`/admin/store/${book.id}`} className="button button-ghost" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+                            ویرایش
                           </Link>
                         </td>
                       </tr>
