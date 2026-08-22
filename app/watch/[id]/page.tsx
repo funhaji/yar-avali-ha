@@ -155,7 +155,6 @@ export default async function WatchPage({ params }: { params: Promise<{ id: stri
                         alt={content.title}
                         className="max-w-full max-h-full object-contain rounded-xl shadow-md"
                         style={{ userSelect: 'none', WebkitUserSelect: 'none', pointerEvents: 'none' }}
-                        onContextMenu={(e) => e.preventDefault()}
                       />
                     </div>
                   ) : (
