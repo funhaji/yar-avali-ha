@@ -60,13 +60,13 @@ export function ProductCard({ product }: { product: StoreItem }) {
         
         {/* Overlay Add to cart button (desktop mostly) */}
         {product.price_cents !== null && (
-          <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-ink/60 to-transparent translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+          <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
             <button 
               onClick={handleAdd}
               disabled={adding || !!shouldDisableAdd || (product.stock_quantity === 0 && !product.is_digital)}
-              className="button bg-paper text-teal-deep hover:bg-cream border-none shadow-lg w-full justify-center"
+              className="button bg-teal text-white hover:bg-teal-deep hover:shadow-xl hover:-translate-y-0.5 border-none shadow-lg w-full justify-center font-bold text-sm md:text-base py-3"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-5 h-5 mr-2" />
               {shouldDisableAdd ? 'تو سبدته' : adding ? 'داره اضافه میشه...' : 'بذار تو سبد'}
             </button>
           </div>
