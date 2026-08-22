@@ -115,7 +115,7 @@ function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
   )
 }
 
-export function StoreItemForm({ initialData }: { initialData?: StoreItem }) {
+export function StoreItemForm({ initialData, defaultCategory }: { initialData?: StoreItem, defaultCategory?: string }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -125,7 +125,9 @@ export function StoreItemForm({ initialData }: { initialData?: StoreItem }) {
   const [contentType, setContentType] = useState(initialData?.content_type || 'pdf')
   const [storageProvider, setStorageProvider] = useState(initialData?.storage_provider || 'pixeldrain')
 
-  const isEditing = !!initialData
+  const [isShowcase, setIsShowcase] = useState(initialData ? (initialData.price_cents === null || initialData.price_cents === undefined) : false)
+
+  const isEditing = !!initialData && !!initialData.id
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -136,7 +138,7 @@ export function StoreItemForm({ initialData }: { initialData?: StoreItem }) {
     const formData = new FormData(e.currentTarget)
     
     // Parse numeric/boolean fields
-    const priceCents = parseInt(formData.get('price_cents') as string) * 10
+    const priceCents = isShowcase ? null : (parseInt(formData.get('price_cents') as string) * 10 || 0)
     const discountStr = formData.get('discount_price_cents') as string
     const discountPriceCents = discountStr ? parseInt(discountStr) * 10 : null
     const stockStr = formData.get('stock_quantity') as string
@@ -234,13 +236,13 @@ export function StoreItemForm({ initialData }: { initialData?: StoreItem }) {
       <form onSubmit={handleSubmit} className="p-6 form-stack">
         <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <label>اسم محصول *
-              <input name="title" required defaultValue={initialData?.title} placeholder="مثال: کتاب آموزش الفبا" />
+            <label>عنوان محصول *
+              <input name="title" required defaultValue={initialData?.title} placeholder="مثلاً: کتاب فارسی اول دبستان" />
             </label>
           </div>
           <div>
             <label>دسته‌بندی
-              <input name="category" defaultValue={initialData?.category || ''} placeholder="مثال: کتاب‌ها" />
+              <input name="category" defaultValue={initialData?.category || defaultCategory || ''} placeholder="مثلاً: کتاب، اسباب‌بازی" />
             </label>
           </div>
         </div>
@@ -251,24 +253,36 @@ export function StoreItemForm({ initialData }: { initialData?: StoreItem }) {
           </label>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 p-4 bg-cream rounded-xl">
-          <div>
-            <label>قیمت (تومان) *
-              <input type="number" name="price_cents" required defaultValue={initialData ? initialData.price_cents / 10 : ''} min="0" />
-            </label>
-          </div>
-          <div>
-            <label>قیمت با تخفیف (تومان)
-              <input type="number" name="discount_price_cents" defaultValue={initialData?.discount_price_cents ? initialData.discount_price_cents / 10 : ''} min="0" />
-            </label>
-            <small className="text-ink-soft">اگه وارد کنی، محصول حراج میشه</small>
-          </div>
-          <div>
-            <label>موجودی انبار
-              <input type="number" name="stock_quantity" defaultValue={initialData?.stock_quantity || ''} min="0" disabled={isDigital} />
-            </label>
-            <small className="text-ink-soft">برای دیجیتال‌ها غیرفعال است</small>
-          </div>
+        <div className="flex flex-col gap-4 p-4 bg-cream rounded-xl">
+          <label className="flex items-center gap-3 cursor-pointer p-3 border border-line-soft rounded-lg bg-white shadow-sm">
+            <input type="checkbox" checked={isShowcase} onChange={e => setIsShowcase(e.target.checked)} className="w-5 h-5 accent-teal" />
+            <div className="flex flex-col">
+              <span className="font-bold">فقط معرفی (غیرقابل فروش)</span>
+              <span className="text-sm text-ink-soft">با انتخاب این گزینه، این محصول صرفا جهت معرفی نمایش داده می‌شود و قیمت یا دکمه خرید نخواهد داشت.</span>
+            </div>
+          </label>
+          
+          {!isShowcase && (
+            <div className="grid md:grid-cols-3 gap-6 mt-2">
+              <div>
+                <label>قیمت (تومان) *
+                  <input type="number" name="price_cents" required defaultValue={initialData?.price_cents ? initialData.price_cents / 10 : ''} min="0" />
+                </label>
+              </div>
+              <div>
+                <label>قیمت با تخفیف (تومان)
+                  <input type="number" name="discount_price_cents" defaultValue={initialData?.discount_price_cents ? initialData.discount_price_cents / 10 : ''} min="0" />
+                </label>
+                <small className="text-ink-soft">اگر وارد کنید، محصول حراج می‌شود</small>
+              </div>
+              <div>
+                <label>موجودی انبار
+                  <input type="number" name="stock_quantity" defaultValue={initialData?.stock_quantity || ''} min="0" disabled={isDigital} />
+                </label>
+                <small className="text-ink-soft">برای محصولات دیجیتال نادیده گرفته می‌شود</small>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 p-4 bg-cream rounded-xl">

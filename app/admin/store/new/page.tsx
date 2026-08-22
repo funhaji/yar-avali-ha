@@ -14,7 +14,7 @@ export default async function NewStoreItemPage({ searchParams }: { searchParams:
     <div className="page fade-in">
       <SiteHeader userName={admin.name} isAdmin />
       <main className="shell section flex justify-center">
-        <StoreItemForm initialData={{ category } as any} />
+        <StoreItemForm defaultCategory={category} />
       </main>
     </div>
   )
