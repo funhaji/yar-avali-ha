@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { AlertCircle } from 'lucide-react'
+import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
 interface SecurePDFViewerProps {
   pdfUrl: string
@@ -9,235 +9,58 @@ interface SecurePDFViewerProps {
 }
 
 export default function SecurePDFViewer({ pdfUrl, title }: SecurePDFViewerProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Disable right-click, screenshots, printing, and dev tools
-  useEffect(() => {
-    const preventContextMenu = (e: MouseEvent) => {
-      e.preventDefault()
-      return false
+  // Use Google Docs viewer for better font support, or direct iframe with toolbar=0
+  // Google docs viewer is more secure as it renders images of the PDF
+  const isGoogleDriveUrl = pdfUrl.includes('drive.google.com')
+  
+  let embedUrl = pdfUrl
+  if (isGoogleDriveUrl) {
+    const fileIdMatch = pdfUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || pdfUrl.match(/id=([a-zA-Z0-9_-]+)/)
+    if (fileIdMatch && fileIdMatch[1]) {
+      embedUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`
     }
-
-    const preventKeyboardShortcuts = (e: KeyboardEvent) => {
-      // Prevent Print (Ctrl+P, Cmd+P)
-      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-        e.preventDefault()
-        return false
-      }
-      // Prevent Save (Ctrl+S, Cmd+S)
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault()
-        return false
-      }
-      // Prevent Screenshot shortcuts
-      if (
-        e.key === 'PrintScreen' ||
-        ((e.metaKey || e.ctrlKey) && e.shiftKey && ['3', '4', '5'].includes(e.key))
-      ) {
-        e.preventDefault()
-        return false
-      }
-      // Prevent Dev Tools
-      if (
-        e.key === 'F12' ||
-        ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c'))
-      ) {
-        e.preventDefault()
-        return false
-      }
-    }
-
-    const preventSelectAndCopy = (e: Event) => {
-      e.preventDefault()
-      return false
-    }
-
-    document.addEventListener('contextmenu', preventContextMenu)
-    document.addEventListener('keydown', preventKeyboardShortcuts)
-    document.addEventListener('copy', preventSelectAndCopy)
-    document.addEventListener('cut', preventSelectAndCopy)
-
-    if (containerRef.current) {
-      containerRef.current.style.userSelect = 'none'
-      containerRef.current.style.webkitUserSelect = 'none'
-    }
-
-    return () => {
-      document.removeEventListener('contextmenu', preventContextMenu)
-      document.removeEventListener('keydown', preventKeyboardShortcuts)
-      document.removeEventListener('copy', preventSelectAndCopy)
-      document.removeEventListener('cut', preventSelectAndCopy)
-    }
-  }, [])
-
-  // Handle loading timeout
-  useEffect(() => {
-    if (!pdfUrl) {
-      setError('لینک فایل PDF موجود نیست. لطفاً با پشتیبانی تماس بگیرید.')
-      setLoading(false)
-      return
-    }
-
-    // Set a timeout for loading
-    const loadTimeout = setTimeout(() => {
-      if (loading) {
-        setLoading(false)
-        // Don't set error, just hide loading - the PDF might still load
-      }
-    }, 8000) // 8 seconds timeout
-
-    return () => clearTimeout(loadTimeout)
-  }, [pdfUrl, loading])
-
-  // Process PDF URL based on storage provider
-  const getViewerUrl = () => {
-    if (!pdfUrl) return ''
-    
-    // If it's a Google Drive URL, use the preview format
-    if (pdfUrl.includes('drive.google.com')) {
-      // Extract file ID from various Google Drive URL formats
-      let fileId = ''
-      
-      if (pdfUrl.includes('/file/d/')) {
-        fileId = pdfUrl.split('/file/d/')[1]?.split('/')[0]
-      } else if (pdfUrl.includes('id=')) {
-        fileId = pdfUrl.split('id=')[1]?.split('&')[0]
-      }
-      
-      if (fileId) {
-        return `https://drive.google.com/file/d/${fileId}/preview`
-      }
-    }
-    
-    // For direct URLs, use as-is
-    return pdfUrl
+  } else {
+    // For direct PDF links, use Google Docs viewer for better font rendering and security
+    embedUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`
   }
 
-  const viewerUrl = getViewerUrl()
-
   return (
-    <div 
-      ref={containerRef}
-      className="secure-pdf-viewer"
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '80vh',
-        backgroundColor: '#2a2a2a',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        userSelect: 'none',
-        WebkitUserSelect: 'none'
-      }}
-    >
+    <div className="relative w-full h-full flex flex-col bg-paper rounded-xl overflow-hidden border border-line-soft">
+      {/* Loading State */}
       {loading && (
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#000',
-          color: '#fff',
-          zIndex: 10
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div className="animate-spin" style={{
-              width: '4rem',
-              height: '4rem',
-              border: '4px solid #9333ea',
-              borderTopColor: 'transparent',
-              borderRadius: '50%',
-              margin: '0 auto 1rem'
-            }}></div>
-            <p style={{ fontSize: '1.125rem' }}>در حال بارگذاری سند...</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-cream z-10">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-teal animate-spin mx-auto mb-4" />
+            <p className="text-ink-soft text-lg font-medium">در حال بارگذاری سند...</p>
           </div>
         </div>
       )}
 
-      {error && (
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#000',
-          color: '#fff',
-          zIndex: 10
-        }}>
-          <div style={{ textAlign: 'center', maxWidth: '32rem', padding: '2rem' }}>
-            <AlertCircle style={{ width: '3rem', height: '3rem', margin: '0 auto 1rem', color: '#ef4444' }} />
-            <p style={{ fontSize: '1.125rem', marginBottom: '1.5rem' }}>{error}</p>
-          </div>
+      {/* Toolbar */}
+      <div className="sticky top-0 z-20 bg-cream/90 backdrop-blur-sm border-b border-line-soft px-6 py-4 flex items-center justify-between">
+        <h3 className="text-ink font-bold text-lg truncate pr-2 border-r-4 border-teal">{title}</h3>
+        <div className="text-ink-soft text-sm font-medium bg-paper px-3 py-1 rounded-full border border-line-soft">
+          فایل PDF
         </div>
-      )}
-
-      {/* PDF Controls */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: 'rgba(0,0,0,0.8)',
-        padding: '1rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        zIndex: 5
-      }}>
-        <div style={{ color: '#fff', fontWeight: 600 }}>{title}</div>
       </div>
 
-      {/* PDF Viewer using iframe */}
-      {viewerUrl && !error && (
-        <div style={{
-          width: '100%',
-          height: '100%',
-          position: 'relative',
-          paddingTop: '60px'
-        }}>
-          <iframe
-            ref={iframeRef}
-            src={viewerUrl}
-            style={{
-              width: '100%',
-              height: 'calc(100% - 60px)',
-              border: 'none',
-              backgroundColor: '#2a2a2a'
-            }}
-            title={title}
-            onLoad={() => {
-              console.log('PDF loaded successfully')
-              setLoading(false)
-            }}
-            onError={(e) => {
-              console.error('PDF load error:', e)
-              setError('خطا در بارگذاری سند. لطفاً دوباره تلاش کنید.')
-              setLoading(false)
-            }}
-            allow="autoplay"
-          />
+      {/* Iframe */}
+      <div className="flex-1 w-full bg-cream relative">
+        <iframe
+          src={embedUrl}
+          className="w-full h-full absolute inset-0"
+          frameBorder="0"
+          onLoad={() => setLoading(false)}
+          title={title}
+          allowFullScreen
+        />
+        
+        {/* Protection watermark */}
+        <div className="absolute bottom-4 right-4 bg-paper/90 text-ink-soft px-3 py-1.5 rounded-lg text-xs font-medium pointer-events-none z-30 border border-line-soft shadow-sm">
+          محافظت شده - کپی برداری ممنوع
         </div>
-      )}
-
-      {/* Protection watermark */}
-      <div style={{
-        position: 'absolute',
-        bottom: '1rem',
-        right: '1rem',
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        color: '#fff',
-        padding: '0.5rem 1rem',
-        borderRadius: '6px',
-        fontSize: '0.875rem',
-        pointerEvents: 'none',
-        zIndex: 5
-      }}>
-        محافظت شده - کپی برداری ممنوع
       </div>
     </div>
   )
