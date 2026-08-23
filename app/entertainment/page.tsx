@@ -6,7 +6,7 @@ import { validateSession } from '@/lib/auth'
 import { EntertainmentContent } from '@/components/EntertainmentContent'
 import { getSettings } from '@/lib/settings'
 import { SiteHeader } from '@/components/SiteHeader'
-import { getCachedContent, getCachedSettings } from '@/lib/cache'
+import { getCachedContent } from '@/lib/cache'
 
 async function getEntertainmentContent(userId?: string, searchQuery?: string) {
   const hasSubscription = userId ? await hasActiveSubscription(userId) : false
@@ -67,7 +67,7 @@ export default async function EntertainmentPage({ searchParams }: { searchParams
   
   const [{ byCategory, hasSubscription }, settings] = await Promise.all([
     getEntertainmentContent(user?.id, searchQuery),
-    getCachedSettings(['site_logo_url', 'site_name', 'ent_cat1_image', 'ent_cat2_image', 'ent_cat3_image', 'ent_cat4_image', 'ent_cat1_video', 'ent_cat2_video', 'ent_cat3_video']),
+    getSettings(['site_logo_url', 'site_name', 'ent_cat1_image', 'ent_cat2_image', 'ent_cat3_image', 'ent_cat4_image', 'ent_cat1_video', 'ent_cat2_video', 'ent_cat3_video']),
   ])
   
   const siteName = settings.site_name || 'یار اولی‌ها'
