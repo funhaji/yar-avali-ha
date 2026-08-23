@@ -242,6 +242,12 @@ CREATE TABLE IF NOT EXISTS yar_blog_posts (
 CREATE INDEX IF NOT EXISTS idx_yar_blog_slug ON yar_blog_posts(slug);
 CREATE INDEX IF NOT EXISTS idx_yar_blog_published ON yar_blog_posts(published);
 
+ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS images TEXT[];
+ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS video_url VARCHAR(1000);
+ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS video_provider VARCHAR(50);
+ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS redirect_url VARCHAR(1000);
+
 -- Workshops table
 CREATE TABLE IF NOT EXISTS yar_workshops (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
