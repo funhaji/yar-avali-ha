@@ -43,6 +43,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     'social_instagram',
     'social_telegram',
     'social_whatsapp',
+    'social_eitaa',
     'site_name',
     'site_logo_url'
   ]).catch(() => ({}))
@@ -74,6 +75,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               socialInstagram={(allSettings?.social_instagram as string) || undefined}
               socialTelegram={(allSettings?.social_telegram as string) || undefined}
               socialWhatsapp={(allSettings?.social_whatsapp as string) || undefined}
+              socialEitaa={(allSettings?.social_eitaa as string) || undefined}
             />
           </CartProvider>
         </SettingsProvider>

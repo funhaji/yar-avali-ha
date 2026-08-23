@@ -4,6 +4,7 @@ import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { cookies } from 'next/headers'
 import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
+import { getEmbedUrl } from '@/lib/video'
 
 export const metadata = {
   title: 'تربیت معلم و معلم خصوصی'
@@ -54,8 +55,8 @@ export default async function TeacherTrainingPage() {
               </p>
               
               {s?.tt_video_url && (
-                <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
-                  <iframe src={s.tt_video_url} className="w-full h-full border-none" allowFullScreen></iframe>
+                <div className="w-full aspect-video relative bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
+                  <iframe src={getEmbedUrl(s.tt_video_url)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
                 </div>
               )}
 
@@ -80,8 +81,8 @@ export default async function TeacherTrainingPage() {
               </p>
               
               {s?.tt_video_url_2 && (
-                <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
-                  <iframe src={s.tt_video_url_2} className="w-full h-full border-none" allowFullScreen></iframe>
+                <div className="w-full aspect-video relative bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
+                  <iframe src={getEmbedUrl(s.tt_video_url_2)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
                 </div>
               )}
 

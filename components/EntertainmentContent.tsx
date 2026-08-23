@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Search, ArrowRight } from 'lucide-react'
 import ContentFilter from './ContentFilter'
+import { getEmbedUrl } from '@/lib/video'
 
 type FilterOption = 'all' | 'free' | 'premium'
 
@@ -110,11 +111,11 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
         <div className="mb-12 bg-paper border border-line-soft rounded-2xl p-6 shadow-sm flex flex-col md:flex-row gap-8 items-center">
           <div className="w-full md:w-1/2 aspect-video bg-black rounded-xl overflow-hidden shadow-md relative">
             {initialCategory === 'لوحه نویسی' && categoryMedia?.ent_cat1_video ? (
-              <iframe src={categoryMedia.ent_cat1_video} className="w-full h-full border-none" allowFullScreen></iframe>
+              <iframe src={getEmbedUrl(categoryMedia.ent_cat1_video)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
             ) : initialCategory === 'نشانه های ۱/۲' && categoryMedia?.ent_cat2_video ? (
-              <iframe src={categoryMedia.ent_cat2_video} className="w-full h-full border-none" allowFullScreen></iframe>
+              <iframe src={getEmbedUrl(categoryMedia.ent_cat2_video)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
             ) : initialCategory === 'علوم' && categoryMedia?.ent_cat3_video ? (
-              <iframe src={categoryMedia.ent_cat3_video} className="w-full h-full border-none" allowFullScreen></iframe>
+              <iframe src={getEmbedUrl(categoryMedia.ent_cat3_video)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-white/50 text-sm">
                 ویدیویی برای این بخش تنظیم نشده است
