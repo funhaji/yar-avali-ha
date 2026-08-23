@@ -15,7 +15,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published } = await request.json()
+    const body = await request.json()
+    const { title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, category } = body
 
     if (!title || !slug || !content) {
       return NextResponse.json(
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
       INSERT INTO yar_blog_posts (title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, author_id, category)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *
-    `, [title, slug, content, excerpt, thumbnail_url, images || [], video_url || null, video_provider || 'direct', redirect_url || null, published, user.id, body.category || null])
+    `, [title, slug, content, excerpt, thumbnail_url, images || [], video_url || null, video_provider || 'direct', redirect_url || null, published, user.id, category || null])
 
     revalidateTag('blog')
     return NextResponse.json({ post: result[0] })
