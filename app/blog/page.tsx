@@ -12,7 +12,6 @@ export const metadata = {
   description: 'مقالات و نکات آموزشی برای کودکان و والدین'
 }
 
-export default async function BlogPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
 export default async function BlogPage({ searchParams }: { searchParams: Promise<{ category?: string, search?: string }> }) {
   const headersList = await headers()
   const token = headersList.get('cookie')?.split('session_token=')[1]?.split(';')[0]
