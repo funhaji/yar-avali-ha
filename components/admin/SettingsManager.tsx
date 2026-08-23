@@ -77,10 +77,15 @@ const DEFAULT_SETTINGS = [
   { key: 'promo_box_2_badge', label: 'نشان بنر دوم', type: 'text', placeholder: 'معرفی', category: 'banners' },
   { key: 'promo_box_2_link', label: 'لینک بنر دوم', type: 'text', placeholder: '/books', category: 'banners' },
   { key: 'promo_box_2_image', label: 'تصویر بنر دوم (URL)', type: 'url', category: 'banners' },
-    { key: 'ent_cat1_image', label: 'تصویر بخش لوحه نویسی', type: 'url', category: 'banners' },
-  { key: 'ent_cat2_image', label: 'تصویر بخش نشانه های ۱/۲', type: 'url', category: 'banners' },
-  { key: 'ent_cat3_image', label: 'تصویر بخش علوم', type: 'url', category: 'banners' },
-  { key: 'ent_cat4_image', label: 'تصویر بخش سایر', type: 'url', category: 'banners' },
+
+  // Entertainment Page
+  { key: 'ent_cat1_image', label: 'کاور دسته لوحه نویسی (URL)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat1_video', label: 'لینک ویدیوی لوحه نویسی (آپارات)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat2_image', label: 'کاور دسته نشانه های ۱/۲ (URL)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat2_video', label: 'لینک ویدیوی نشانه های ۱/۲ (آپارات)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat3_image', label: 'کاور دسته علوم (URL)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat3_video', label: 'لینک ویدیوی علوم (آپارات)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat4_image', label: 'کاور دسته سایر محتوا (URL)', type: 'url', category: 'entertainment' },
   
   // About Us Page
   { key: 'about_title', label: 'عنوان صفحه درباره ما', type: 'text', placeholder: 'درباره یار اولی‌ها', category: 'about' },

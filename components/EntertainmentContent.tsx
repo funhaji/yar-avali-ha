@@ -15,14 +15,14 @@ type Props = {
   initialCategory?: string
   types: string[]
   typeNames: Record<string, string>
-  categoryImages?: Record<string, string | null>
+  categoryMedia?: Record<string, string | null>
 }
 
-export function EntertainmentContent({ byType, hasSubscription, initialQuery, initialCategory, types, typeNames, categoryImages }: Props) {
+export function EntertainmentContent({ byType, hasSubscription, initialQuery, initialCategory, types, typeNames, categoryMedia }: Props) {
   const CATEGORY_CARDS = [
-    { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '📝', bg: categoryImages?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${categoryImages.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
-    { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '🔤', bg: categoryImages?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${categoryImages.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
-    { id: 'علوم', title: 'علوم', icon: '🔬', bg: categoryImages?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${categoryImages.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }
+    { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '📝', bg: categoryMedia?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${categoryMedia.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
+    { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '🔤', bg: categoryMedia?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${categoryMedia.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
+    { id: 'علوم', title: 'علوم', icon: '🔬', bg: categoryMedia?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${categoryMedia.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }
   ]
   const [searchQuery, setSearchQuery] = useState(initialQuery || '')
   const [tierFilter, setTierFilter] = useState<FilterOption>('all')
@@ -107,9 +107,18 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
       {/* Category Teaser Video */}
       {initialCategory && (
         <div className="mb-12 bg-paper border border-line-soft rounded-2xl p-6 shadow-sm flex flex-col md:flex-row gap-8 items-center">
-          <div className="w-full md:w-1/2 aspect-video bg-black rounded-xl overflow-hidden shadow-md">
-            {/* Hardcoded placeholder for teaser, can be dynamic later */}
-            <iframe src="https://www.aparat.com/video/video/embed/videohash/dummy3" className="w-full h-full border-none" allowFullScreen></iframe>
+          <div className="w-full md:w-1/2 aspect-video bg-black rounded-xl overflow-hidden shadow-md relative">
+            {initialCategory === 'لوحه نویسی' && categoryMedia?.ent_cat1_video ? (
+              <iframe src={categoryMedia.ent_cat1_video} className="w-full h-full border-none" allowFullScreen></iframe>
+            ) : initialCategory === 'نشانه های ۱/۲' && categoryMedia?.ent_cat2_video ? (
+              <iframe src={categoryMedia.ent_cat2_video} className="w-full h-full border-none" allowFullScreen></iframe>
+            ) : initialCategory === 'علوم' && categoryMedia?.ent_cat3_video ? (
+              <iframe src={categoryMedia.ent_cat3_video} className="w-full h-full border-none" allowFullScreen></iframe>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-white/50 text-sm">
+                ویدیویی برای این بخش تنظیم نشده است
+              </div>
+            )}
           </div>
           <div className="w-full md:w-1/2">
             <h2 className="text-3xl font-black mb-4 text-ink">محتوای آموزشی {initialCategory}</h2>
