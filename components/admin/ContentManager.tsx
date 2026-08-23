@@ -274,8 +274,8 @@ export function ContentManager({ initialItems }: { initialItems: ContentItem[] }
             </div>
             {form.content_type !== 'pdf' && form.content_type !== 'image' && (
               <>
-                <label>ژانر<input value={form.genre} onChange={(event) => setField('genre', event.target.value)} placeholder="کمدی، آموزشی، ماجراجویی..." /></label>
-                <label>نام مجموعه<input value={form.series_title} onChange={(event) => setField('series_title', event.target.value)} placeholder="برای انیمه/سریال" /></label>
+                <label>ژانر / زیردسته (برای نشانه ها)<input value={form.genre} onChange={(event) => setField('genre', event.target.value)} placeholder="مثال: نشانه های ۱" /></label>
+                <label>نام مجموعه<input value={form.series_title} onChange={(event) => setField('series_title', event.target.value)} placeholder="سریال فلان/بهمان" /></label>
                 <label>شماره قسمت<input type="number" min="1" value={form.episode_number} onChange={(event) => setField('episode_number', event.target.value)} /></label>
               </>
             )}

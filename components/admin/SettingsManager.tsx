@@ -36,7 +36,8 @@ const DEFAULT_SETTINGS = [
   // Social media links
   { key: 'social_instagram', label: 'لینک اینستاگرام', type: 'url', placeholder: 'https://instagram.com/username', category: 'social' },
   { key: 'social_telegram', label: 'لینک تلگرام', type: 'url', placeholder: 'https://t.me/username', category: 'social' },
-  { key: 'social_whatsapp', label: 'شماره واتس‌اپ', type: 'tel', placeholder: '+989123456789', category: 'social' },
+  { key: 'social_whatsapp', label: 'شماره واتساپ', type: 'tel', placeholder: '+989123456789', category: 'social' },
+  { key: 'social_eitaa', label: 'لینک ایتا', type: 'url', placeholder: 'https://eitaa.com/username', category: 'social' },
   
   // Stats configuration
   { key: 'stat_lessons_count', label: 'تعداد درس‌ها (خودکار یا دستی)', type: 'text', placeholder: 'auto یا عدد مثل 120', category: 'stats' },
@@ -188,10 +189,11 @@ export function SettingsManager({ initialSettings }: Props) {
     { id: 'general', label: 'عمومی' },
     { id: 'social', label: 'شبکه‌های اجتماعی' },
     { id: 'stats', label: 'آمار' },
-    { id: 'posters', label: 'کارت‌های صفحه اصلی' },
+    { id: 'posters', label: 'کاشی‌های صفحه اصلی' },
     { id: 'banners', label: 'بنرهای تبلیغاتی' },
     { id: 'about', label: 'درباره ما' },
     { id: 'teacher_training', label: 'تربیت معلم' },
+    { id: 'entertainment', label: 'محتوای آموزشی' },
   ]
 
   return (

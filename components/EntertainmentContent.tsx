@@ -26,6 +26,7 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
   ]
   const [searchQuery, setSearchQuery] = useState(initialQuery || '')
   const [tierFilter, setTierFilter] = useState<FilterOption>('all')
+  const [activeSubCategory, setActiveSubCategory] = useState<string>('all')
   const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
@@ -195,32 +196,66 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
       {categoriesToRender.map(type => {
         if (!types.includes(type)) return null; // Protect against invalid categories in URL
         
+        let sectionItems = byType[type] || []
+        
+        // Extract sub-categories (using genre) for 'نشانه های ۱/۲'
+        const hasSubCategories = type === 'نشانه های ۱/۲' && initialCategory
+        const subCategories = hasSubCategories 
+          ? Array.from(new Set(sectionItems.map((item: any) => item.genre).filter(Boolean))) as string[]
+          : []
+          
+        if (hasSubCategories && activeSubCategory !== 'all') {
+          sectionItems = sectionItems.filter((item: any) => item.genre === activeSubCategory)
+        }
+        
         return (
           <section key={type} className="mb-12">
             {!initialCategory && (
               <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                 <span className="bg-teal-400 text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl shadow-sm">
-                  {type === 'لوحه نویسی' ? '✏️' : type === 'نشانه های ۱/۲' ? '🔤' : type === 'علوم' ? '🔬' : '📺'}
+                  {type === 'لوحه نویسی' ? '📝' : type === 'نشانه های ۱/۲' ? '🔤' : type === 'علوم' ? '🔬' : '🎬'}
                 </span>
                 {typeNames[type]}
               </h2>
             )}
             
             {initialCategory && (
-              <div className="flex items-center gap-4 mb-8 pb-4 border-b border-gray-200">
-                <span className="bg-teal-500 text-white w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-md rotate-3">
-                  {type === 'لوحه نویسی' ? '✏️' : type === 'نشانه های ۱/۲' ? '🔤' : type === 'علوم' ? '🔬' : '📺'}
-                </span>
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-800">{typeNames[type]}</h2>
-                  <p className="text-gray-500 mt-1">{byType[type]?.length || 0} ویدیو آموزشی</p>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-200">
+                <div className="flex items-center gap-4">
+                  <span className="bg-teal-500 text-white w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-md rotate-3">
+                    {type === 'لوحه نویسی' ? '📝' : type === 'نشانه های ۱/۲' ? '🔤' : type === 'علوم' ? '🔬' : '🎬'}
+                  </span>
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-800">{typeNames[type]}</h2>
+                    <p className="text-gray-500 mt-1">{byType[type]?.length || 0} ویدیوی آموزشی</p>
+                  </div>
                 </div>
               </div>
             )}
             
-            {byType[type] && byType[type].length > 0 ? (
+            {hasSubCategories && subCategories.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-8">
+                <button
+                  onClick={() => setActiveSubCategory('all')}
+                  className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors ${activeSubCategory === 'all' ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-gray-600 border-gray-200 hover:border-teal-400'}`}
+                >
+                  همه موارد
+                </button>
+                {subCategories.map(subCat => (
+                  <button
+                    key={subCat}
+                    onClick={() => setActiveSubCategory(subCat)}
+                    className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors ${activeSubCategory === subCat ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-gray-600 border-gray-200 hover:border-teal-400'}`}
+                  >
+                    {subCat}
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {sectionItems && sectionItems.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                {filterContentByTier(byType[type]).map((item: any) => {
+                {filterContentByTier(sectionItems).map((item: any) => {
                   const isLocked = item.tier_requirement !== 'free' && !hasSubscription
                   
                   return (
