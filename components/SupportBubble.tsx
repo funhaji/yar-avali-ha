@@ -306,15 +306,15 @@ export function SupportBubble({
                     <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
                       {socialInstagram && (
                         <a
-                          href={socialInstagram}
+                          href={socialInstagram.startsWith('http') ? socialInstagram : `https://instagram.com/${socialInstagram.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '48px',
-                            height: '48px',
+                            width: '36px',
+                            height: '36px',
                             borderRadius: '50%',
                             background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
                             color: 'white',
@@ -331,7 +331,7 @@ export function SupportBubble({
                       )}
                       {socialTelegram && (
                         <a
-                          href={socialTelegram}
+                          href={socialTelegram.startsWith('http') ? socialTelegram : `https://t.me/${socialTelegram.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
