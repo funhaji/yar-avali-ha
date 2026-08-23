@@ -8,6 +8,7 @@ import { cookies } from 'next/headers'
 import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
 import { AddToCartButton } from './AddToCartButton'
+import { getEmbedUrl } from '@/lib/video'
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -52,7 +53,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             <div className="w-full md:w-1/2 lg:w-5/12 shrink-0 flex flex-col gap-4">
               {product.video_url && (
                 <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-lg relative border-4 border-line-soft">
-                  <iframe src={product.video_url} className="w-full h-full border-none" allowFullScreen></iframe>
+                  <iframe src={getEmbedUrl(product.video_url)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
                 </div>
               )}
               <div className="aspect-square bg-paper border border-line-soft rounded-2xl overflow-hidden relative shadow-sm">
