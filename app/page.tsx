@@ -313,9 +313,7 @@ export default async function HomePage() {
               {news.map((item: any) => (
                 <Link 
                   key={item.id} 
-                  href={item.redirect_url || `/blog/${item.slug}`} 
-                  target={item.redirect_url ? "_blank" : undefined}
-                  rel={item.redirect_url ? "noopener noreferrer" : undefined}
+                  href={`/blog/${item.slug}`} 
                   className="card card-hover p-0 overflow-hidden flex flex-col max-md:w-[280px] max-md:snap-center shrink-0"
                 >
                   <div className="aspect-video" style={{ 

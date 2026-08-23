@@ -31,6 +31,7 @@ const DEFAULT_SETTINGS = [
   { key: 'footer_text', label: 'متن فوتر', type: 'textarea', category: 'general' },
   { key: 'contact_email', label: 'ایمیل تماس', type: 'email', category: 'general' },
   { key: 'contact_phone', label: 'تلفن تماس', type: 'tel', category: 'general' },
+  { key: 'contact_telegram_id', label: 'آیدی تلگرام (برای ثبت سفارشات)', type: 'text', placeholder: '@yar_avali_ha', category: 'general' },
   
   // Social media links
   { key: 'social_instagram', label: 'لینک اینستاگرام', type: 'url', placeholder: 'https://instagram.com/username', category: 'social' },

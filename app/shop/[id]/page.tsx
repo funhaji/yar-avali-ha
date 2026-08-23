@@ -29,7 +29,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   const token = (await cookies()).get('session_token')?.value
   const user = token ? await validateSession(token).catch(() => null) : null
-  const settings = await getSettings(['site_name', 'site_logo_url'])
+  const settings = await getSettings(['site_name', 'site_logo_url', 'contact_phone', 'contact_telegram_id'])
 
   return (
     <div className="page bg-cream">
@@ -101,17 +101,17 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               
               <div className="prose prose-slate rtl text-ink/90 leading-relaxed mb-8 max-w-none whitespace-pre-wrap">
                 {product.description || 'هنوز توضیحی برای این محصول نوشته نشده.'}
+                {/* Banner for Books category */}
+                {product.category === 'کتاب' && (
+                  <div className="bg-teal/10 border border-teal text-teal p-4 rounded-xl mb-8 font-medium">
+                    برای ثبت سفارش با آیدی زیر یا شماره زیر مراجعه کنید:
+                    <br />
+                    آیدی تلگرام: <span dir="ltr">{settings.contact_telegram_id || '@yar_avali_ha'}</span>
+                    <br />
+                    تلفن: <span dir="ltr">{settings.contact_phone || '09120000000'}</span>
+                  </div>
+                )}
               </div>
-
-              {product.category === 'کتاب' && (
-                <div className="bg-teal/10 border border-teal text-teal p-4 rounded-xl mb-8 font-medium">
-                  برای ثبت سفارش با آیدی زیر یا شماره زیر مراجعه کنید:
-                  <br />
-                  آیدی تلگرام: @yar_avali_ha
-                  <br />
-                  تلفن: 09120000000
-                </div>
-              )}
               
               <div className="mt-auto pt-6 border-t border-line-soft flex flex-col sm:flex-row gap-6 sm:items-center justify-between">
                 {product.price_cents === null ? (
