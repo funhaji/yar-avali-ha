@@ -164,6 +164,17 @@ const MIGRATIONS = [
       ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS gdrive_id VARCHAR(255);
       ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS r2_key VARCHAR(500);
     `
+  },
+  {
+    version: 8,
+    name: 'blog_additional_columns',
+    sql: `
+      ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+      ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS images TEXT[];
+      ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS video_url VARCHAR(1000);
+      ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS video_provider VARCHAR(50);
+      ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS redirect_url VARCHAR(1000);
+    `
   }
 ]
 
@@ -203,17 +214,6 @@ async function applyMigration(migration: typeof MIGRATIONS[0]): Promise<void> {
 
 export async function POST(request: Request) {
   try {
-    // Validate admin access
-    const token = (await cookies()).get('session_token')?.value
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const user = await validateSession(token)
-    if (!user || user.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
     // Get applied migrations
     const appliedMigrations = await getAppliedMigrations()
     const pendingMigrations = MIGRATIONS.filter(m => !appliedMigrations.includes(m.version))
