@@ -16,6 +16,7 @@ const MENU_ITEMS = [
   { href: '/admin/content', label: 'مدیریت محتوا', icon: FileVideo },
   { href: '/admin/settings', label: 'تنظیمات سایت', icon: Settings },
   { href: '/admin/slider', label: 'اسلایدر داشبورد', icon: ImageIcon },
+  { href: '/admin/gallery', label: 'گالری تصاویر', icon: ImageIcon },
   { href: '/admin/users', label: 'کاربران', icon: Users },
   { href: '/admin/teachers', label: 'معلم‌ها', icon: HeartHandshake },
   { href: '/admin/subscriptions/new', label: 'کدهای اشتراک', icon: Link2 },
