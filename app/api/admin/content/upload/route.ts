@@ -56,6 +56,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: blob.url, filename: file.name })
   }
 
+  if (kind === 'image') {
+    if (!file.type.startsWith('image/')) return NextResponse.json({ error: 'Only images are allowed for this type.' }, { status: 400 })
+    if (file.size > 15 * 1024 * 1024) return NextResponse.json({ error: 'File size must be less than 15MB.' }, { status: 400 })
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json({ error: 'BLOB_READ_WRITE_TOKEN is not set.' }, { status: 503 })
+    }
+
+    const blob = await put(`gallery/images/${Date.now()}-${safeName}`, file, {
+      access: 'public',
+      addRandomSuffix: true,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    })
+    return NextResponse.json({ url: blob.url })
+  }
+
   if (kind === 'video') {
     return NextResponse.json(
       { error: 'برای کم شدن مصرف Vercel، ویدیو را مستقیم در Pixeldrain آپلود کنید و لینک یا شناسه آن را در فرم وارد کنید.' },
