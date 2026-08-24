@@ -164,6 +164,18 @@ const MIGRATIONS = [
       ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS gdrive_id VARCHAR(255);
       ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS r2_key VARCHAR(500);
     `
+  },
+  {
+    version: 9,
+    name: 'gallery_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS yar_gallery (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title VARCHAR(500),
+        image_url VARCHAR(1000) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `
   }
 ]
 

@@ -302,4 +302,12 @@ CREATE TABLE IF NOT EXISTS yar_homepage_sections (
 
 CREATE INDEX IF NOT EXISTS idx_yar_homepage_sections_type ON yar_homepage_sections(section_type);
 CREATE INDEX IF NOT EXISTS idx_yar_homepage_sections_order ON yar_homepage_sections(display_order);
+
+-- Gallery table
+CREATE TABLE IF NOT EXISTS yar_gallery (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(500),
+  image_url VARCHAR(1000) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 `;
