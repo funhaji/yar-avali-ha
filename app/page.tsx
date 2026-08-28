@@ -12,7 +12,7 @@ export const revalidate = 60; // ISR: 1 minute
 
 async function getHomePageContent() {
   const settingsKeys = [
-    'hero_title', 'hero_subtitle', 'hero_cta_text', 'site_logo_url', 'site_name',
+    'hero_title', 'hero_subtitle', 'hero_cta_text', 'hero_trust_badge_1', 'hero_trust_badge_2', 'site_logo_url', 'site_name',
     'footer_text', 'contact_email', 'contact_phone',
     'stat_lessons_count', 'stat_lessons_label', 'stat_episodes_count', 'stat_episodes_label',
     'stat_uptime', 'stat_uptime_label',
@@ -110,8 +110,8 @@ export default async function HomePage() {
               <Link href="/subscription" className="button button-ghost button-lg">اشتراک‌ها</Link>
             </div>
             <div className="hero-trust">
-              <span><ShieldCheck style={{ width: 18, color: 'var(--teal-deep)' }} /> محیط امن خانواده</span>
-              <span><Star style={{ width: 18, color: 'var(--sunflower)' }} /> محتوای مناسب سن</span>
+              <span><ShieldCheck style={{ width: 18, color: 'var(--teal-deep)' }} /> {s?.hero_trust_badge_1 || 'محیط امن خانواده'}</span>
+              <span><Star style={{ width: 18, color: 'var(--sunflower)' }} /> {s?.hero_trust_badge_2 || 'محتوای مناسب سن'}</span>
             </div>
             <div className="stat-bar">
               <div>

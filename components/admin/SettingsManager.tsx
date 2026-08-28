@@ -28,6 +28,8 @@ const DEFAULT_SETTINGS = [
   { key: 'hero_title', label: 'عنوان اصلی صفحه', type: 'text', category: 'general' },
   { key: 'hero_subtitle', label: 'زیرعنوان صفحه اصلی', type: 'textarea', category: 'general' },
   { key: 'hero_cta_text', label: 'متن دکمه اصلی', type: 'text', category: 'general' },
+  { key: 'hero_trust_badge_1', label: 'متن نشان اعتماد اول (سپر)', type: 'text', category: 'general' },
+  { key: 'hero_trust_badge_2', label: 'متن نشان اعتماد دوم (ستاره)', type: 'text', category: 'general' },
   { key: 'footer_text', label: 'متن فوتر', type: 'textarea', category: 'general' },
   { key: 'contact_email', label: 'ایمیل تماس', type: 'email', category: 'general' },
   { key: 'contact_phone', label: 'تلفن تماس', type: 'tel', category: 'general' },
