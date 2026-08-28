@@ -167,6 +167,7 @@ ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS storage_provider VARCHAR(50
 ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS pixeldrain_id VARCHAR(255);
 ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS gdrive_id VARCHAR(255);
 ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS r2_key VARCHAR(500);
+ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS subcategory VARCHAR(100);
 
 -- Orders table
 CREATE TABLE IF NOT EXISTS yar_orders (

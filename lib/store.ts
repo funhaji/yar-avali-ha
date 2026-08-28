@@ -21,6 +21,7 @@ export type StoreItem = {
   video_url: string | null
   images: string[] | null
   category: string | null
+  subcategory: string | null
   tags: string[] | null
   file_url: string | null
   created_at: Date
@@ -82,6 +83,20 @@ export async function getStoreItems(filters?: {
   return await query<StoreItem>(sql, params)
 }
 
+export async function getUniqueCategories(): Promise<string[]> {
+  const result = await query<{ category: string }>('SELECT DISTINCT category FROM yar_store_items WHERE category IS NOT NULL AND category != \'\' ORDER BY category')
+  return result.map(r => r.category)
+}
+
+export async function getUniqueSubcategories(category?: string): Promise<string[]> {
+  if (category) {
+    const result = await query<{ subcategory: string }>('SELECT DISTINCT subcategory FROM yar_store_items WHERE subcategory IS NOT NULL AND subcategory != \'\' AND category = $1 ORDER BY subcategory', [category])
+    return result.map(r => r.subcategory)
+  }
+  const result = await query<{ subcategory: string }>('SELECT DISTINCT subcategory FROM yar_store_items WHERE subcategory IS NOT NULL AND subcategory != \'\' ORDER BY subcategory')
+  return result.map(r => r.subcategory)
+}
+
 export async function getStoreItemById(id: string): Promise<StoreItem | null> {
   const items = await query<StoreItem>('SELECT * FROM yar_store_items WHERE id = $1', [id])
   return items[0] || null
@@ -93,7 +108,7 @@ export async function createStoreItem(data: Partial<StoreItem>): Promise<StoreIt
     'stock_quantity', 'is_digital', 'is_free', 'is_downloadable', 
     'is_published', 'display_order',
     'content_type', 'storage_provider', 'pixeldrain_id', 'gdrive_id', 'r2_key',
-    'thumbnail_url', 'video_url', 'images', 'category', 'tags', 'file_url'
+    'thumbnail_url', 'video_url', 'images', 'category', 'subcategory', 'tags', 'file_url'
   ]
   
   const values = []
@@ -126,7 +141,7 @@ export async function updateStoreItem(id: string, data: Partial<StoreItem>): Pro
     'stock_quantity', 'is_digital', 'is_free', 'is_downloadable', 
     'is_published', 'display_order',
     'content_type', 'storage_provider', 'pixeldrain_id', 'gdrive_id', 'r2_key',
-    'thumbnail_url', 'video_url', 'images', 'category', 'tags', 'file_url'
+    'thumbnail_url', 'video_url', 'images', 'category', 'subcategory', 'tags', 'file_url'
   ]
   
   const values = []

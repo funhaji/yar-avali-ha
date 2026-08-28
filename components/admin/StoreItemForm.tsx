@@ -115,7 +115,7 @@ function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
   )
 }
 
-export function StoreItemForm({ initialData, defaultCategory }: { initialData?: StoreItem, defaultCategory?: string }) {
+export function StoreItemForm({ initialData, defaultCategory, existingCategories = [], existingSubcategories = [] }: { initialData?: StoreItem, defaultCategory?: string, existingCategories?: string[], existingSubcategories?: string[] }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -126,6 +126,7 @@ export function StoreItemForm({ initialData, defaultCategory }: { initialData?: 
   const [storageProvider, setStorageProvider] = useState(initialData?.storage_provider || 'pixeldrain')
 
   const [isShowcase, setIsShowcase] = useState(initialData ? (initialData.price_cents === null || initialData.price_cents === undefined) : false)
+  const [selectedCategory, setSelectedCategory] = useState(initialData?.category || defaultCategory || '')
 
   const isEditing = !!initialData && !!initialData.id
 
@@ -176,6 +177,7 @@ export function StoreItemForm({ initialData, defaultCategory }: { initialData?: 
       video_url: formData.get('teaser_video_url') || null,
       images,
       category: formData.get('category') || null,
+      subcategory: formData.get('subcategory') || null,
       tags,
       content_type: isDigital ? contentType : null,
       storage_provider: isDigital ? storageProvider : null,
@@ -241,11 +243,37 @@ export function StoreItemForm({ initialData, defaultCategory }: { initialData?: 
               <input name="title" required defaultValue={initialData?.title} placeholder="مثلاً: کتاب فارسی اول دبستان" />
             </label>
           </div>
-          <div>
-            <label>دسته‌بندی
-              <input name="category" defaultValue={initialData?.category || defaultCategory || ''} placeholder="مثلاً: کتاب، اسباب‌بازی" />
-            </label>
-          </div>
+            <div>
+              <label>دسته بندی
+                <input 
+                  name="category" 
+                  list="category-list"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  placeholder="مثال: کتاب، اسباب بازی..." 
+                />
+                <datalist id="category-list">
+                  {existingCategories.map(cat => (
+                    <option key={cat} value={cat} />
+                  ))}
+                </datalist>
+              </label>
+            </div>
+            <div>
+              <label>زیردسته بندی (اختیاری)
+                <input 
+                  name="subcategory" 
+                  list="subcategory-list"
+                  defaultValue={initialData?.subcategory || ''} 
+                  placeholder="مثال: اول دبستان" 
+                />
+                <datalist id="subcategory-list">
+                  {existingSubcategories.map(sub => (
+                    <option key={sub} value={sub} />
+                  ))}
+                </datalist>
+              </label>
+            </div>
         </div>
 
         <div>

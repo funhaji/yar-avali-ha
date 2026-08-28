@@ -176,6 +176,13 @@ const MIGRATIONS = [
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `
+  },
+  {
+    version: 10,
+    name: 'store_subcategory',
+    sql: `
+      ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS subcategory VARCHAR(100);
+    `
   }
 ]
 

@@ -12,6 +12,7 @@ import { getCachedStoreItems, getCachedSettings } from '@/lib/cache'
 export default async function ShopPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const params = await searchParams
   const category = params.category || 'all'
+  const subcategory = params.subcategory || ''
   const search = params.search || ''
   const sort = params.sort || 'newest'
   
@@ -23,6 +24,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   if (category !== 'all') {
     items = items.filter(i => i.category === category)
   }
+  if (subcategory) {
+    items = items.filter(i => i.subcategory === subcategory)
+  }
   if (search) {
     items = items.filter(i => (i.title && i.title.includes(search)) || (i.description && i.description.includes(search)))
   }
@@ -32,15 +36,24 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     items = items.sort((a, b) => (b.discount_price_cents || b.price_cents) - (a.discount_price_cents || a.price_cents))
   }
   
-  const categoriesMap = new Map<string, number>()
+  type CatNode = { name: string, count: number, subs: Map<string, number> }
+  const catTree = new Map<string, CatNode>()
   allItems.forEach(i => {
-    if (i.category) {
-      categoriesMap.set(i.category, (categoriesMap.get(i.category) || 0) + 1)
+    if (!i.is_free && i.price_cents !== 0 && i.price_cents !== null) {
+      if (i.category) {
+        if (!catTree.has(i.category)) {
+          catTree.set(i.category, { name: i.category, count: 0, subs: new Map() })
+        }
+        const node = catTree.get(i.category)!
+        node.count++
+        if (i.subcategory) {
+          node.subs.set(i.subcategory, (node.subs.get(i.subcategory) || 0) + 1)
+        }
+      }
     }
   })
-  const categories = Array.from(categoriesMap.entries())
-    .map(([cat, count]) => ({ category: cat, count }))
-    .sort((a, b) => b.count - a.count)
+  
+  const categories = Array.from(catTree.values()).sort((a, b) => b.count - a.count)
 
   const token = (await cookies()).get('session_token')?.value
   const user = token ? await validateSession(token).catch(() => null) : null
@@ -72,14 +85,29 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                   همه محصولات
                 </Link>
                 {categories.map(cat => (
-                  <Link 
-                    key={cat.category}
-                    href={`/shop?category=${cat.category}&search=${search}`}
-                    className={`px-3 py-2 rounded-lg transition-colors flex justify-between items-center ${category === cat.category ? 'bg-teal text-paper font-bold' : 'hover:bg-cream text-ink-soft'}`}
-                  >
-                    <span>{cat.category}</span>
-                    <span className="text-xs opacity-70 bg-black/10 px-2 py-0.5 rounded-full">{cat.count}</span>
-                  </Link>
+                  <div key={cat.name} className="flex flex-col">
+                    <Link 
+                      href={`/shop?category=${cat.name}&search=${search}`}
+                      className={`px-3 py-2 rounded-lg transition-colors flex justify-between items-center ${category === cat.name && !subcategory ? 'bg-teal text-paper font-bold' : 'hover:bg-cream text-ink-soft'}`}
+                    >
+                      <span>{cat.name}</span>
+                      <span className="text-xs opacity-70 bg-black/10 px-2 py-0.5 rounded-full">{cat.count}</span>
+                    </Link>
+                    {category === cat.name && cat.subs.size > 0 && (
+                      <div className="flex flex-col ml-2 mr-4 pr-3 border-r-2 border-line-soft mt-1 mb-1 gap-1">
+                        {Array.from(cat.subs.entries()).map(([subName, subCount]) => (
+                          <Link 
+                            key={subName}
+                            href={`/shop?category=${cat.name}&subcategory=${subName}&search=${search}`}
+                            className={`px-3 py-1.5 rounded-lg text-sm transition-colors flex justify-between items-center ${subcategory === subName ? 'bg-teal/10 text-teal font-bold' : 'hover:bg-cream text-ink-soft'}`}
+                          >
+                            <span>{subName}</span>
+                            <span className="text-xs opacity-70 bg-black/5 px-2 py-0.5 rounded-full">{subCount}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -96,6 +124,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
               
               <form className="flex w-full md:w-auto gap-2" action="/shop" method="GET">
                 <input type="hidden" name="category" value={category} />
+                {subcategory && <input type="hidden" name="subcategory" value={subcategory} />}
                 
                 <div className="relative flex-1 max-w-sm">
                   <input 
