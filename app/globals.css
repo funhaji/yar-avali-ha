@@ -949,6 +949,11 @@ input[type="range"]::-moz-range-thumb:hover {
     text-align: center;
   }
   
+  .hero-copy .display,
+  .hero-copy .lead {
+    margin-inline: auto;
+  }
+  
   .hero-copy .button-row {
     justify-content: center;
   }
