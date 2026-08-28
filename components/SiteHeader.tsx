@@ -46,7 +46,7 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
       <nav className="site-nav" aria-label="ناوبری اصلی">
         <Link href="/" className="brand">
           {siteLogo ? (
-            <img src={siteLogo} alt={siteName || 'یارِ اولی‌ها'} style={{ maxHeight: '40px', objectFit: 'contain' }} />
+            <img src={siteLogo} alt={siteName || 'یارِ اولی‌ها'} style={{ maxHeight: '60px', objectFit: 'contain' }} />
           ) : (
             <>
               <span className="brand-mark">۱</span>
@@ -106,10 +106,10 @@ export function SiteFooter({ footerText, contactEmail, contactPhone, siteLogo: p
 
   return (
     <footer className="site-footer">
-      <div>
-        <Link href="/" className="brand">
+        <div className="flex flex-col items-center">
+          <Link href="/" className="brand" style={{ justifyContent: "center", marginBottom: "1rem" }}>
           {siteLogo ? (
-            <img src={siteLogo} alt={siteName || 'یارِ اولی‌ها'} style={{ maxHeight: '40px', objectFit: 'contain' }} />
+            <img src={siteLogo} alt={siteName || 'یارِ اولی‌ها'} style={{ maxHeight: '60px', objectFit: 'contain' }} />
           ) : (
             <>
               <span className="brand-mark">۱</span>
