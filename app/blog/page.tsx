@@ -26,23 +26,34 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
   
   const sp = await searchParams
   const activeCategory = sp.category || 'all'
+  const activeSubcategory = sp.subcategory || ''
   const search = sp.search || ''
   
-  // Calculate category counts
-  const categoriesMap = new Map<string, number>()
+  // Calculate category tree
+  type CatNode = { name: string, count: number, subs: Map<string, number> }
+  const catTree = new Map<string, CatNode>()
   posts.forEach((p: any) => {
     if (p.category) {
-      categoriesMap.set(p.category, (categoriesMap.get(p.category) || 0) + 1)
+      if (!catTree.has(p.category)) {
+        catTree.set(p.category, { name: p.category, count: 0, subs: new Map() })
+      }
+      const node = catTree.get(p.category)!
+      node.count++
+      if (p.subcategory) {
+        node.subs.set(p.subcategory, (node.subs.get(p.subcategory) || 0) + 1)
+      }
     }
   })
-  const categories = Array.from(categoriesMap.entries())
-    .map(([cat, count]) => ({ category: cat, count }))
-    .sort((a, b) => b.count - a.count)
+  
+  const categories = Array.from(catTree.values()).sort((a, b) => b.count - a.count)
     
   let filteredPosts = posts
   
   if (activeCategory !== 'all') {
     filteredPosts = filteredPosts.filter((p: any) => p.category === activeCategory)
+  }
+  if (activeSubcategory) {
+    filteredPosts = filteredPosts.filter((p: any) => p.subcategory === activeSubcategory)
   }
   
   if (search) {
@@ -82,14 +93,29 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                   همه مقالات
                 </Link>
                 {categories.map(cat => (
-                  <Link 
-                    key={cat.category}
-                    href={`/blog?category=${cat.category}&search=${search}`}
-                    className={`px-3 py-2 rounded-lg transition-colors flex justify-between items-center ${activeCategory === cat.category ? 'bg-teal text-paper font-bold' : 'hover:bg-cream text-ink-soft'}`}
-                  >
-                    <span>{cat.category}</span>
-                    <span className="text-xs opacity-70 bg-black/10 px-2 py-0.5 rounded-full">{cat.count}</span>
-                  </Link>
+                  <div key={cat.name} className="flex flex-col">
+                    <Link 
+                      href={`/blog?category=${cat.name}&search=${search}`}
+                      className={`px-3 py-2 rounded-lg transition-colors flex justify-between items-center ${activeCategory === cat.name && !activeSubcategory ? 'bg-teal text-paper font-bold' : 'hover:bg-cream text-ink-soft'}`}
+                    >
+                      <span>{cat.name}</span>
+                      <span className="text-xs opacity-70 bg-black/10 px-2 py-0.5 rounded-full">{cat.count}</span>
+                    </Link>
+                    {activeCategory === cat.name && cat.subs.size > 0 && (
+                      <div className="flex flex-col ml-2 mr-4 pr-3 border-r-2 border-line-soft mt-1 mb-1 gap-1">
+                        {Array.from(cat.subs.entries()).map(([subName, subCount]) => (
+                          <Link 
+                            key={subName}
+                            href={`/blog?category=${cat.name}&subcategory=${subName}&search=${search}`}
+                            className={`px-3 py-1.5 rounded-lg text-sm transition-colors flex justify-between items-center ${activeSubcategory === subName ? 'bg-teal/10 text-teal font-bold' : 'hover:bg-cream text-ink-soft'}`}
+                          >
+                            <span>{subName}</span>
+                            <span className="text-xs opacity-70 bg-black/5 px-2 py-0.5 rounded-full">{subCount}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -107,16 +133,17 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                 </Link>
                 {categories.map(cat => (
                   <Link 
-                    key={cat.category} 
-                    href={`/blog?category=${cat.category}&search=${search}`}
-                    className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-sm transition-colors ${activeCategory === cat.category ? 'bg-teal text-paper' : 'bg-cream text-ink-soft hover:bg-line-soft'}`}>
-                    {cat.category}
+                    key={cat.name} 
+                    href={`/blog?category=${cat.name}&search=${search}`}
+                    className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-sm transition-colors ${activeCategory === cat.name ? 'bg-teal text-paper' : 'bg-cream text-ink-soft hover:bg-line-soft'}`}>
+                    {cat.name}
                   </Link>
                 ))}
               </div>
               
               <form className="flex w-full md:w-auto gap-2 ml-auto" action="/blog" method="GET">
                 <input type="hidden" name="category" value={activeCategory} />
+                {activeSubcategory && <input type="hidden" name="subcategory" value={activeSubcategory} />}
                 <div className="relative flex-1 min-w-[250px]">
                   <input 
                     type="text" 

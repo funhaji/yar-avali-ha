@@ -248,6 +248,7 @@ ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS images TEXT[];
 ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS video_url VARCHAR(1000);
 ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS video_provider VARCHAR(50);
 ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS redirect_url VARCHAR(1000);
+ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS subcategory VARCHAR(100);
 
 -- Workshops table
 CREATE TABLE IF NOT EXISTS yar_workshops (

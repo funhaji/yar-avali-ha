@@ -41,13 +41,19 @@ export default async function AdminBlogPage() {
 
   const posts = await getBlogPosts()
 
+  const cats = await query<{ category: string }>('SELECT DISTINCT category FROM yar_blog_posts WHERE category IS NOT NULL AND category != \'\' ORDER BY category')
+  const categories = cats.map(c => c.category)
+
+  const subcats = await query<{ subcategory: string }>('SELECT DISTINCT subcategory FROM yar_blog_posts WHERE subcategory IS NOT NULL AND subcategory != \'\' ORDER BY subcategory')
+  const subcategories = subcats.map(c => c.subcategory)
+
   return (
     <div className="page">
       <SiteHeader userName={user.name} isAdmin />
       <main className="shell section">
         <span className="section-kicker"><FileText /> مدیریت وبلاگ</span>
         <h1 className="section-title" style={{ marginBottom: '1.6rem' }}>پست‌های وبلاگ</h1>
-        <BlogManager initialPosts={posts} />
+        <BlogManager initialPosts={posts} existingCategories={categories} existingSubcategories={subcategories} />
       </main>
     </div>
   )

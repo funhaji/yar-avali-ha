@@ -183,6 +183,13 @@ const MIGRATIONS = [
     sql: `
       ALTER TABLE yar_store_items ADD COLUMN IF NOT EXISTS subcategory VARCHAR(100);
     `
+  },
+  {
+    version: 11,
+    name: 'blog_subcategory',
+    sql: `
+      ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS subcategory VARCHAR(100);
+    `
   }
 ]
 

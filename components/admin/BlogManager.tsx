@@ -16,9 +16,11 @@ type BlogPost = {
 
 type Props = {
   initialPosts: BlogPost[]
+  existingCategories?: string[]
+  existingSubcategories?: string[]
 }
 
-export function BlogManager({ initialPosts }: Props) {
+export function BlogManager({ initialPosts, existingCategories = [], existingSubcategories = [] }: Props) {
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [editing, setEditing] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -27,6 +29,7 @@ export function BlogManager({ initialPosts }: Props) {
     content: '',
     excerpt: '',
     category: '',
+    subcategory: '',
     thumbnail_url: '',
     images: [] as string[],
     video_url: '',
@@ -49,6 +52,7 @@ export function BlogManager({ initialPosts }: Props) {
           content: data.post.content,
           excerpt: data.post.excerpt || '',
           category: data.post.category || '',
+          subcategory: data.post.subcategory || '',
           thumbnail_url: data.post.thumbnail_url || '',
           images: data.post.images || [],
           video_url: data.post.video_url || '',
@@ -67,6 +71,7 @@ export function BlogManager({ initialPosts }: Props) {
       content: '',
       excerpt: '',
       category: '',
+      subcategory: '',
       thumbnail_url: '',
       images: [] as string[],
       video_url: '',
@@ -220,17 +225,40 @@ export function BlogManager({ initialPosts }: Props) {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             />
           </div>
-          
-          <div>
-            <label className="block font-medium mb-2">دسته بندی</label>
-            <input
-              type="text"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              placeholder="مثلا: اخبار، اطلاعیه، ..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-            />
-          </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-medium mb-2">دسته‌بندی</label>
+                <input
+                  type="text"
+                  list="blog-category-list"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="مثلاً: اخبار، مقالات..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                />
+                <datalist id="blog-category-list">
+                  {existingCategories.map(cat => (
+                    <option key={cat} value={cat} />
+                  ))}
+                </datalist>
+              </div>
+              <div>
+                <label className="block font-medium mb-2">زیردسته بندی (اختیاری)</label>
+                <input
+                  type="text"
+                  list="blog-subcategory-list"
+                  value={formData.subcategory}
+                  onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                  placeholder="مثلاً: جشنواره"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                />
+                <datalist id="blog-subcategory-list">
+                  {existingSubcategories.map(sub => (
+                    <option key={sub} value={sub} />
+                  ))}
+                </datalist>
+              </div>
+            </div>
 
           <div>
             <label className="block font-medium mb-2">محتوا *</label>

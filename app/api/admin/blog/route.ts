@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, category } = body
+    const { title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, category, subcategory } = body
 
     if (!title || !slug || !content) {
       return NextResponse.json(
@@ -26,10 +26,10 @@ export async function POST(request: Request) {
     }
 
     const result = await query(`
-      INSERT INTO yar_blog_posts (title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, author_id, category)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      INSERT INTO yar_blog_posts (title, slug, content, excerpt, thumbnail_url, images, video_url, video_provider, redirect_url, published, author_id, category, subcategory)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *
-    `, [title, slug, content, excerpt, thumbnail_url, images || [], video_url || null, video_provider || 'direct', redirect_url || null, published, user.id, category || null])
+    `, [title, slug, content, excerpt, thumbnail_url, images || [], video_url || null, video_provider || 'direct', redirect_url || null, published, user.id, category || null, subcategory || null])
 
     revalidateTag('blog')
     return NextResponse.json({ post: result[0] })
