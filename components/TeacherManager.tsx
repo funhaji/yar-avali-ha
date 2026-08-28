@@ -7,10 +7,12 @@ interface Teacher {
   id: string; name: string; specialty: string | null; bio: string | null; photo_url: string | null; video_url: string | null; display_order: number; is_visible: boolean;
   education?: string | null; location?: string | null; workplace?: string | null; experience_years?: number | null;
   national_rank?: number | null; provincial_rank?: number | null; district_rank?: number | null;
+  contact_phone?: string | null; telegram_id?: string | null; whatsapp_id?: string | null; eitaa_id?: string | null; instagram_id?: string | null;
 }
 const empty = { 
   id: '', name: '', specialty: '', bio: '', photo_url: '', video_url: '', display_order: 0, is_visible: true,
-  education: '', location: '', workplace: '', experience_years: '', national_rank: '', provincial_rank: '', district_rank: ''
+  education: '', location: '', workplace: '', experience_years: '', national_rank: '', provincial_rank: '', district_rank: '',
+  contact_phone: '', telegram_id: '', whatsapp_id: '', eitaa_id: '', instagram_id: ''
 }
 
 export function TeacherManager({ initial }: { initial: Teacher[] }) {
@@ -75,6 +77,16 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
             <label>رتبه ناحیه <input type="number" value={form.district_rank || ''} onChange={e => setForm({ ...form, district_rank: e.target.value ? Number(e.target.value) : '' })} /></label>
           </div>
 
+          <label>شماره تماس <small className="muted">مثلا: 09123456789</small><input value={form.contact_phone || ''} onChange={e => setForm({ ...form, contact_phone: e.target.value })} /></label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <label>آیدی تلگرام <input value={form.telegram_id || ''} onChange={e => setForm({ ...form, telegram_id: e.target.value })} /></label>
+            <label>آیدی ایتا <input value={form.eitaa_id || ''} onChange={e => setForm({ ...form, eitaa_id: e.target.value })} /></label>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <label>آیدی اینستاگرام <input value={form.instagram_id || ''} onChange={e => setForm({ ...form, instagram_id: e.target.value })} /></label>
+            <label>شماره واتساپ <input value={form.whatsapp_id || ''} onChange={e => setForm({ ...form, whatsapp_id: e.target.value })} /></label>
+          </div>
+
           <label>درباره معلم <textarea rows={3} value={form.bio || ''} onChange={e => setForm({ ...form, bio: e.target.value })} /></label>
           <label>ترتیب نمایش <input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: Number(e.target.value) })} /></label>
           <label>لینک ویدیو معرفی (اختیاری) <input type="url" placeholder="مثال: https://www.aparat.com/v/..." value={form.video_url || ''} onChange={e => setForm({ ...form, video_url: e.target.value })} /></label>
@@ -108,7 +120,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                   <h3 className="teacher-name">{t.name}</h3>
                   {t.specialty && <span className="chip teacher-specialty">{t.specialty}</span>}
                   <div className="button-row" style={{ marginTop: '.6rem' }}>
-                    <button className="icon-button" aria-label="ویرایش" onClick={() => { setForm({ ...t, specialty: t.specialty || '', bio: t.bio || '', photo_url: t.photo_url || '', video_url: t.video_url || '', education: t.education || '', location: t.location || '', workplace: t.workplace || '', experience_years: t.experience_years || '', national_rank: t.national_rank || '', provincial_rank: t.provincial_rank || '', district_rank: t.district_rank || '' }); setEditing(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }}><Pencil /></button>
+                    <button className="icon-button" aria-label="ویرایش" onClick={() => { setForm({ ...t, specialty: t.specialty || '', bio: t.bio || '', photo_url: t.photo_url || '', video_url: t.video_url || '', education: t.education || '', location: t.location || '', workplace: t.workplace || '', experience_years: t.experience_years || '', national_rank: t.national_rank || '', provincial_rank: t.provincial_rank || '', district_rank: t.district_rank || '', contact_phone: t.contact_phone || '', telegram_id: t.telegram_id || '', whatsapp_id: t.whatsapp_id || '', eitaa_id: t.eitaa_id || '', instagram_id: t.instagram_id || '' }); setEditing(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }}><Pencil /></button>
                     <button className="icon-button" aria-label="نمایش" onClick={() => toggle(t)}>{t.is_visible ? <Eye /> : <EyeOff />}</button>
                     <button className="icon-button" aria-label="حذف" onClick={() => remove(t.id)}><Trash2 /></button>
                   </div>

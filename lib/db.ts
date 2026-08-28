@@ -213,6 +213,11 @@ CREATE TABLE IF NOT EXISTS yar_teachers (
   national_rank INT,
   provincial_rank INT,
   district_rank INT,
+  contact_phone VARCHAR(50),
+  telegram_id VARCHAR(255),
+  whatsapp_id VARCHAR(255),
+  eitaa_id VARCHAR(255),
+  instagram_id VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

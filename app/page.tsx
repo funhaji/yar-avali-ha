@@ -373,13 +373,16 @@ export default async function HomePage() {
               <span className="section-kicker"><HeartHandshake /> تیم دوست‌داشتنی</span>
               <h2 className="section-title">معلم‌های ما را بشناسید</h2>
             </div>
-            <p className="muted" style={{ maxWidth: '38ch', lineHeight: 1.7 }}>هر درس را کسی می‌سازد که عاشق آموزش کودکان است.</p>
+            <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+              <p className="muted" style={{ maxWidth: '38ch', lineHeight: 1.7 }}>هر درس را کسی می‌سازد که عاشق آموزش کودکان است.</p>
+              <Link href="/teachers" className="button button-ghost whitespace-nowrap">مشاهده همه معلم‌ها <ArrowLeft className="w-4 h-4 mr-2" /></Link>
+            </div>
           </div>
 
           {teachers.length > 0 ? (
             <div className="teacher-grid max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch', gap: '1rem' }}>
               {teachers.map((t) => (
-                <article key={t.id} className="card card-hover teacher-card max-md:w-[260px] max-md:snap-center shrink-0">
+                <Link href={`/teachers/${t.id}`} key={t.id} className="card card-hover teacher-card max-md:w-[260px] max-md:snap-center shrink-0 block">
                   {t.photo_url ? (
                     <img src={t.photo_url || "/placeholder.svg"} alt={t.name} className="teacher-photo" />
                   ) : (
@@ -388,14 +391,9 @@ export default async function HomePage() {
                   <div className="teacher-body">
                     <h3 className="teacher-name">{t.name}</h3>
                     {t.specialty && <span className="chip teacher-specialty">{t.specialty}</span>}
-                    {t.bio && <p className="muted" style={{ lineHeight: 1.7, fontSize: '.95rem', marginBottom: t.video_url ? '1rem' : 0 }}>{t.bio}</p>}
-                    {t.video_url && (
-                      <a href={t.video_url} target="_blank" rel="noopener noreferrer" className="button button-ghost" style={{ alignSelf: 'flex-start', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-                        <Clapperboard style={{ width: 14, height: 14 }} /> ویدیو معرفی
-                      </a>
-                    )}
+                    {t.bio && <p className="muted" style={{ lineHeight: 1.7, fontSize: '.95rem' }}>{t.bio}</p>}
                   </div>
-                </article>
+                </Link>
               ))}
             </div>
           ) : (

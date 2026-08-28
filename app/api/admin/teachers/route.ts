@@ -10,12 +10,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'عدم دسترسی' }, { status: 403 })
-  const { name, specialty, bio, photo_url, display_order, is_visible, video_url, education, location, workplace, experience_years, national_rank, provincial_rank, district_rank } = await request.json()
+  const { name, specialty, bio, photo_url, display_order, is_visible, video_url, education, location, workplace, experience_years, national_rank, provincial_rank, district_rank, contact_phone, telegram_id, whatsapp_id, eitaa_id, instagram_id } = await request.json()
   if (!name) return NextResponse.json({ error: 'نام الزامی است' }, { status: 400 })
   try {
     const rows = await query(
-      'INSERT INTO yar_teachers (name, specialty, bio, photo_url, display_order, is_visible, video_url, education, location, workplace, experience_years, national_rank, provincial_rank, district_rank) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *',
-      [name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, video_url || null, education || null, location || null, workplace || null, experience_years || null, national_rank || null, provincial_rank || null, district_rank || null]
+      'INSERT INTO yar_teachers (name, specialty, bio, photo_url, display_order, is_visible, video_url, education, location, workplace, experience_years, national_rank, provincial_rank, district_rank, contact_phone, telegram_id, whatsapp_id, eitaa_id, instagram_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING *',
+      [name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, video_url || null, education || null, location || null, workplace || null, experience_years || null, national_rank || null, provincial_rank || null, district_rank || null, contact_phone || null, telegram_id || null, whatsapp_id || null, eitaa_id || null, instagram_id || null]
     )
     revalidateTag('teachers')
     return NextResponse.json({ teacher: rows[0] })
@@ -26,12 +26,12 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'عدم دسترسی' }, { status: 403 })
-  const { id, name, specialty, bio, photo_url, display_order, is_visible, video_url, education, location, workplace, experience_years, national_rank, provincial_rank, district_rank } = await request.json()
+  const { id, name, specialty, bio, photo_url, display_order, is_visible, video_url, education, location, workplace, experience_years, national_rank, provincial_rank, district_rank, contact_phone, telegram_id, whatsapp_id, eitaa_id, instagram_id } = await request.json()
   if (!id) return NextResponse.json({ error: 'ایدی الزامی است' }, { status: 400 })
   try {
     const rows = await query(
-      'UPDATE yar_teachers SET name=$1, specialty=$2, bio=$3, photo_url=$4, display_order=$5, is_visible=$6, video_url=$7, education=$9, location=$10, workplace=$11, experience_years=$12, national_rank=$13, provincial_rank=$14, district_rank=$15, updated_at=NOW() WHERE id=$8 RETURNING *',
-      [name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, video_url || null, id, education || null, location || null, workplace || null, experience_years || null, national_rank || null, provincial_rank || null, district_rank || null]
+      'UPDATE yar_teachers SET name=$1, specialty=$2, bio=$3, photo_url=$4, display_order=$5, is_visible=$6, video_url=$7, education=$9, location=$10, workplace=$11, experience_years=$12, national_rank=$13, provincial_rank=$14, district_rank=$15, contact_phone=$16, telegram_id=$17, whatsapp_id=$18, eitaa_id=$19, instagram_id=$20, updated_at=NOW() WHERE id=$8 RETURNING *',
+      [name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, video_url || null, id, education || null, location || null, workplace || null, experience_years || null, national_rank || null, provincial_rank || null, district_rank || null, contact_phone || null, telegram_id || null, whatsapp_id || null, eitaa_id || null, instagram_id || null]
     )
     revalidateTag('teachers')
     return NextResponse.json({ teacher: rows[0] })

@@ -304,6 +304,16 @@ export default async function DashboardPage() {
               </div>
               <ArrowLeft style={{ width: 18, opacity: .4 }} />
             </Link>
+            <Link href="/teachers" className="card card-hover" style={{ padding: '1.5rem', border: '1px solid var(--line-soft)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.9rem' }}>
+                <div className="tile-ico" style={{ background: '#e0f0ff', color: '#2563eb', marginBottom: 0 }}><HeartHandshake /></div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>معلم‌های یاراولیها</div>
+                  <div className="muted" style={{ fontSize: '.85rem' }}>آشنایی با تیم آموزشی ما</div>
+                </div>
+              </div>
+              <ArrowLeft style={{ width: 18, opacity: .4 }} />
+            </Link>
           </div>
         </section>
 

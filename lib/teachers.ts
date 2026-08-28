@@ -17,6 +17,11 @@ export interface Teacher {
   national_rank?: number | null
   provincial_rank?: number | null
   district_rank?: number | null
+  contact_phone?: string | null
+  telegram_id?: string | null
+  whatsapp_id?: string | null
+  eitaa_id?: string | null
+  instagram_id?: string | null
 }
 
 export async function getVisibleTeachers(): Promise<Teacher[]> {

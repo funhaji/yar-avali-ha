@@ -218,6 +218,18 @@ const MIGRATIONS = [
       ADD COLUMN IF NOT EXISTS provincial_rank INT,
       ADD COLUMN IF NOT EXISTS district_rank INT;
     `
+  },
+  {
+    version: 14,
+    name: 'teachers_contact_fields',
+    sql: `
+      ALTER TABLE yar_teachers 
+      ADD COLUMN IF NOT EXISTS contact_phone VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS telegram_id VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS whatsapp_id VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS eitaa_id VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS instagram_id VARCHAR(255);
+    `
   }
 ]
 
