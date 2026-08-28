@@ -250,6 +250,16 @@ ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS video_provider VARCHAR(50);
 ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS redirect_url VARCHAR(1000);
 ALTER TABLE yar_blog_posts ADD COLUMN IF NOT EXISTS subcategory VARCHAR(100);
 
+-- Store Comments table
+CREATE TABLE IF NOT EXISTS yar_store_comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_item_id UUID REFERENCES yar_store_items(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES yar_users(id) ON DELETE CASCADE,
+  comment TEXT NOT NULL,
+  is_approved BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Workshops table
 CREATE TABLE IF NOT EXISTS yar_workshops (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

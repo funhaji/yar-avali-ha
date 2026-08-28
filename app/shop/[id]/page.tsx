@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
-import { getStoreItemById, getRelatedStoreItems } from '@/lib/store'
-import { ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Download, Image as ImageIcon } from 'lucide-react'
+import { getStoreItemById, getRelatedStoreItems, getStoreComments } from '@/lib/store'
+import { ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Download, Image as ImageIcon, MessageSquare } from 'lucide-react'
 import { ProductCard } from '@/components/shop/ProductCard'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
@@ -9,6 +9,7 @@ import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
 import { AddToCartButton } from './AddToCartButton'
 import { getEmbedUrl } from '@/lib/video'
+import { StoreComments } from '@/components/shop/StoreComments'
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -27,6 +28,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   }
 
   const relatedItems = await getRelatedStoreItems(product.id, 3)
+  const comments = await getStoreComments(product.id)
 
   const token = (await cookies()).get('session_token')?.value
   const user = token ? await validateSession(token).catch(() => null) : null
@@ -144,6 +146,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Comments Section */}
+        <div className="mt-12 max-w-4xl slide-up" style={{ animationDelay: '0.1s' }}>
+          <StoreComments storeItemId={product.id} initialComments={comments} user={user} />
         </div>
 
         {/* Related Products */}

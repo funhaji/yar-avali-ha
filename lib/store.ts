@@ -197,3 +197,14 @@ export async function getRelatedStoreItems(id: string, limit: number = 3): Promi
   `
   return await query<StoreItem>(sql, [item.category, id, limit])
 }
+
+export async function getStoreComments(storeItemId: string) {
+  const sql = `
+    SELECT c.id, c.comment, c.created_at, u.name as user_name
+    FROM yar_store_comments c
+    JOIN yar_users u ON c.user_id = u.id
+    WHERE c.store_item_id = $1 AND c.is_approved = true
+    ORDER BY c.created_at DESC
+  `
+  return await query<{ id: string, comment: string, created_at: string, user_name: string }>(sql, [storeItemId])
+}
