@@ -1,4 +1,4 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { ArrowLeft, BookOpen, Clapperboard, HeartHandshake, Palette, Rocket, ShieldCheck, Sparkles, Star } from 'lucide-react'
 import { validateSession } from '@/lib/auth'
@@ -72,17 +72,17 @@ export default async function HomePage() {
   const s = settings as Record<string, string | null>
   
   // Use settings or fallback to defaults
-  const heroTitle = s?.hero_title || 'Ø¯Ø±Ø³ Ø¨Ø®ÙˆÙ†ØŒ Ø§Ù†ÛŒÙ…Ù‡ Ø¨Ø¨ÛŒÙ†ØŒ Ø¨Ø§ Ø®Ø§Ù†ÙˆØ§Ø¯Ù‡'
-  const heroSubtitle = s?.hero_subtitle || 'Ø¯Ø±Ø³â€ŒÙ‡Ø§ÛŒ ØªØµÙˆÛŒØ±ÛŒ Ø¨Ø±Ø§ÛŒ Ú©Ù„Ø§Ø³ Ø§ÙˆÙ„ ØªØ§ Ø³ÙˆÙ…ØŒ Ø¯Ø± Ú©Ù†Ø§Ø± Ú©ØªØ§Ø¨Ø®Ø§Ù†Ù‡â€ŒØ§ÛŒ Ø§Ø² Ø§Ù†ÛŒÙ…Ù‡ Ùˆ ÙÛŒÙ„Ù…â€ŒÙ‡Ø§ÛŒ Ù…Ù†Ø§Ø³Ø¨ Ù‡Ø± Ø³Ù† â€” Ù‡Ù…Ù‡ Ø¯Ø± ÛŒÚ© Ø§Ø´ØªØ±Ø§Ú©.'
-  const ctaText = s?.hero_cta_text || (user ? 'Ø±ÙØªÙ† Ø¨Ù‡ Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯' : 'Ø±Ø§ÛŒÚ¯Ø§Ù† Ø´Ø±ÙˆØ¹ Ú©Ù†')
+  const heroTitle = s?.hero_title || 'درس بخون، انیمه ببین، با خانواده'
+  const heroSubtitle = s?.hero_subtitle || 'درس‌های تصویری برای کلاس اول تا سوم، در کنار کتابخانه‌ای از انیمه و فیلم‌های مناسب هر سن — همه در یک اشتراک.'
+  const ctaText = s?.hero_cta_text || (user ? 'رفتن به داشبورد' : 'رایگان شروع کن')
   
   // Stats configuration
   const statLessonsCount = s?.stat_lessons_count || '120'
-  const statLessonsLabel = s?.stat_lessons_label || 'Ø¯Ø±Ø³ ØªØµÙˆÛŒØ±ÛŒ'
+  const statLessonsLabel = s?.stat_lessons_label || 'درس تصویری'
   const statEpisodesCount = s?.stat_episodes_count || '500'
-  const statEpisodesLabel = s?.stat_episodes_label || 'Ù‚Ø³Ù…Øª Ø§Ù†ÛŒÙ…Ù‡ Ùˆ ÙÛŒÙ„Ù…'
+  const statEpisodesLabel = s?.stat_episodes_label || 'قسمت انیمه و فیلم'
   const statUptime = s?.stat_uptime || '99.9'
-  const statUptimeLabel = s?.stat_uptime_label || 'Ù¾Ø§ÛŒØ¯Ø§Ø±ÛŒ Ø³Ø±ÙˆÛŒØ³'
+  const statUptimeLabel = s?.stat_uptime_label || 'پایداری سرویس'
 
   return (
     <div className="page">
@@ -93,7 +93,7 @@ export default async function HomePage() {
         siteName={s?.site_name || undefined}
       />
 
-      {/* HERO: poster collage â€” the content is the identity, not decoration */}
+      {/* HERO: poster collage — the content is the identity, not decoration */}
       <section className="hero">
         <div className="hero-field" aria-hidden="true">
           <div className="hero-glow g1" />
@@ -102,16 +102,16 @@ export default async function HomePage() {
         </div>
         <div className="shell hero-grid">
           <div className="hero-copy">
-            <span className="section-kicker"><Sparkles /> ÛŒØ§Ø¯Ú¯ÛŒØ±ÛŒ + Ø³Ø±Ú¯Ø±Ù…ÛŒØŒ ÛŒÚ©â€ŒØ¬Ø§</span>
+            <span className="section-kicker"><Sparkles /> یادگیری + سرگرمی، یک‌جا</span>
             <h1 className="display text-balance">{heroTitle}</h1>
             <p className="lead" style={{ marginTop: '1.1rem' }}>{heroSubtitle}</p>
             <div className="button-row" style={{ marginTop: '1.6rem' }}>
               <Link href={user ? '/dashboard' : '/register'} className="button button-primary button-lg">{ctaText} <ArrowLeft /></Link>
-              <Link href="/subscription" className="button button-ghost button-lg">Ø§Ø´ØªØ±Ø§Ú©â€ŒÙ‡Ø§</Link>
+              <Link href="/subscription" className="button button-ghost button-lg">اشتراک‌ها</Link>
             </div>
             <div className="hero-trust">
-              <span><ShieldCheck style={{ width: 18, color: 'var(--teal-deep)' }} /> {s?.hero_trust_badge_1 || 'Ù…Ø­ÛŒØ· Ø§Ù…Ù† Ø®Ø§Ù†ÙˆØ§Ø¯Ù‡'}</span>
-              <span><Star style={{ width: 18, color: 'var(--sunflower)' }} /> {s?.hero_trust_badge_2 || 'Ù…Ø­ØªÙˆØ§ÛŒ Ù…Ù†Ø§Ø³Ø¨ Ø³Ù†'}</span>
+              <span><ShieldCheck style={{ width: 18, color: 'var(--teal-deep)' }} /> {s?.hero_trust_badge_1 || 'محیط امن خانواده'}</span>
+              <span><Star style={{ width: 18, color: 'var(--sunflower)' }} /> {s?.hero_trust_badge_2 || 'محتوای مناسب سن'}</span>
             </div>
             <div className="stat-bar">
               <div>
@@ -123,7 +123,7 @@ export default async function HomePage() {
                 <div className="stat-bar-label">{statEpisodesLabel}</div>
               </div>
               <div>
-                <div className="stat-bar-num">{statUptime}Ùª</div>
+                <div className="stat-bar-num">{statUptime}٪</div>
                 <div className="stat-bar-label">{statUptimeLabel}</div>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default async function HomePage() {
             }}>
               {(s?.poster_tile_1_show_text === 'true' || !s?.poster_tile_1_image) && (
                 <div style={{ display: 'grid', placeItems: 'center', height: '100%', color: '#fff', fontWeight: 800, fontSize: '.85rem', textAlign: 'center', padding: '.5rem', whiteSpace: 'pre-line' }}>
-                  {s?.poster_tile_1_text || 'Ø±ÛŒØ§Ø¶ÛŒ\nÚ©Ù„Ø§Ø³ Ø§ÙˆÙ„'}
+                  {s?.poster_tile_1_text || 'ریاضی\nکلاس اول'}
                 </div>
               )}
             </div>
@@ -160,7 +160,7 @@ export default async function HomePage() {
             }}>
               {(s?.poster_tile_2_show_text === 'true' || !s?.poster_tile_2_image) && (
                 <div style={{ display: 'grid', placeItems: 'center', height: '100%', color: '#fff', fontWeight: 800, fontSize: '.85rem', textAlign: 'center', padding: '.5rem', whiteSpace: 'pre-line' }}>
-                  {s?.poster_tile_2_text || 'Ø§Ù†ÛŒÙ…Ù‡\nÙ…Ø§Ø¬Ø±Ø§Ø¬ÙˆÛŒÛŒ'}
+                  {s?.poster_tile_2_text || 'انیمه\nماجراجویی'}
                 </div>
               )}
               {s?.poster_tile_2_badge && (
@@ -180,7 +180,7 @@ export default async function HomePage() {
             }}>
               {(s?.poster_tile_3_show_text === 'true' || !s?.poster_tile_3_image) && (
                 <div style={{ display: 'grid', placeItems: 'center', height: '100%', color: '#fff', fontWeight: 800, fontSize: '.85rem', textAlign: 'center', padding: '.5rem', whiteSpace: 'pre-line' }}>
-                  {s?.poster_tile_3_text || 'ÙØ§Ø±Ø³ÛŒ\nÙˆ Ø±ÙˆØ§Ù†â€ŒØ®ÙˆØ§Ù†ÛŒ'}
+                  {s?.poster_tile_3_text || 'فارسی\nو روان‌خوانی'}
                 </div>
               )}
             </div>
@@ -197,7 +197,7 @@ export default async function HomePage() {
             }}>
               {(s?.poster_tile_4_show_text === 'true' || !s?.poster_tile_4_image) && (
                 <div style={{ display: 'grid', placeItems: 'center', height: '100%', color: '#fff', fontWeight: 800, fontSize: '.85rem', textAlign: 'center', padding: '.5rem', whiteSpace: 'pre-line' }}>
-                  {s?.poster_tile_4_text || 'ÙÛŒÙ„Ù…\nÚ©ÙˆØ¯Ú©Ø§Ù†Ù‡'}
+                  {s?.poster_tile_4_text || 'فیلم\nکودکانه'}
                 </div>
               )}
               {s?.poster_tile_4_badge && (
@@ -214,10 +214,10 @@ export default async function HomePage() {
           <Reveal>
           <div className="rail-head">
             <div>
-              <span className="section-kicker"><Star /> Ø¨Ø±Ú¯Ø²ÛŒØ¯Ù‡â€ŒÙ‡Ø§</span>
-              <h2 className="section-title">ÙØ±ÙˆØ´Ú¯Ø§Ù‡</h2>
+              <span className="section-kicker"><Star /> برگزیده‌ها</span>
+              <h2 className="section-title">فروشگاه</h2>
             </div>
-            <Link href="/shop" className="muted" style={{ fontWeight: 700 }}>Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ù‡Ù…Ù‡ <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
+            <Link href="/shop" className="muted" style={{ fontWeight: 700 }}>مشاهده همه <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
           </div>
           {storeItems.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -229,7 +229,7 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-              <p className="muted">Ù…Ø­ØµÙˆÙ„Ø§Øª ÙØ±ÙˆØ´Ú¯Ø§Ù‡ Ø¨Ù‡ Ø²ÙˆØ¯ÛŒ Ø§Ø¶Ø§ÙÙ‡ Ù…ÛŒâ€ŒØ´ÙˆØ¯</p>
+              <p className="muted">محصولات فروشگاه به زودی اضافه می‌شود</p>
             </div>
           )}
           </Reveal>
@@ -237,15 +237,15 @@ export default async function HomePage() {
       </section>
 
       {/* TEACHER TRAINING & BOOKS */}
-      <section className="section" style={{ paddingBlock: '1rem' }}>
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid md:grid-cols-2 gap-6">
             <Reveal>
               <Link href={s?.promo_box_1_link || "/teacher-training"} className="card card-hover p-4 md:p-8 relative overflow-hidden group aspect-video md:aspect-auto md:min-h-[300px]" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', border: '1px solid var(--teal)', background: `linear-gradient(180deg, rgba(20,19,31,0) 0%, rgba(20,19,31,0.8) 100%), url(${s?.promo_box_1_image || 'https://images.unsplash.com/photo-1544717302-de2939b7ef71?q=80&w=2000&auto=format&fit=crop'}) center/cover` }}>
                 <div className="relative z-10 text-white">
-                  <span className="badge bg-teal text-paper mb-2 md:mb-3">{s?.promo_box_1_badge || 'ÙˆÛŒÚ˜Ù‡'}</span>
-                  <h3 className="text-xl md:text-2xl font-bold mb-1 md:mb-2">{s?.promo_box_1_title || 'Ú©Ø§Ø±Ú¯Ø§Ù‡ ØªØ±Ø¨ÛŒØª Ù…Ø¹Ù„Ù… Ùˆ Ø¯ÙˆØ±Ù‡ Ù…Ø¹Ù„Ù… Ø®ØµÙˆØµÛŒ'}</h3>
-                  <p className="text-white/80 line-clamp-2 text-sm md:text-base">{s?.promo_box_1_desc || 'Ø¨Ø§ Ø´Ø±Ú©Øª Ø¯Ø± Ø§ÛŒÙ† Ø¯ÙˆØ±Ù‡â€ŒÙ‡Ø§ Ù…Ù‡Ø§Ø±Øªâ€ŒÙ‡Ø§ÛŒ Ø®ÙˆØ¯ Ø±Ø§ Ø¨Ù‡ Ø¹Ù†ÙˆØ§Ù† ÛŒÚ© Ù…Ø¹Ù„Ù… Ø­Ø±ÙÙ‡â€ŒØ§ÛŒ Ø§Ø±ØªÙ‚Ø§ Ø¯Ù‡ÛŒØ¯ Ùˆ Ø¨Ù‡ ÛŒÚ© Ù…Ø¯Ø±Ø³ Ø¨Ø±ØªØ± Ø¯Ø± Ø³Ø·Ø­ Ú©Ø´ÙˆØ± ØªØ¨Ø¯ÛŒÙ„ Ø´ÙˆÛŒØ¯.'}</p>
+                  <span className="badge bg-teal text-paper mb-2 md:mb-3">{s?.promo_box_1_badge || 'ویژه'}</span>
+                  <h3 className="text-xl md:text-2xl font-bold mb-1 md:mb-2">{s?.promo_box_1_title || 'دوره تربیت معلم و معلم خصوصی'}</h3>
+                  <p className="text-white/80 line-clamp-2 text-sm md:text-base">{s?.promo_box_1_desc || 'با شرکت در این دوره، مهارت‌های تدریس خود را ارتقا دهید و به یک معلم حرفه‌ای تبدیل شوید.'}</p>
                 </div>
               </Link>
             </Reveal>
@@ -253,9 +253,9 @@ export default async function HomePage() {
             <Reveal delay={100}>
               <Link href={s?.promo_box_2_link || "/books"} className="card card-hover p-4 md:p-8 relative overflow-hidden group aspect-video md:aspect-auto md:min-h-[300px]" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', border: '1px solid var(--tangerine)', background: `linear-gradient(180deg, rgba(20,19,31,0) 0%, rgba(20,19,31,0.8) 100%), url(${s?.promo_box_2_image || 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=2000&auto=format&fit=crop'}) center/cover` }}>
                 <div className="relative z-10 text-white">
-                  <span className="badge bg-tangerine text-paper mb-2 md:mb-3">{s?.promo_box_2_badge || 'Ù…Ø¹Ø±ÙÛŒ'}</span>
-                  <h3 className="text-xl md:text-2xl font-bold mb-1 md:mb-2">{s?.promo_box_2_title || 'Ù…Ø¹Ø±ÙÛŒ Ú©ØªØ§Ø¨ Ù‡Ø§ÛŒ ÛŒØ§Ø±Ø§ÙˆÙ„ÛŒÙ‡Ø§'}</h3>
-                  <p className="text-white/80 line-clamp-2 text-sm md:text-base">{s?.promo_box_2_desc || 'Ø¨Ù‡ØªØ±ÛŒÙ† Ú©ØªØ§Ø¨ Ù‡Ø§ÛŒ Ú©Ù…Ú© Ø¢Ù…ÙˆØ²Ø´ÛŒ Ùˆ Ø¯Ø§Ø³ØªØ§Ù†ÛŒ Ø±Ø§ Ø¨Ø±Ø§ÛŒ Ø¯Ø§Ù†Ø´ Ø¢Ù…ÙˆØ²Ø§Ù† Ø®ÙˆØ¯ Ø§Ø² Ø³Ø§ÛŒØª ÛŒØ§Ø±Ø§ÙˆÙ„ÛŒÙ‡Ø§ ØªÙ‡ÛŒÙ‡ Ú©Ù†ÛŒØ¯.'}</p>
+                  <span className="badge bg-tangerine text-paper mb-2 md:mb-3">{s?.promo_box_2_badge || 'معرفی'}</span>
+                  <h3 className="text-xl md:text-2xl font-bold mb-1 md:mb-2">{s?.promo_box_2_title || 'معرفی کتاب‌ها'}</h3>
+                  <p className="text-white/80 line-clamp-2 text-sm md:text-base">{s?.promo_box_2_desc || 'بهترین کتاب‌های کمک آموزشی و داستان را برای فرزندان خود پیدا کنید.'}</p>
                 </div>
               </Link>
             </Reveal>
@@ -269,23 +269,23 @@ export default async function HomePage() {
           <Reveal>
           <div className="rail-head">
             <div>
-              <span className="section-kicker"><Clapperboard /> Ú©ØªØ§Ø¨Ø®Ø§Ù†Ù‡ Ø³Ø±Ú¯Ø±Ù…ÛŒ</span>
-              <h2 className="section-title">Ø§Ù†ÛŒÙ…Ù‡ Ùˆ ÙÛŒÙ„Ù…</h2>
+              <span className="section-kicker"><Clapperboard /> کتابخانه سرگرمی</span>
+              <h2 className="section-title">انیمه و فیلم</h2>
             </div>
-            <Link href="/entertainment" className="muted" style={{ fontWeight: 700 }}>Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ù‡Ù…Ù‡ <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
+            <Link href="/entertainment" className="muted" style={{ fontWeight: 700 }}>مشاهده همه <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
           </div>
                     {/* CATEGORY CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { id: 'Ù„ÙˆØ­Ù‡ Ù†ÙˆÛŒØ³ÛŒ', title: 'Ù„ÙˆØ­Ù‡ Ù†ÙˆÛŒØ³ÛŒ', icon: 'âœï¸', bg: s?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${s.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
-              { id: 'Ù†Ø´Ø§Ù†Ù‡ Ù‡Ø§ÛŒ Û±/Û²', title: 'Ù†Ø´Ø§Ù†Ù‡ Ù‡Ø§ÛŒ Û±/Û²', icon: 'ðŸ”¤', bg: s?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${s.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
-              { id: 'Ø¹Ù„ÙˆÙ…', title: 'Ø¹Ù„ÙˆÙ…', icon: 'ðŸ”¬', bg: s?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${s.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
-              { id: 'Ø³Ø§ÛŒØ±', title: 'Ø³Ø§ÛŒØ± Ù…Ø­ØªÙˆØ§', icon: 'ðŸ“º', bg: s?.ent_cat4_image ? `linear-gradient(135deg, rgba(236,72,153,0.6), rgba(190,24,93,0.8)), url(${s.ent_cat4_image}) center/cover` : 'linear-gradient(135deg, #ec4899, #be185d)' }
+              { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '✏️', bg: s?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${s.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
+              { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '🔤', bg: s?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${s.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
+              { id: 'علوم', title: 'علوم', icon: '🔬', bg: s?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${s.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
+              { id: 'سایر', title: 'سایر محتوا', icon: '📺', bg: s?.ent_cat4_image ? `linear-gradient(135deg, rgba(236,72,153,0.6), rgba(190,24,93,0.8)), url(${s.ent_cat4_image}) center/cover` : 'linear-gradient(135deg, #ec4899, #be185d)' }
             ].map(card => (
               <Link key={card.id} href={`/entertainment?c=${encodeURIComponent(card.id)}`} className="card card-hover p-6 relative overflow-hidden group flex flex-col justify-end text-right transition-transform hover:-translate-y-1" style={{ minHeight: '200px', background: card.bg, border: 'none', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.2)' }}>
                 <div className="absolute top-4 right-4 text-4xl opacity-80 group-hover:scale-110 transition-transform duration-300">{card.icon}</div>
                 <div className="relative z-10 text-white w-full">
-                  <span className="badge bg-white/20 text-white backdrop-blur-sm mb-2 inline-block px-2 py-1 rounded-full text-xs font-medium">Ø¨Ø®Ø´ Ø¢Ù…ÙˆØ²Ø´ÛŒ</span>
+                  <span className="badge bg-white/20 text-white backdrop-blur-sm mb-2 inline-block px-2 py-1 rounded-full text-xs font-medium">بخش آموزشی</span>
                   <h3 className="text-xl font-bold mb-1 text-white drop-shadow-md">{card.title}</h3>
                 </div>
               </Link>
@@ -303,10 +303,10 @@ export default async function HomePage() {
           <Reveal>
           <div className="rail-head">
             <div>
-              <span className="section-kicker"><BookOpen /> Ù…Ø¬Ù„Ù‡ Ù…Ø§</span>
-              <h2 className="section-title">Ø¢Ø®Ø±ÛŒÙ† Ø®Ø¨Ø±Ù‡Ø§ Ùˆ ÙˆØ¨Ù„Ø§Ú¯</h2>
+              <span className="section-kicker"><BookOpen /> مجله ما</span>
+              <h2 className="section-title">آخرین خبرها و وبلاگ</h2>
             </div>
-            <Link href="/blog" className="muted" style={{ fontWeight: 700 }}>Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ù‡Ù…Ù‡ <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
+            <Link href="/blog" className="muted" style={{ fontWeight: 700 }}>مشاهده همه <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
           </div>
           {news.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -323,7 +323,7 @@ export default async function HomePage() {
                     background: !item.thumbnail_url ? 'linear-gradient(150deg, var(--teal-deep), var(--ink))' : undefined,
                   }} />
                   <div className="p-4 flex-1 flex flex-col">
-                    <div className="text-xs text-teal font-bold mb-2">ÙˆØ¨Ù„Ø§Ú¯</div>
+                    <div className="text-xs text-teal font-bold mb-2">وبلاگ</div>
                     <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.title}</h3>
                     <p className="text-ink-soft text-sm line-clamp-2 flex-1">{item.excerpt || item.description}</p>
                   </div>
@@ -332,7 +332,7 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-              <p className="muted">Ù…Ø·Ù„Ø¨ÛŒ ÛŒØ§ÙØª Ù†Ø´Ø¯</p>
+              <p className="muted">مطلبی یافت نشد</p>
             </div>
           )}
           </Reveal>
@@ -346,18 +346,18 @@ export default async function HomePage() {
           <div className="tiles">
             <div className="card tile">
               <div className="tile-ico" style={{ background: '#d9f9e3', color: '#0d7a3d' }}><BookOpen /></div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Ù…Ø­ØªÙˆØ§ÛŒ Ø¯Ø±Ø³ÛŒ Ù…Ø¹ØªØ¨Ø±</h3>
-              <p className="muted" style={{ marginTop: '.4rem', lineHeight: 1.7, fontSize: '.92rem' }}>Ø±ÛŒØ§Ø¶ÛŒØŒ ÙØ§Ø±Ø³ÛŒ Ùˆ Ø¹Ù„ÙˆÙ… Ø¨Ø±Ø§ÛŒ Ú©Ù„Ø§Ø³â€ŒÙ‡Ø§ÛŒ Ø§ÙˆÙ„ ØªØ§ Ø³ÙˆÙ….</p>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>محتوای درسی معتبر</h3>
+              <p className="muted" style={{ marginTop: '.4rem', lineHeight: 1.7, fontSize: '.92rem' }}>ریاضی، فارسی و علوم برای کلاس‌های اول تا سوم.</p>
             </div>
             <div className="card tile">
               <div className="tile-ico" style={{ background: '#fde3ef', color: '#c2185b' }}><Palette /></div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Ú©ØªØ§Ø¨Ø®Ø§Ù†Ù‡ Ø±Ø¯Ù‡â€ŒØ¨Ù†Ø¯ÛŒâ€ŒØ´Ø¯Ù‡</h3>
-              <p className="muted" style={{ marginTop: '.4rem', lineHeight: 1.7, fontSize: '.92rem' }}>Ù‡Ø± Ø¹Ù†ÙˆØ§Ù† Ø¨Ø§ Ø±Ø¯Ù‡ Ø³Ù†ÛŒ Ù…Ø´Ø®ØµØŒ Ø¨Ø±Ø§ÛŒ Ø§Ù†ØªØ®Ø§Ø¨ Ø±Ø§Ø­Øª ÙˆØ§Ù„Ø¯ÛŒÙ†.</p>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>کتابخانه رده‌بندی‌شده</h3>
+              <p className="muted" style={{ marginTop: '.4rem', lineHeight: 1.7, fontSize: '.92rem' }}>هر عنوان با رده سنی مشخص، برای انتخاب راحت والدین.</p>
             </div>
             <div className="card tile">
               <div className="tile-ico" style={{ background: '#e0f0ff', color: '#2563eb' }}><ShieldCheck /></div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Ú©Ù†ØªØ±Ù„ ÙˆØ§Ù„Ø¯ÛŒÙ†</h3>
-              <p className="muted" style={{ marginTop: '.4rem', lineHeight: 1.7, fontSize: '.92rem' }}>Ù…Ø¯ÛŒØ±ÛŒØª Ø¯Ø³ØªØ±Ø³ÛŒ Ùˆ Ø²Ù…Ø§Ù† ØªÙ…Ø§Ø´Ø§ Ø¨Ø±Ø§ÛŒ Ù‡Ø± Ù¾Ø±ÙˆÙØ§ÛŒÙ„ Ú©ÙˆØ¯Ú©.</p>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>کنترل والدین</h3>
+              <p className="muted" style={{ marginTop: '.4rem', lineHeight: 1.7, fontSize: '.92rem' }}>مدیریت دسترسی و زمان تماشا برای هر پروفایل کودک.</p>
             </div>
           </div>
           </Reveal>
@@ -370,10 +370,10 @@ export default async function HomePage() {
           <Reveal>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
             <div>
-              <span className="section-kicker"><HeartHandshake /> ØªÛŒÙ… Ø¯ÙˆØ³Øªâ€ŒØ¯Ø§Ø´ØªÙ†ÛŒ</span>
-              <h2 className="section-title">Ù…Ø¹Ù„Ù…â€ŒÙ‡Ø§ÛŒ Ù…Ø§ Ø±Ø§ Ø¨Ø´Ù†Ø§Ø³ÛŒØ¯</h2>
+              <span className="section-kicker"><HeartHandshake /> تیم دوست‌داشتنی</span>
+              <h2 className="section-title">معلم‌های ما را بشناسید</h2>
             </div>
-            <p className="muted" style={{ maxWidth: '38ch', lineHeight: 1.7 }}>Ù‡Ø± Ø¯Ø±Ø³ Ø±Ø§ Ú©Ø³ÛŒ Ù…ÛŒâ€ŒØ³Ø§Ø²Ø¯ Ú©Ù‡ Ø¹Ø§Ø´Ù‚ Ø¢Ù…ÙˆØ²Ø´ Ú©ÙˆØ¯Ú©Ø§Ù† Ø§Ø³Øª.</p>
+            <p className="muted" style={{ maxWidth: '38ch', lineHeight: 1.7 }}>هر درس را کسی می‌سازد که عاشق آموزش کودکان است.</p>
           </div>
 
           {teachers.length > 0 ? (
@@ -391,7 +391,7 @@ export default async function HomePage() {
                     {t.bio && <p className="muted" style={{ lineHeight: 1.7, fontSize: '.95rem', marginBottom: t.video_url ? '1rem' : 0 }}>{t.bio}</p>}
                     {t.video_url && (
                       <a href={t.video_url} target="_blank" rel="noopener noreferrer" className="button button-ghost" style={{ alignSelf: 'flex-start', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-                        <Clapperboard style={{ width: 14, height: 14 }} /> ÙˆÛŒØ¯ÛŒÙˆ Ù…Ø¹Ø±ÙÛŒ
+                        <Clapperboard style={{ width: 14, height: 14 }} /> ویدیو معرفی
                       </a>
                     )}
                   </div>
@@ -401,7 +401,7 @@ export default async function HomePage() {
           ) : (
             <div className="card" style={{ padding: '2.4rem', textAlign: 'center', border: '1px dashed var(--line-soft)' }}>
               <Sparkles style={{ width: 40, margin: '0 auto .6rem', color: 'var(--teal-deep)' }} />
-              <p className="muted">Ø¨Ù‡â€ŒØ²ÙˆØ¯ÛŒ Ù…Ø¹Ù„Ù…â€ŒÙ‡Ø§ÛŒ Ù…Ø§ Ø±Ø§ Ø§ÛŒÙ†Ø¬Ø§ Ù…Ø¹Ø±ÙÛŒ Ù…ÛŒâ€ŒÚ©Ù†ÛŒÙ….</p>
+              <p className="muted">به‌زودی معلم‌های ما را اینجا معرفی می‌کنیم.</p>
             </div>
           )}
           </Reveal>
@@ -415,10 +415,10 @@ export default async function HomePage() {
           <div className="card" style={{ padding: 'clamp(2rem, 5vw, 3rem)', background: 'var(--ink)', color: 'var(--paper)', border: 'none' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <span className="section-kicker" style={{ background: 'rgba(255,255,255,.12)', color: '#fff' }}><Rocket style={{ width: 16 }} /> Ø§Ø´ØªØ±Ø§Ú© Û¶ Ù…Ø§Ù‡Ù‡</span>
-                <h2 className="section-title text-balance" style={{ maxWidth: '22ch' }}>Ø¯Ø³ØªØ±Ø³ÛŒ Ú©Ø§Ù…Ù„ Ø¨Ù‡ Ù‡Ù…Ù‡ Ø¯Ø±Ø³â€ŒÙ‡Ø§ØŒ Ø§Ù†ÛŒÙ…Ù‡ Ùˆ ÙÛŒÙ„Ù…â€ŒÙ‡Ø§</h2>
+                <span className="section-kicker" style={{ background: 'rgba(255,255,255,.12)', color: '#fff' }}><Rocket style={{ width: 16 }} /> اشتراک ۶ ماهه</span>
+                <h2 className="section-title text-balance" style={{ maxWidth: '22ch' }}>دسترسی کامل به همه درس‌ها، انیمه و فیلم‌ها</h2>
               </div>
-              <Link href="/subscription" className="button button-primary button-lg">ÙØ¹Ø§Ù„â€ŒØ³Ø§Ø²ÛŒ Ø§Ø´ØªØ±Ø§Ú© <ArrowLeft /></Link>
+              <Link href="/subscription" className="button button-primary button-lg">فعال‌سازی اشتراک <ArrowLeft /></Link>
             </div>
           </div>
           </Reveal>
