@@ -206,6 +206,13 @@ CREATE TABLE IF NOT EXISTS yar_teachers (
   sample_work_url VARCHAR(1000),
   display_order INT DEFAULT 0,
   is_visible BOOLEAN DEFAULT true,
+  education VARCHAR(255),
+  location VARCHAR(255),
+  workplace VARCHAR(255),
+  experience_years INT,
+  national_rank INT,
+  provincial_rank INT,
+  district_rank INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

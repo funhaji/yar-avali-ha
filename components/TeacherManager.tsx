@@ -3,8 +3,15 @@
 import { useState } from 'react'
 import { Eye, EyeOff, ImagePlus, Pencil, Plus, Trash2, X } from 'lucide-react'
 
-interface Teacher { id: string; name: string; specialty: string | null; bio: string | null; photo_url: string | null; video_url: string | null; display_order: number; is_visible: boolean }
-const empty = { id: '', name: '', specialty: '', bio: '', photo_url: '', video_url: '', display_order: 0, is_visible: true }
+interface Teacher { 
+  id: string; name: string; specialty: string | null; bio: string | null; photo_url: string | null; video_url: string | null; display_order: number; is_visible: boolean;
+  education?: string | null; location?: string | null; workplace?: string | null; experience_years?: number | null;
+  national_rank?: number | null; provincial_rank?: number | null; district_rank?: number | null;
+}
+const empty = { 
+  id: '', name: '', specialty: '', bio: '', photo_url: '', video_url: '', display_order: 0, is_visible: true,
+  education: '', location: '', workplace: '', experience_years: '', national_rank: '', provincial_rank: '', district_rank: ''
+}
 
 export function TeacherManager({ initial }: { initial: Teacher[] }) {
   const [teachers, setTeachers] = useState<Teacher[]>(initial)
@@ -52,11 +59,25 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
       <section className="card account-panel">
         <div className="section-kicker"><Plus /> {editing ? 'ویرایش معلم' : 'افزودن معلم'}</div>
         <form onSubmit={save} className="form-stack">
-          <label>نام<input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required /></label>
-          <label>تخصص <small className="muted">مثلاً معلم ریاضی</small><input value={form.specialty || ''} onChange={e => setForm({ ...form, specialty: e.target.value })} /></label>
-          <label>معرفی کوتاه<textarea rows={3} value={form.bio || ''} onChange={e => setForm({ ...form, bio: e.target.value })} /></label>
-          <label>ترتیب نمایش<input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: Number(e.target.value) })} /></label>
-          <label>لینک ویدیو معرفی (آپارات)<input type="url" placeholder="مثال: https://www.aparat.com/v/..." value={form.video_url || ''} onChange={e => setForm({ ...form, video_url: e.target.value })} /></label>
+          <label>نام <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required /></label>
+          <label>تخصص <small className="muted">مثلا: معلم پایه اول</small><input value={form.specialty || ''} onChange={e => setForm({ ...form, specialty: e.target.value })} /></label>
+          <label>مدرک تحصیلی <small className="muted">مثلا: دکتری</small><input value={form.education || ''} onChange={e => setForm({ ...form, education: e.target.value })} /></label>
+          <label>استان و شهر <small className="muted">مثلا: استان خوزستان شهر اهواز</small><input value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} /></label>
+          <label>محل خدمت <small className="muted">مثلا: مدرسه علامه طباطبایی</small><input value={form.workplace || ''} onChange={e => setForm({ ...form, workplace: e.target.value })} /></label>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <label>سابقه کار (سال) <input type="number" value={form.experience_years || ''} onChange={e => setForm({ ...form, experience_years: e.target.value ? Number(e.target.value) : '' })} /></label>
+            <label>رتبه کشوری <input type="number" value={form.national_rank || ''} onChange={e => setForm({ ...form, national_rank: e.target.value ? Number(e.target.value) : '' })} /></label>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <label>رتبه استانی <input type="number" value={form.provincial_rank || ''} onChange={e => setForm({ ...form, provincial_rank: e.target.value ? Number(e.target.value) : '' })} /></label>
+            <label>رتبه ناحیه <input type="number" value={form.district_rank || ''} onChange={e => setForm({ ...form, district_rank: e.target.value ? Number(e.target.value) : '' })} /></label>
+          </div>
+
+          <label>درباره معلم <textarea rows={3} value={form.bio || ''} onChange={e => setForm({ ...form, bio: e.target.value })} /></label>
+          <label>ترتیب نمایش <input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: Number(e.target.value) })} /></label>
+          <label>لینک ویدیو معرفی (اختیاری) <input type="url" placeholder="مثال: https://www.aparat.com/v/..." value={form.video_url || ''} onChange={e => setForm({ ...form, video_url: e.target.value })} /></label>
           <label style={{ flexDirection: 'row', alignItems: 'center', gap: '.6rem' }}><input type="checkbox" style={{ width: 'auto' }} checked={form.is_visible} onChange={e => setForm({ ...form, is_visible: e.target.checked })} /> نمایش در سایت</label>
           <div>
             <span style={{ fontWeight: 700, display: 'block', marginBottom: '.5rem' }}>عکس معلم</span>
@@ -87,7 +108,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                   <h3 className="teacher-name">{t.name}</h3>
                   {t.specialty && <span className="chip teacher-specialty">{t.specialty}</span>}
                   <div className="button-row" style={{ marginTop: '.6rem' }}>
-                    <button className="icon-button" aria-label="ویرایش" onClick={() => { setForm({ ...t, specialty: t.specialty || '', bio: t.bio || '', photo_url: t.photo_url || '', video_url: t.video_url || '' }); setEditing(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }}><Pencil /></button>
+                    <button className="icon-button" aria-label="ویرایش" onClick={() => { setForm({ ...t, specialty: t.specialty || '', bio: t.bio || '', photo_url: t.photo_url || '', video_url: t.video_url || '', education: t.education || '', location: t.location || '', workplace: t.workplace || '', experience_years: t.experience_years || '', national_rank: t.national_rank || '', provincial_rank: t.provincial_rank || '', district_rank: t.district_rank || '' }); setEditing(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }}><Pencil /></button>
                     <button className="icon-button" aria-label="نمایش" onClick={() => toggle(t)}>{t.is_visible ? <Eye /> : <EyeOff />}</button>
                     <button className="icon-button" aria-label="حذف" onClick={() => remove(t.id)}><Trash2 /></button>
                   </div>

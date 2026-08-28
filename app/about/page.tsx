@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
 import { getVisibleTeachers } from '@/lib/teachers'
@@ -66,7 +67,7 @@ export default async function AboutPage() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {teachers.map((t) => (
-                  <div key={t.id} className="card card-hover p-6 text-center border border-line-soft">
+                  <Link href={`/teachers/${t.id}`} key={t.id} className="card card-hover p-6 text-center border border-line-soft block">
                     {t.photo_url ? (
                       <img src={t.photo_url} alt={t.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-cream shadow-sm" />
                     ) : (
@@ -77,7 +78,7 @@ export default async function AboutPage() {
                     <h3 className="text-xl font-bold mb-1">{t.name}</h3>
                     {t.specialty && <div className="text-sm font-bold text-teal mb-3">{t.specialty}</div>}
                     {t.bio && <p className="text-sm text-ink-soft line-clamp-3 leading-relaxed">{t.bio}</p>}
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

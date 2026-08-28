@@ -204,6 +204,20 @@ const MIGRATIONS = [
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `
+  },
+  {
+    version: 13,
+    name: 'teachers_profile_fields',
+    sql: `
+      ALTER TABLE yar_teachers 
+      ADD COLUMN IF NOT EXISTS education VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS location VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS workplace VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS experience_years INT,
+      ADD COLUMN IF NOT EXISTS national_rank INT,
+      ADD COLUMN IF NOT EXISTS provincial_rank INT,
+      ADD COLUMN IF NOT EXISTS district_rank INT;
+    `
   }
 ]
 
