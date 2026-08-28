@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowLeft, BookOpen, Clapperboard, Crown, Play, Download, ExternalLink, ShoppingBag } from 'lucide-react'
+import { ArrowLeft, BookOpen, Clapperboard, Crown, Play, Download, ExternalLink, ShoppingBag, HeartHandshake } from 'lucide-react'
 import { query } from '@/lib/db'
 import { hasActiveSubscription } from '@/lib/subscriptions'
 import { validateSession } from '@/lib/auth'
