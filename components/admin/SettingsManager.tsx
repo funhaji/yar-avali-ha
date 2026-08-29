@@ -204,7 +204,7 @@ export function SettingsManager({ initialSettings }: Props) {
   const TABS = [
     { id: 'general', label: 'عمومی' },
     { id: 'home', label: 'صفحه اصلی (ویژگی‌ها)' },
-    { id: 'promo', label: 'باکس‌های پروموشن' },
+    
     { id: 'social', label: 'شبکه‌های اجتماعی' },
     { id: 'stats', label: 'آمار' },
     { id: 'posters', label: 'کاشی‌های صفحه اصلی' },
