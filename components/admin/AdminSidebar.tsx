@@ -10,12 +10,13 @@ import {
 import { useState } from 'react'
 
 const MENU_ITEMS = [
-  { href: '/dashboard', label: 'داشبورد کاربری', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'پیشخوان کاربری', icon: LayoutDashboard },
   { href: '/admin', label: 'پیشخوان ادمین', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'سفارشات', icon: ShoppingBag },
   { href: '/admin/content', label: 'مدیریت محتوا', icon: FileVideo },
   { href: '/admin/settings', label: 'تنظیمات سایت', icon: Settings },
-  { href: '/admin/slider', label: 'اسلایدر داشبورد', icon: ImageIcon },
+  { href: '/admin/categories', label: 'ترتیب دسته‌بندی‌ها', icon: Settings },
+  { href: '/admin/slider', label: 'اسلایدر پیشخوان', icon: ImageIcon },
   { href: '/admin/gallery', label: 'گالری تصاویر', icon: ImageIcon },
   { href: '/admin/users', label: 'کاربران', icon: Users },
   { href: '/admin/teachers', label: 'معلم‌ها', icon: HeartHandshake },

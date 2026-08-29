@@ -53,11 +53,27 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     }
   })
   
-  const categories = Array.from(catTree.values()).sort((a, b) => b.count - a.count)
+  
+  let shopCatOrder = [];
+  let shopSubcatOrder = {};
+  try {
+    if (settings.shop_cat_order) shopCatOrder = JSON.parse(settings.shop_cat_order);
+    if (settings.shop_subcat_order) shopSubcatOrder = JSON.parse(settings.shop_subcat_order);
+  } catch(e){}
+
+  const categories = Array.from(catTree.values()).sort((a, b) => {
+    const idxA = shopCatOrder.indexOf(a.name);
+    const idxB = shopCatOrder.indexOf(b.name);
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+    if (idxA !== -1) return -1;
+    if (idxB !== -1) return 1;
+    return b.count - a.count; // fallback to count
+  })
+
 
   const token = (await cookies()).get('session_token')?.value
   const user = token ? await validateSession(token).catch(() => null) : null
-  const settings = await getCachedSettings(['site_name', 'site_logo_url'])
+  const settings = await getCachedSettings(['site_name', 'site_logo_url', 'shop_cat_order', 'shop_subcat_order'])
 
   return (
     <div className="page bg-cream">
@@ -95,7 +111,15 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                     </Link>
                     {category === cat.name && cat.subs.size > 0 && (
                       <div className="flex flex-col ml-2 mr-4 pr-3 border-r-2 border-line-soft mt-1 mb-1 gap-1">
-                        {Array.from(cat.subs.entries()).map(([subName, subCount]) => (
+                        {Array.from(cat.subs.entries()).sort(([nameA], [nameB]) => {
+  const subsOrder = shopSubcatOrder[cat.name] || [];
+  const idxA = subsOrder.indexOf(nameA);
+  const idxB = subsOrder.indexOf(nameB);
+  if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+  if (idxA !== -1) return -1;
+  if (idxB !== -1) return 1;
+  return 0;
+}).map(([subName, subCount]) => (
                           <Link 
                             key={subName}
                             href={`/shop?category=${cat.name}&subcategory=${subName}&search=${search}`}

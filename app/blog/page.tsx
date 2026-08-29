@@ -45,7 +45,23 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
     }
   })
   
-  const categories = Array.from(catTree.values()).sort((a, b) => b.count - a.count)
+  
+  let blogCatOrder = [];
+  let blogSubcatOrder = {};
+  try {
+    if (settings.blog_cat_order) blogCatOrder = JSON.parse(settings.blog_cat_order);
+    if (settings.blog_subcat_order) blogSubcatOrder = JSON.parse(settings.blog_subcat_order);
+  } catch(e){}
+
+  const categories = Array.from(catTree.values()).sort((a, b) => {
+    const idxA = blogCatOrder.indexOf(a.name);
+    const idxB = blogCatOrder.indexOf(b.name);
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+    if (idxA !== -1) return -1;
+    if (idxB !== -1) return 1;
+    return b.count - a.count; // fallback to count
+  })
+
     
   let filteredPosts = posts
   
@@ -103,7 +119,15 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                     </Link>
                     {activeCategory === cat.name && cat.subs.size > 0 && (
                       <div className="flex flex-col ml-2 mr-4 pr-3 border-r-2 border-line-soft mt-1 mb-1 gap-1">
-                        {Array.from(cat.subs.entries()).map(([subName, subCount]) => (
+                        {Array.from(cat.subs.entries()).sort(([nameA], [nameB]) => {
+  const subsOrder = blogSubcatOrder[cat.name] || [];
+  const idxA = subsOrder.indexOf(nameA);
+  const idxB = subsOrder.indexOf(nameB);
+  if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+  if (idxA !== -1) return -1;
+  if (idxB !== -1) return 1;
+  return 0;
+}).map(([subName, subCount]) => (
                           <Link 
                             key={subName}
                             href={`/blog?category=${cat.name}&subcategory=${subName}&search=${search}`}
