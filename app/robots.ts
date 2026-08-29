@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/dashboard/', '/api/', '/shop/checkout/'],
     },
-    sitemap: 'https://yar-avali-ha.vercel.app/sitemap.xml',
+    sitemap: 'https://www.yaravaliha.ir/sitemap.xml',
   }
 }

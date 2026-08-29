@@ -182,7 +182,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { getStoreItemById } = require('@/lib/store');
   const product = await getStoreItemById(id);
   if (!product) return {};
-  const url = 'https://yar-avali-ha.vercel.app/shop/' + id;
+  const url = 'https://www.yaravaliha.ir/shop/' + id;
   return {
     title: product.title,
     description: product.description?.substring(0, 160) || 'خرید ' + product.title,

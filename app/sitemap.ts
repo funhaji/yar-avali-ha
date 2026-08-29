@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next'
 import { query } from '@/lib/db'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://yar-avali-ha.vercel.app'
+  const baseUrl = 'https://www.yaravaliha.ir'
 
   // Fetch all dynamic routes
   const [contentItems, storeItems, blogPosts, teachers] = await Promise.all([

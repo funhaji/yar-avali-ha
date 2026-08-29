@@ -112,6 +112,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'اخبار و اطلاعیه‌ها',
     description: 'تازه‌ترین اخبار، رویدادها و اطلاعیه‌های پلتفرم یار اولی‌ها.',
-    alternates: { canonical: 'https://yar-avali-ha.vercel.app/news' }
+    alternates: { canonical: 'https://www.yaravaliha.ir/news' }
   }
 }

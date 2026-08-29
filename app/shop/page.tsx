@@ -184,6 +184,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'فروشگاه',
     description: 'فروشگاه تخصصی محصولات کمک آموزشی، کاربرگ، کتاب و محصولات دیجیتال برای کلاس اول تا سوم دبستان.',
-    alternates: { canonical: 'https://yar-avali-ha.vercel.app/shop' }
+    alternates: { canonical: 'https://www.yaravaliha.ir/shop' }
   }
 }

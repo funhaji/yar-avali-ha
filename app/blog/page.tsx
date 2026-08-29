@@ -238,6 +238,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'وبلاگ',
     description: 'مقالات آموزشی، نکات فرزندپروری و راهنمای تحصیلی برای والدین و معلمان دوره ابتدایی.',
-    alternates: { canonical: 'https://yar-avali-ha.vercel.app/blog' }
+    alternates: { canonical: 'https://www.yaravaliha.ir/blog' }
   }
 }

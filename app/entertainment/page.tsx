@@ -120,6 +120,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'سرگرمی و ویدیوها',
     description: 'مجموعه انیمیشن‌ها، ویدیوهای آموزشی و سرگرمی‌های سالم برای کودکان دبستانی.',
-    alternates: { canonical: 'https://yar-avali-ha.vercel.app/entertainment' }
+    alternates: { canonical: 'https://www.yaravaliha.ir/entertainment' }
   }
 }

@@ -112,6 +112,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'دوره تربیت معلم',
     description: 'دوره‌های تخصصی تربیت معلم پایه اول تا سوم دبستان با ارائه مدرک معتبر.',
-    alternates: { canonical: 'https://yar-avali-ha.vercel.app/teacher-training' }
+    alternates: { canonical: 'https://www.yaravaliha.ir/teacher-training' }
   }
 }

@@ -281,7 +281,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const result = await query('SELECT * FROM yar_content_items WHERE id = $1', [id]);
   const item = result[0];
   if (!item) return {};
-  const url = 'https://yar-avali-ha.vercel.app/watch/' + id;
+  const url = 'https://www.yaravaliha.ir/watch/' + id;
   return {
     title: item.title,
     description: item.description?.substring(0, 160) || item.title,

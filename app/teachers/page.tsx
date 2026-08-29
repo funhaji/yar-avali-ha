@@ -88,6 +88,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'معلم‌ها',
     description: 'معرفی بهترین معلم‌های پایه اول تا سوم دبستان همکار با یار اولی‌ها.',
-    alternates: { canonical: 'https://yar-avali-ha.vercel.app/teachers' }
+    alternates: { canonical: 'https://www.yaravaliha.ir/teachers' }
   }
 }

@@ -70,8 +70,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
   "name": "یار اولی‌ها",
-  "url": "https://yar-avali-ha.vercel.app",
-  "logo": "https://yar-avali-ha.vercel.app/favicon.ico",
+  "url": "https://www.yaravaliha.ir",
+  "logo": "https://www.yaravaliha.ir/favicon.ico",
   "sameAs": [
     "https://instagram.com/yaravaliha",
     "https://t.me/yaravaliha"
