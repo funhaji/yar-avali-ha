@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { query } from '@/lib/db'
@@ -7,10 +8,7 @@ import { getSettings } from '@/lib/settings'
 
 import { getCachedBlogPosts, getCachedSettings } from '@/lib/cache'
 
-export const metadata = {
-  title: 'وبلاگ',
-  description: 'مقالات و نکات آموزشی برای کودکان و والدین'
-}
+
 
 export default async function BlogPage({ searchParams }: { searchParams: Promise<{ category?: string, search?: string }> }) {
   const headersList = await headers()
@@ -233,4 +231,13 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
       </main>
     </div>
   )
+}
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'وبلاگ',
+    description: 'مقالات آموزشی، نکات فرزندپروری و راهنمای تحصیلی برای والدین و معلمان دوره ابتدایی.',
+    alternates: { canonical: 'https://yar-avali-ha.vercel.app/blog' }
+  }
 }

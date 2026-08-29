@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { query } from '@/lib/db'
@@ -112,4 +113,13 @@ export default async function EntertainmentPage({ searchParams }: { searchParams
       </main>
     </div>
   )
+}
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'سرگرمی و ویدیوها',
+    description: 'مجموعه انیمیشن‌ها، ویدیوهای آموزشی و سرگرمی‌های سالم برای کودکان دبستانی.',
+    alternates: { canonical: 'https://yar-avali-ha.vercel.app/entertainment' }
+  }
 }

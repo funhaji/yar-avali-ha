@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getStoreItemById, getRelatedStoreItems, getStoreComments } from '@/lib/store'
@@ -173,4 +174,29 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <SiteFooter />
     </div>
   )
+}
+
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const { getStoreItemById } = require('@/lib/store');
+  const product = await getStoreItemById(id);
+  if (!product) return {};
+  const url = 'https://yar-avali-ha.vercel.app/shop/' + id;
+  return {
+    title: product.title,
+    description: product.description?.substring(0, 160) || 'خرید ' + product.title,
+    openGraph: {
+      title: product.title,
+      description: product.description?.substring(0, 160) || 'خرید ' + product.title,
+      url,
+      images: product.thumbnail_url ? [product.thumbnail_url] : [],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.title,
+      images: product.thumbnail_url ? [product.thumbnail_url] : [],
+    }
+  }
 }

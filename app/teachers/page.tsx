@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
@@ -8,9 +9,7 @@ import { Sparkles, Users } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata = {
-  title: 'معلم‌ها - یاراولیها'
-}
+
 
 export default async function TeachersPage() {
   const token = (await cookies()).get('session_token')?.value
@@ -82,4 +81,13 @@ export default async function TeachersPage() {
       />
     </div>
   )
+}
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'معلم‌ها',
+    description: 'معرفی بهترین معلم‌های پایه اول تا سوم دبستان همکار با یار اولی‌ها.',
+    alternates: { canonical: 'https://yar-avali-ha.vercel.app/teachers' }
+  }
 }

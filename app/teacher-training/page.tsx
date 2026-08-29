@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, PlayCircle, GraduationCap, Users } from 'lucide-react'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
@@ -6,9 +7,7 @@ import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
 import { getEmbedUrl } from '@/lib/video'
 
-export const metadata = {
-  title: 'تربیت معلم و معلم خصوصی'
-}
+
 
 export default async function TeacherTrainingPage() {
   const token = (await cookies()).get('session_token')?.value
@@ -106,4 +105,13 @@ export default async function TeacherTrainingPage() {
       />
     </div>
   )
+}
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'دوره تربیت معلم',
+    description: 'دوره‌های تخصصی تربیت معلم پایه اول تا سوم دبستان با ارائه مدرک معتبر.',
+    alternates: { canonical: 'https://yar-avali-ha.vercel.app/teacher-training' }
+  }
 }

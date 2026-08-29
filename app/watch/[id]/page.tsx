@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { query } from '@/lib/db'
@@ -271,4 +272,25 @@ export default async function WatchPage({ params }: { params: Promise<{ id: stri
       <SiteFooter />
     </div>
   )
+}
+
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const { query } = require('@/lib/db');
+  const result = await query('SELECT * FROM yar_content_items WHERE id = $1', [id]);
+  const item = result[0];
+  if (!item) return {};
+  const url = 'https://yar-avali-ha.vercel.app/watch/' + id;
+  return {
+    title: item.title,
+    description: item.description?.substring(0, 160) || item.title,
+    openGraph: {
+      title: item.title,
+      description: item.description?.substring(0, 160) || item.title,
+      url,
+      images: item.thumbnail_url ? [item.thumbnail_url] : [],
+      type: 'video.other',
+    },
+  }
 }

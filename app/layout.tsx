@@ -64,6 +64,22 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="fa" dir="rtl" className="bg-background">
       <body className={`${fontClass} font-sans`} style={{ fontFamily: siteFont === 'vazirmatn' ? undefined : `'${siteFont}', var(--font-vazir), 'Tahoma', sans-serif` }}>
+        <script 
+          type="application/ld+json" 
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "یار اولی‌ها",
+  "url": "https://yar-avali-ha.vercel.app",
+  "logo": "https://yar-avali-ha.vercel.app/favicon.ico",
+  "sameAs": [
+    "https://instagram.com/yaravaliha",
+    "https://t.me/yaravaliha"
+  ],
+  "description": "اولین پلتفرم آموزشی کلاس اول تا سوم دبستان در ایران با محتوای آموزشی تعاملی، انیمیشن، کاربرگ و فروشگاه کمک آموزشی."
+}) }} 
+        />
+
         <SettingsProvider settings={{ site_name: allSettings.site_name, site_logo_url: allSettings.site_logo_url }}>
           <CartProvider>
             {children}

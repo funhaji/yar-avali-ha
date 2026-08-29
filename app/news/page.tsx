@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { query } from '@/lib/db'
@@ -22,10 +23,7 @@ async function getNewsPosts() {
   return posts
 }
 
-export const metadata = {
-  title: 'اخبار',
-  description: 'آخرین اخبار و رویدادهای پلتفرم'
-}
+
 
 export default async function NewsPage() {
   const headersList = await headers()
@@ -107,4 +105,13 @@ export default async function NewsPage() {
       </main>
     </div>
   )
+}
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'اخبار و اطلاعیه‌ها',
+    description: 'تازه‌ترین اخبار، رویدادها و اطلاعیه‌های پلتفرم یار اولی‌ها.',
+    alternates: { canonical: 'https://yar-avali-ha.vercel.app/news' }
+  }
 }

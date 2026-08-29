@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { getStoreItems, getCategories } from '@/lib/store'
 import { ProductCard } from '@/components/shop/ProductCard'
 import { ShopGrid } from '@/components/shop/ShopGrid'
@@ -176,4 +177,13 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       <SiteFooter />
     </div>
   )
+}
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'فروشگاه',
+    description: 'فروشگاه تخصصی محصولات کمک آموزشی، کاربرگ، کتاب و محصولات دیجیتال برای کلاس اول تا سوم دبستان.',
+    alternates: { canonical: 'https://yar-avali-ha.vercel.app/shop' }
+  }
 }
