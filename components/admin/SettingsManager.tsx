@@ -68,6 +68,20 @@ const DEFAULT_SETTINGS = [
   { key: 'poster_tile_4_show_text', label: 'نمایش متن روی تصویر کارت چهارم', type: 'checkbox', category: 'posters' },
   { key: 'poster_tile_4_badge', label: 'بج کارت چهارم', type: 'text', placeholder: 'فیلم', category: 'posters' },
 
+  
+  // Feature Tiles
+  { key: 'feature_1_title', label: 'عنوان ویژگی ۱', type: 'text', placeholder: 'محتوای درسی معتبر', category: 'home' },
+  { key: 'feature_1_desc', label: 'توضیحات ویژگی ۱', type: 'textarea', placeholder: 'ریاضی، فارسی و علوم برای کلاس‌های اول تا سوم.', category: 'home' },
+  { key: 'feature_1_icon', label: 'نام آیکون ویژگی ۱ (از Lucide)', type: 'text', placeholder: 'BookOpen', category: 'home' },
+  
+  { key: 'feature_2_title', label: 'عنوان ویژگی ۲', type: 'text', placeholder: 'کتابخانه رده‌بندی‌شده', category: 'home' },
+  { key: 'feature_2_desc', label: 'توضیحات ویژگی ۲', type: 'textarea', placeholder: 'هر عنوان با رده سنی مشخص، برای انتخاب راحت والدین.', category: 'home' },
+  { key: 'feature_2_icon', label: 'نام آیکون ویژگی ۲ (از Lucide)', type: 'text', placeholder: 'Palette', category: 'home' },
+  
+  { key: 'feature_3_title', label: 'عنوان ویژگی ۳', type: 'text', placeholder: 'کنترل والدین', category: 'home' },
+  { key: 'feature_3_desc', label: 'توضیحات ویژگی ۳', type: 'textarea', placeholder: 'مدیریت دسترسی و زمان تماشا برای هر پروفایل کودک.', category: 'home' },
+  { key: 'feature_3_icon', label: 'نام آیکون ویژگی ۳ (از Lucide)', type: 'text', placeholder: 'ShieldCheck', category: 'home' },
+
   // Promo Box 1 (Teacher Training)
   { key: 'promo_box_1_title', label: 'عنوان بنر اول', type: 'text', placeholder: 'دوره تربیت معلم و معلم خصوصی', category: 'banners' },
   { key: 'promo_box_1_desc', label: 'توضیحات بنر اول', type: 'textarea', placeholder: 'با شرکت در این دوره، مهارت‌های تدریس خود را ارتقا دهید...', category: 'banners' },

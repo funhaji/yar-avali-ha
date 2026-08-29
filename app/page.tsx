@@ -4,6 +4,15 @@ import { ArrowLeft, BookOpen, Clapperboard, HeartHandshake, Palette, Rocket, Shi
 import { validateSession } from '@/lib/auth'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { Reveal } from '@/components/Reveal'
+
+import { icons } from 'lucide-react';
+function DynamicIcon({ name, ...props }: { name: string, [key: string]: any }) {
+  // @ts-ignore
+  const IconComponent = icons[name];
+  if (!IconComponent) return <icons.Star {...props} />;
+  return <IconComponent {...props} />;
+}
+
 import { getCachedSettings, getCachedTeachers, getCachedStoreItems, getCachedContent, getCachedBlogPosts } from '@/lib/cache'
 import { query } from '@/lib/db'
 import { ProductCard } from '@/components/shop/ProductCard'
@@ -20,7 +29,10 @@ async function getHomePageContent() {
     'poster_tile_2_text', 'poster_tile_2_image', 'poster_tile_2_show_text', 'poster_tile_2_badge',
     'poster_tile_3_text', 'poster_tile_3_image', 'poster_tile_3_show_text',
     'poster_tile_4_text', 'poster_tile_4_image', 'poster_tile_4_show_text', 'poster_tile_4_badge',
-    'promo_box_1_title', 'promo_box_1_desc', 'promo_box_1_badge', 'promo_box_1_link', 'promo_box_1_image',
+    'feature_1_title', 'feature_1_desc', 'feature_1_icon',
+      'feature_2_title', 'feature_2_desc', 'feature_2_icon',
+      'feature_3_title', 'feature_3_desc', 'feature_3_icon',
+      'promo_box_1_title', 'promo_box_1_desc', 'promo_box_1_badge', 'promo_box_1_link', 'promo_box_1_image',
     'promo_box_2_title', 'promo_box_2_desc', 'promo_box_2_badge', 'promo_box_2_link', 'promo_box_2_image',
     'ent_cat1_image', 'ent_cat2_image', 'ent_cat3_image', 'ent_cat4_image'
   ]

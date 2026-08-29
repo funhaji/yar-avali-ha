@@ -10,9 +10,9 @@ export const dynamic = 'force-dynamic'
 
 export default async function AboutPage() {
   const token = (await cookies()).get('session_token')?.value
-  const [user, teachers, settingsData] = await Promise.all([
+  const [user, settingsData] = await Promise.all([
     token ? validateSession(token).catch(() => null) : Promise.resolve(null),
-    getVisibleTeachers().catch(() => []),
+    
     getSettings([
       'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone',
       'about_title', 'about_subtitle', 'about_content', 'about_image'
@@ -54,34 +54,6 @@ export default async function AboutPage() {
 
           {s?.about_content && (
             <div className="prose prose-lg max-w-none text-ink text-lg leading-relaxed mb-20 slide-up stagger-2" style={{ direction: 'rtl' }} dangerouslySetInnerHTML={{ __html: s.about_content.replace(/\n/g, '<br>') }} />
-          )}
-
-          {teachers.length > 0 && (
-            <div className="mt-20 slide-up stagger-3">
-              <div className="text-center mb-12">
-                <span className="inline-flex items-center gap-2 bg-teal/10 text-teal px-4 py-2 rounded-full font-bold text-sm mb-4">
-                  <HeartHandshake className="w-4 h-4" /> تیم دوست‌داشتنی ما
-                </span>
-                <h2 className="text-3xl font-bold">معلم‌های یار اولی‌ها</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {teachers.map((t) => (
-                  <Link href={`/teachers/${t.id}`} key={t.id} className="card card-hover p-6 text-center border border-line-soft block">
-                    {t.photo_url ? (
-                      <img src={t.photo_url} alt={t.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-cream shadow-sm" />
-                    ) : (
-                      <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-teal/10 text-teal flex items-center justify-center">
-                        <Sparkles className="w-8 h-8" />
-                      </div>
-                    )}
-                    <h3 className="text-xl font-bold mb-1">{t.name}</h3>
-                    {t.specialty && <div className="text-sm font-bold text-teal mb-3">{t.specialty}</div>}
-                    {t.bio && <p className="text-sm text-ink-soft line-clamp-3 leading-relaxed">{t.bio}</p>}
-                  </Link>
-                ))}
-              </div>
-            </div>
           )}
         </div>
       </main>
