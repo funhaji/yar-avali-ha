@@ -57,16 +57,16 @@ export function HomepageSlider({ slides }: Props) {
   const currentSlide = slides[currentIndex]
 
   const SlideContent = () => (
-    <div className="relative w-full aspect-[21/9] min-h-[220px] bg-gray-200 rounded-lg overflow-hidden">
+    <div className="relative w-full rounded-xl overflow-hidden bg-cream border border-line-soft">
       <img
         src={currentSlide.image_url}
         alt={currentSlide.title || 'اسلاید'}
-        className="w-full h-full object-cover"
+        className="w-full h-auto object-contain"
       />
       {currentSlide.title && (
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
-          <div className="absolute bottom-0 left-0 right-0 p-6">
-            <h2 className="text-white text-2xl font-bold">{currentSlide.title}</h2>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end">
+          <div className="p-4 md:p-6 w-full">
+            <h2 className="text-white text-lg md:text-2xl font-bold">{currentSlide.title}</h2>
           </div>
         </div>
       )}
