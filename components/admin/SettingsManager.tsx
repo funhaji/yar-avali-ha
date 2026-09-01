@@ -116,6 +116,30 @@ const DEFAULT_SETTINGS = [
   { key: 'tt_subtitle', label: 'زیرنویس صفحه', type: 'textarea', placeholder: 'با استفاده از بهترین متدها...', category: 'teacher_training' },
   { key: 'tt_video_url', label: 'لینک ویدیو تربیت معلم (آپارات)', type: 'url', category: 'teacher_training' },
   { key: 'tt_video_url_2', label: 'لینک ویدیو معلم خصوصی (آپارات)', type: 'url', category: 'teacher_training' },
+
+  // Store Page Badges
+  { key: 'product_badge_1', label: 'متن نشان اول', type: 'text', placeholder: 'تضمین کیفیت', category: 'store' },
+  { key: 'product_badge_1_icon', label: 'آیکون نشان اول (Lucide)', type: 'text', placeholder: 'ShieldCheck', category: 'store' },
+  { key: 'product_badge_2', label: 'متن نشان دوم', type: 'text', placeholder: 'دانلود فوری', category: 'store' },
+  { key: 'product_badge_2_icon', label: 'آیکون نشان دوم (Lucide)', type: 'text', placeholder: 'Download', category: 'store' },
+  { key: 'product_badge_3_instock', label: 'متن موجود بودن', type: 'text', placeholder: 'موجوده', category: 'store' },
+  { key: 'product_badge_3_outstock', label: 'متن تمام شدن', type: 'text', placeholder: 'تمام شده', category: 'store' },
+  { key: 'product_badge_3_icon', label: 'آیکون موجودی (Lucide)', type: 'text', placeholder: 'CheckCircle2', category: 'store' },
+
+  // Teacher Training Page Additional
+  { key: 'tt_card1_title', label: 'عنوان کارت ۱ (معلم خصوصی)', type: 'text', placeholder: 'معلم خصوصی', category: 'teacher_training' },
+  { key: 'tt_card1_desc', label: 'توضیحات کارت ۱', type: 'textarea', placeholder: 'درخواست معلم خصوصی...', category: 'teacher_training' },
+  { key: 'tt_card1_btn_title', label: 'متن دکمه کارت ۱', type: 'text', placeholder: 'درخواست معلم', category: 'teacher_training' },
+  { key: 'tt_card1_btn_desc', label: 'توضیحات زیر دکمه کارت ۱', type: 'textarea', placeholder: 'برای هماهنگی...', category: 'teacher_training' },
+  { key: 'tt_card1_btn_id', label: 'آیدی پشتیبانی کارت ۱', type: 'text', placeholder: '@yar_avali_ha', category: 'teacher_training' },
+
+  { key: 'tt_card2_title', label: 'عنوان کارت ۲ (تربیت معلم)', type: 'text', placeholder: 'دوره تربیت معلم', category: 'teacher_training' },
+  { key: 'tt_card2_desc', label: 'توضیحات کارت ۲', type: 'textarea', placeholder: 'در دوره‌های تربیت معلم...', category: 'teacher_training' },
+  { key: 'tt_card2_btn_title', label: 'متن دکمه کارت ۲', type: 'text', placeholder: 'ثبت نام به زودی!', category: 'teacher_training' },
+  { key: 'tt_card2_btn_desc', label: 'توضیحات زیر دکمه کارت ۲', type: 'textarea', placeholder: 'ظرفیت دوره محدود است...', category: 'teacher_training' },
+  { key: 'tt_card2_btn_id', label: 'آیدی پشتیبانی کارت ۲', type: 'text', placeholder: '@yar_avali_ha', category: 'teacher_training' },
+
+
 ]
 
 export function SettingsManager({ initialSettings }: Props) {
@@ -212,6 +236,7 @@ export function SettingsManager({ initialSettings }: Props) {
     { id: 'about', label: 'درباره ما' },
     { id: 'teacher_training', label: 'تربیت معلم' },
     { id: 'entertainment', label: 'محتوای آموزشی' },
+      { id: 'store', label: 'فروشگاه' },
   ]
 
   return (

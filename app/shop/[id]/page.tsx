@@ -9,6 +9,13 @@ import { cookies } from 'next/headers'
 import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
 import { AddToCartButton } from './AddToCartButton'
+import { icons } from 'lucide-react';
+function DynamicIcon({ name, ...props }: { name: string, [key: string]: any }) {
+  // @ts-ignore
+  const IconComponent = icons[name];
+  if (!IconComponent) return null;
+  return <IconComponent {...props} />;
+}
 import { getEmbedUrl } from '@/lib/video'
 import { StoreComments } from '@/components/shop/StoreComments'
 
@@ -93,13 +100,23 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               <h1 className="display" style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>{product.title}</h1>
               
               <div className="flex items-center gap-4 text-sm font-bold text-ink-soft mb-6 pb-6 border-b border-line-soft">
-                <span className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-teal" /> تضمین کیفیت</span>
-                {product.is_downloadable && (
-                  <span className="flex items-center gap-1.5"><Download className="w-4 h-4 text-teal" /> دانلود فوری</span>
-                )}
+                {/* Dynamic Badge 1 */}
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-teal" /> 
-                  {product.stock_quantity === 0 && !product.is_digital ? <span className="text-berry">تموم شده</span> : 'موجوده'}
+                  <DynamicIcon name={settings?.product_badge_1_icon || 'ShieldCheck'} className="w-4 h-4 text-teal" /> 
+                  {settings?.product_badge_1 || 'تضمین کیفیت'}
+                </span>
+                {product.is_downloadable && (
+                  <span className="flex items-center gap-1.5">
+                    <DynamicIcon name={settings?.product_badge_2_icon || 'Download'} className="w-4 h-4 text-teal" /> 
+                    {settings?.product_badge_2 || 'دانلود فوری'}
+                  </span>
+                )}
+                {/* Dynamic Badge 3 */}
+                <span className="flex items-center gap-1.5">
+                  <DynamicIcon name={settings?.product_badge_3_icon || 'CheckCircle2'} className="w-4 h-4 text-teal" /> 
+                  {product.stock_quantity === 0 && !product.is_digital 
+                    ? <span className="text-berry">{settings?.product_badge_3_outstock || 'تمام شده'}</span> 
+                    : (settings?.product_badge_3_instock || 'موجوده')}
                 </span>
               </div>
               

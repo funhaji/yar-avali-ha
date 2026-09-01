@@ -14,6 +14,9 @@ export default async function TeacherTrainingPage() {
   const user = token ? await validateSession(token).catch(() => null) : null
   
   const settingsData = await getSettings([
+    'tt_card1_title', 'tt_card1_desc', 'tt_card1_btn_title', 'tt_card1_btn_desc', 'tt_card1_btn_id',
+    'tt_card2_title', 'tt_card2_desc', 'tt_card2_btn_title', 'tt_card2_btn_desc', 'tt_card2_btn_id',
+    
     'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone',
     'tt_video_url', 'tt_video_url_2'
   ])
@@ -47,7 +50,7 @@ export default async function TeacherTrainingPage() {
               <div className="w-20 h-20 bg-teal/10 text-teal rounded-full flex items-center justify-center mb-6">
                 <GraduationCap className="w-10 h-10" />
               </div>
-              <h2 className="text-3xl font-black mb-4">دوره تربیت معلم</h2>
+              <h2 className="text-3xl font-black mb-4">{s?.tt_card2_title || 'دوره تربیت معلم'}</h2>
               <p className="text-ink-soft leading-relaxed mb-8">
                 در دوره‌های تربیت معلم یار اولی‌ها، شما با جدیدترین شیوه‌های تدریس و روانشناسی کودک آشنا می‌شوید. 
                 این دوره مناسب علاقه‌مندان به تدریس مقطع ابتدایی می‌باشد.
@@ -60,11 +63,12 @@ export default async function TeacherTrainingPage() {
               )}
 
               <div className="bg-teal text-white w-full p-6 rounded-2xl shadow-sm mt-auto">
-                <h3 className="text-xl font-bold mb-2">ثبت نام به زودی!</h3>
-                <p className="mb-4 text-white/90">ظرفیت دوره محدود است. برای رزرو و پیش‌ثبت‌نام پیام دهید.</p>
+                <h3 className="text-xl font-bold mb-2">{s?.tt_card2_btn_title || 'ثبت نام به زودی!'}</h3>
+                <p className="mb-4 text-white/90">{s?.tt_card2_btn_desc || 'ظرفیت دوره محدود است. برای رزرو و پیش‌ثبت‌نام پیام دهید.'}</p>
                 <div className="bg-white/20 p-3 rounded-xl font-mono text-lg font-bold tracking-wider" dir="ltr">
-                  @yar_avali_ha
+                  {s?.tt_card2_btn_id || '@yar_avali_ha'}
                 </div>
+                
               </div>
             </div>
 
@@ -73,7 +77,7 @@ export default async function TeacherTrainingPage() {
               <div className="w-20 h-20 bg-tangerine/10 text-tangerine rounded-full flex items-center justify-center mb-6">
                 <Users className="w-10 h-10" />
               </div>
-              <h2 className="text-3xl font-black mb-4">معلم خصوصی</h2>
+              <h2 className="text-3xl font-black mb-4">{s?.tt_card1_title || 'معلم خصوصی'}</h2>
               <p className="text-ink-soft leading-relaxed mb-8">
                 درخواست معلم خصوصی برای دانش‌آموزان عزیز. با اساتید مجرب یار اولی‌ها، 
                 یادگیری شیرین‌تر و عمیق‌تری را تجربه کنید. رفع اشکال و تقویت پایه‌ای دروس.
@@ -86,11 +90,12 @@ export default async function TeacherTrainingPage() {
               )}
 
               <div className="bg-tangerine text-white w-full p-6 rounded-2xl shadow-sm mt-auto">
-                <h3 className="text-xl font-bold mb-2">درخواست معلم</h3>
-                <p className="mb-4 text-white/90">برای هماهنگی و درخواست معلم خصوصی با آیدی زیر در ارتباط باشید.</p>
+                <h3 className="text-xl font-bold mb-2">{s?.tt_card1_btn_title || 'درخواست معلم'}</h3>
+                <p className="mb-4 text-white/90">{s?.tt_card1_btn_desc || 'برای هماهنگی و درخواست معلم خصوصی با آیدی زیر در ارتباط باشید.'}</p>
                 <div className="bg-white/20 p-3 rounded-xl font-mono text-lg font-bold tracking-wider" dir="ltr">
-                  @yar_avali_ha
+                  {s?.tt_card1_btn_id || '@yar_avali_ha'}
                 </div>
+                
               </div>
             </div>
           </div>
