@@ -55,6 +55,71 @@ function UploadField({ name, label, kind, defaultValue, placeholder }: { name: s
   )
 }
 
+
+function MultipleFileUpload({ name, label, kind, defaultValue }: { name: string, label: string, kind: string, defaultValue?: string }) {
+  const [urls, setUrls] = useState<string[]>(defaultValue ? defaultValue.split(',').filter(Boolean) : [])
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    
+    setUploading(true)
+    const newUrls: string[] = []
+    
+    for (let i = 0; i < files.length; i++) {
+      const fd = new FormData()
+      fd.append('file', files[i])
+      fd.append('kind', kind)
+      try {
+        const res = await fetch('/api/admin/content/upload', { method: 'POST', body: fd })
+        const data = await res.json()
+        if (res.ok) newUrls.push(data.url)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    
+    setUrls([...urls, ...newUrls])
+    setUploading(false)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label>{label}</label>
+      <input type="hidden" name={name} value={urls.join(',')} />
+      
+      <div className="flex flex-col gap-2">
+        {urls.map((url, idx) => (
+          <div key={idx} className="flex gap-2 items-center bg-paper p-2 rounded-xl border border-line-soft">
+            <input value={url} onChange={e => {
+              const newArr = [...urls];
+              newArr[idx] = e.target.value;
+              setUrls(newArr);
+            }} className="flex-1 text-sm bg-transparent border-none" dir="ltr" />
+            <button type="button" onClick={() => setUrls(urls.filter((_, i) => i !== idx))} className="text-berry p-2 hover:bg-berry/10 rounded-lg">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex gap-2 mt-1">
+        <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading} className="button button-ghost bg-white border border-line-soft w-full justify-center">
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          {uploading ? 'در حال آپلود...' : 'انتخاب یک یا چند فایل'}
+        </button>
+        <button type="button" onClick={() => setUrls([...urls, ''])} className="button button-ghost border border-line-soft shrink-0">
+          + افزودن دستی
+        </button>
+        <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple className="hidden" />
+      </div>
+    </div>
+  )
+}
+
 function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
   const [images, setImages] = useState<string[]>(initialImages)
   const [uploading, setUploading] = useState(false)
@@ -408,13 +473,12 @@ export function StoreItemForm({ initialData, defaultCategory, existingCategories
                 )}
               </>
             ) : (
-              <UploadField 
-                name="file_url" 
-                label={`فایل محصول (${contentType === 'pdf' ? 'PDF' : 'فایل دیجیتال'})`}
-                kind="store_file" 
-                defaultValue={initialData?.file_url || ''} 
-                placeholder="آپلود یا قرار دادن لینک مستقیم..." 
-              />
+              <MultipleFileUpload 
+                  name="file_url" 
+                  label={`فایل محتوا (${contentType === 'pdf' ? 'چند PDF مجاز است' : 'فایل دیجیتال'})`}
+                  kind="store_file" 
+                  defaultValue={initialData?.file_url} 
+                />
             )}
           </div>
         )}

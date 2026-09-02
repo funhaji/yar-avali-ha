@@ -138,9 +138,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 {product.price_cents === null ? (
                   <div className="w-full">
                     {product.file_url ? (
-                      <a href={product.file_url.startsWith('http') ? product.file_url : 'https://' + product.file_url} target="_blank" rel="noopener noreferrer" className="button button-primary w-full sm:w-auto justify-center button-lg">
-                        مشاهده و دانلود
-                      </a>
+                      <div className="flex flex-col gap-2 w-full sm:w-auto">
+                        {product.file_url.split(',').map((url: string, idx: number, arr: string[]) => (
+                          <a key={idx} href={url.startsWith('http') ? url : 'https://' + url} target="_blank" rel="noopener noreferrer" className="button button-primary w-full sm:w-auto justify-center button-lg">
+                            دانلود {arr.length > 1 ? `فایل ${idx + 1}` : 'رایگان'}
+                          </a>
+                        ))}
+                      </div>
                     ) : (
                       <div className="text-ink-soft text-lg font-bold">جهت معرفی</div>
                     )}

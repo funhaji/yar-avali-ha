@@ -6,7 +6,7 @@ import VideoPlayer from '@/components/VideoPlayer'
 import SecurePDFViewerCanvas from '@/components/SecurePDFViewerCanvas'
 import { ArrowRight, Lock, Play, FileText, Image as ImageIcon, CheckCircle2, Download } from 'lucide-react'
 
-async function getStoreContentData(contentId: string, userId: string) {
+async function getStoreContentData(contentId: string, userId: string, fileIndex: number = 0) {
   // Get store item details
   const content = await query(`
     SELECT * FROM yar_store_items WHERE id = $1 AND is_digital = true
@@ -35,7 +35,7 @@ async function getStoreContentData(contentId: string, userId: string) {
   
   // Handle PDF and image content types specifically
   if (item.content_type === 'pdf' || item.content_type === 'image' || item.content_type === 'file') {
-    directVideoUrl = item.file_url || ''
+    directVideoUrl = (item.file_url || '').split(',')[fileIndex] || (item.file_url || '').split(',')[0] || ''
     
     // Handle Google Drive PDFs/images
     if (item.gdrive_id) {
@@ -52,20 +52,20 @@ async function getStoreContentData(contentId: string, userId: string) {
         directVideoUrl = item.pixeldrain_id ? getPixeldrainUrl(item.pixeldrain_id) : (item.file_url || '')
         break
       case 'youtube':
-        directVideoUrl = item.file_url || ''
+        directVideoUrl = (item.file_url || '').split(',')[fileIndex] || (item.file_url || '').split(',')[0] || ''
         break
       case 'gdrive':
         directVideoUrl = item.gdrive_id || item.file_url || ''
         break
       case 'mega':
-        directVideoUrl = item.file_url || ''
+        directVideoUrl = (item.file_url || '').split(',')[fileIndex] || (item.file_url || '').split(',')[0] || ''
         break
       case 'direct':
       case 'r2':
-        directVideoUrl = item.file_url || ''
+        directVideoUrl = (item.file_url || '').split(',')[fileIndex] || (item.file_url || '').split(',')[0] || ''
         break
       default:
-        directVideoUrl = item.file_url || ''
+        directVideoUrl = (item.file_url || '').split(',')[fileIndex] || (item.file_url || '').split(',')[0] || ''
     }
   }
   
@@ -77,7 +77,10 @@ async function getStoreContentData(contentId: string, userId: string) {
   }
 }
 
-export default async function ShopViewPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ShopViewPage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<{ [key: string]: string | undefined }> }) {
+  const sp = await searchParams;
+  const fileIndex = parseInt(sp.file || '0', 10);
+
   const { id } = await params
   const headersList = await headers()
   const userId = headersList.get('x-user-id')
@@ -154,7 +157,18 @@ export default async function ShopViewPage({ params }: { params: Promise<{ id: s
           {/* Main Content Area */}
           <div className="bg-black/40 border-b border-white/10">
             <div className="shell max-w-[1400px] mx-auto">
-              <div className="aspect-video w-full relative bg-black rounded-b-2xl overflow-hidden shadow-2xl">
+              
+                {content.file_url && content.file_url.split(',').length > 1 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {content.file_url.split(',').map((u: string, idx: number) => (
+                      <a key={idx} href={'?file=' + idx} className={`button ${fileIndex === idx ? 'button-primary' : 'button-ghost bg-white'}`}>
+                        فایل {idx + 1}
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+<div className="aspect-video w-full relative bg-black rounded-b-2xl overflow-hidden shadow-2xl">
                 {content.content_type === 'pdf' ? (
                   <div className="w-full h-full bg-cream text-ink">
                     <SecurePDFViewerCanvas
