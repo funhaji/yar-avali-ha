@@ -47,7 +47,7 @@ a { color: inherit; text-decoration: none; }
 /* ---------- Layout shell ---------- */
 .page { min-height: 100vh; display: flex; flex-direction: column; }
 .shell { width: min(1240px, 92vw); margin-inline: auto; }
-.section { padding-block: clamp(1.8rem, 7vw, 5.5rem); }
+.section { padding-block: clamp(1.5rem, 4vw, 3rem); }
 
 /* ---------- Video Player Controls ---------- */
 /* Hide browser default video controls and buttons */

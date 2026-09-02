@@ -287,12 +287,11 @@ export default async function HomePage() {
             <Link href="/entertainment" className="muted" style={{ fontWeight: 700 }}>مشاهده همه <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
           </div>
                     {/* CATEGORY CARDS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '✏️', bg: s?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${s.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
-              { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '🔤', bg: s?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${s.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
-              { id: 'علوم', title: 'علوم', icon: '🔬', bg: s?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${s.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
-              { id: 'سایر', title: 'سایر محتوا', icon: '📺', bg: s?.ent_cat4_image ? `linear-gradient(135deg, rgba(236,72,153,0.6), rgba(190,24,93,0.8)), url(${s.ent_cat4_image}) center/cover` : 'linear-gradient(135deg, #ec4899, #be185d)' }
+              { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '🎨', bg: s?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${s.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
+              { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '📝', bg: s?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${s.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
+              { id: 'علوم', title: 'علوم', icon: '🔬', bg: s?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${s.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }
             ].map(card => (
               <Link key={card.id} href={`/entertainment?c=${encodeURIComponent(card.id)}`} className="card card-hover p-6 relative overflow-hidden group flex flex-col justify-end text-right transition-transform hover:-translate-y-1" style={{ minHeight: '200px', background: card.bg, border: 'none', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.2)' }}>
                 <div className="absolute top-4 right-4 text-4xl opacity-80 group-hover:scale-110 transition-transform duration-300">{card.icon}</div>
