@@ -15,6 +15,36 @@ type Props = {
 }
 
 const DEFAULT_SETTINGS = [
+
+    // Header Menu
+    { key: 'nav_1_title', label: 'عنوان لینک ۱', type: 'text', placeholder: 'فروشگاه', category: 'header_menu' },
+    { key: 'nav_1_url', label: 'لینک ۱', type: 'text', placeholder: '/shop', category: 'header_menu' },
+    { key: 'nav_1_icon', label: 'آیکون ۱ (Lucide)', type: 'text', placeholder: 'ShoppingBag', category: 'header_menu' },
+    
+    { key: 'nav_2_title', label: 'عنوان لینک ۲', type: 'text', placeholder: 'سرگرمی', category: 'header_menu' },
+    { key: 'nav_2_url', label: 'لینک ۲', type: 'text', placeholder: '/entertainment', category: 'header_menu' },
+    { key: 'nav_2_icon', label: 'آیکون ۲', type: 'text', placeholder: 'Clapperboard', category: 'header_menu' },
+
+    { key: 'nav_3_title', label: 'عنوان لینک ۳', type: 'text', placeholder: 'کاربرگ‌ها', category: 'header_menu' },
+    { key: 'nav_3_url', label: 'لینک ۳', type: 'text', placeholder: '/worksheets', category: 'header_menu' },
+    { key: 'nav_3_icon', label: 'آیکون ۳', type: 'text', placeholder: '', category: 'header_menu' },
+
+    { key: 'nav_4_title', label: 'عنوان لینک ۴', type: 'text', placeholder: 'وبلاگ', category: 'header_menu' },
+    { key: 'nav_4_url', label: 'لینک ۴', type: 'text', placeholder: '/blog', category: 'header_menu' },
+    { key: 'nav_4_icon', label: 'آیکون ۴', type: 'text', placeholder: '', category: 'header_menu' },
+
+    { key: 'nav_5_title', label: 'عنوان لینک ۵', type: 'text', placeholder: 'کتاب‌ها', category: 'header_menu' },
+    { key: 'nav_5_url', label: 'لینک ۵', type: 'text', placeholder: '/books', category: 'header_menu' },
+    { key: 'nav_5_icon', label: 'آیکون ۵', type: 'text', placeholder: 'BookOpen', category: 'header_menu' },
+
+    { key: 'nav_6_title', label: 'عنوان لینک ۶', type: 'text', placeholder: 'گالری', category: 'header_menu' },
+    { key: 'nav_6_url', label: 'لینک ۶', type: 'text', placeholder: '/gallery', category: 'header_menu' },
+    { key: 'nav_6_icon', label: 'آیکون ۶', type: 'text', placeholder: '', category: 'header_menu' },
+
+    { key: 'nav_7_title', label: 'عنوان لینک ۷', type: 'text', placeholder: 'درباره ما', category: 'header_menu' },
+    { key: 'nav_7_url', label: 'لینک ۷', type: 'text', placeholder: '/about', category: 'header_menu' },
+    { key: 'nav_7_icon', label: 'آیکون ۷', type: 'text', placeholder: '', category: 'header_menu' },
+
   { key: 'site_logo_url', label: 'لوگوی سایت', type: 'logo', category: 'general' },
   { key: 'site_name', label: 'نام سایت', type: 'text', category: 'general' },
   { key: 'site_font', label: 'فونت سایت', type: 'select', category: 'general', options: [
