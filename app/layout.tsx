@@ -46,7 +46,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     'social_eitaa',
     'site_name',
     'site_logo_url'
-  ]).catch(() => ({}))
+  , 
+      'nav_1_title', 'nav_1_url', 'nav_1_icon',
+      'nav_2_title', 'nav_2_url', 'nav_2_icon',
+      'nav_3_title', 'nav_3_url', 'nav_3_icon',
+      'nav_4_title', 'nav_4_url', 'nav_4_icon',
+      'nav_5_title', 'nav_5_url', 'nav_5_icon',
+      'nav_6_title', 'nav_6_url', 'nav_6_icon',
+      'nav_7_title', 'nav_7_url', 'nav_7_icon'
+]).catch(() => ({}))
   const siteFont = (allSettings?.site_font as string) || 'vazirmatn'
   
   // Map font names to CSS classes or inline styles

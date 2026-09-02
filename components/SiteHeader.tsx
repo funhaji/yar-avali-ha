@@ -7,9 +7,18 @@ import { ArrowLeft, BookOpen, Clapperboard, LayoutDashboard, LogOut, Menu, Shopp
 import { useCart } from '@/lib/store-context'
 import { useSettings } from '@/lib/settings-context'
 
+import { icons } from 'lucide-react'
+function DynamicIcon({ name, ...props }: { name: string, [key: string]: any }) {
+  // @ts-ignore
+  const IconComponent = icons[name];
+  if (!IconComponent) return null;
+  return <IconComponent {...props} />;
+}
+
+
 export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: propLogo, siteName: propName }: { userName?: string; isAdmin?: boolean; dark?: boolean; siteLogo?: string; siteName?: string }) {
   const router = useRouter()
-  const { siteLogo: ctxLogo, siteName: ctxName } = useSettings()
+  const { siteLogo: ctxLogo, siteName: ctxName, navLinks } = useSettings()
   
   const siteLogo = propLogo || ctxLogo
   const siteName = propName || ctxName
@@ -62,14 +71,13 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
           {mobileOpen ? <X /> : <Menu />}
         </button>
         <div className={`nav-links ${mobileOpen ? 'open' : ''}`}>
-          <Link href="/shop" className="font-bold text-teal" onClick={() => setMobileOpen(false)}><ShoppingBag /> فروشگاه</Link>
-          <Link href="/entertainment" onClick={() => setMobileOpen(false)}><Clapperboard /> سرگرمی</Link>
-          <Link href="/worksheets" onClick={() => setMobileOpen(false)}>کاربرگ‌ها</Link>
-          <Link href="/blog" onClick={() => setMobileOpen(false)}>وبلاگ</Link>
-          <Link href="/books" onClick={() => setMobileOpen(false)}><BookOpen /> کتاب‌ها</Link>
-          <Link href="/gallery" onClick={() => setMobileOpen(false)}>گالری</Link>
-          <Link href="/about" onClick={() => setMobileOpen(false)}>درباره ما</Link>
-        </div>
+            {navLinks.map((link, idx) => (
+              <Link key={idx} href={link.url} onClick={() => setMobileOpen(false)} className={link.url === '/shop' ? 'font-bold text-teal' : ''}>
+                {link.icon && <DynamicIcon name={link.icon} className="w-4 h-4 inline-block ml-1" />}
+                {link.title}
+              </Link>
+            ))}
+          </div>
         <div className="nav-actions">
           {userName && (
             <button 
