@@ -193,7 +193,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                     className="card card-hover flex flex-col sm:flex-row overflow-hidden group"
                   >
                     {post.thumbnail_url && (
-                      <div className="sm:w-64 shrink-0 aspect-[4/3] sm:aspect-auto">
+                      <div className="w-full sm:w-72 shrink-0 aspect-video sm:aspect-auto overflow-hidden bg-cream">
                         <img
                           src={post.thumbnail_url}
                           alt={post.title}
@@ -201,7 +201,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                         />
                       </div>
                     )}
-                    <div className="p-6 flex flex-col flex-1">
+                    <div className="p-5 sm:p-6 flex flex-col flex-1">
                       <h2 className="text-xl font-bold mb-3 group-hover:text-teal transition-colors">
                         {post.title}
                       </h2>

@@ -81,7 +81,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         siteName={settings.site_name || undefined}
       />
       
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 py-8 sm:py-14">
         <article className="max-w-3xl mx-auto">
           <Link 
             href="/blog" 
@@ -91,11 +91,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </Link>
           
           {post.thumbnail_url && (
-            <img
-              src={post.thumbnail_url}
-              alt={post.title}
-              className="w-full h-96 object-cover rounded-xl mb-8"
-            />
+            <div className="w-full aspect-video sm:aspect-[21/9] max-h-[460px] rounded-2xl overflow-hidden mb-8 shadow-sm border border-line-soft bg-cream">
+              <img
+                src={post.thumbnail_url}
+                alt={post.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
           )}
           
           <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
@@ -139,7 +141,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               // Parse Bold text **bold**
               .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
               // Parse images ![alt](url)
-              .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px; margin: 1.5rem auto; display: block;" />')
+              .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%; height:auto; border-radius:12px; margin: 1.5rem auto; display: block; box-shadow: 0 4px 16px rgba(0,0,0,0.06);" loading="lazy" />')
               // Parse links [text](url)
               .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match: string, text: string, url: string) => {
                 const finalUrl = url.startsWith('http') ? url : 'https://' + url;

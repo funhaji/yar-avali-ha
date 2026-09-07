@@ -1048,3 +1048,12 @@ input[type="range"]::-moz-range-thumb:hover {
 /* Mobile Menu Button Display */
 .mobile-menu-btn { display: flex; }
 @media (min-width: 900px) { .mobile-menu-btn { display: none !important; } }
+
+/* Responsive blog/prose images */
+.prose img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 12px;
+  margin-inline: auto;
+  display: block;
+}

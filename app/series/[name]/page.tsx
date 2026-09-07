@@ -145,7 +145,7 @@ export default async function SeriesPage({ params }: { params: Promise<{ name: s
               return (
                 <Link
                   key={episode.id}
-                  href={isLocked ? '/subscription' : `/watch/${episode.id}`}
+                  href={`/watch/${episode.id}`}
                   className="bg-gray-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-purple-500 transition-all group"
                 >
                   <div className="relative aspect-video">

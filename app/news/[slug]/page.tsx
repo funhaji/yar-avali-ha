@@ -76,7 +76,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
         siteName={settings.site_name || undefined}
       />
       
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 py-8 sm:py-14">
         <article className="max-w-3xl mx-auto">
           <Link 
             href="/news" 
@@ -89,7 +89,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
             <img
               src={post.thumbnail_url}
               alt={post.title}
-              className="w-full h-96 object-cover rounded-xl mb-8"
+              className="w-full aspect-video sm:aspect-[21/9] max-h-[460px] object-cover rounded-2xl mb-8 shadow-sm border border-gray-200"
             />
           )}
           

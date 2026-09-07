@@ -67,7 +67,7 @@ export default async function NewsPage() {
                 >
                   <div className="grid md:grid-cols-3 gap-6">
                     {post.thumbnail_url && (
-                      <div className="md:col-span-1">
+                      <div className="md:col-span-1 aspect-video md:aspect-auto overflow-hidden bg-gray-100">
                         <img
                           src={post.thumbnail_url}
                           alt={post.title}

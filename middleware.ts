@@ -18,7 +18,9 @@ const PUBLIC_ROUTES = [
   '/books',
   '/teacher-training',
   '/news',
-  '/gallery'
+  '/gallery',
+  '/watch',
+  '/series'
 ]
 
 // Public API routes that don't need authentication

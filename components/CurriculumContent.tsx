@@ -123,14 +123,12 @@ export function CurriculumContent({ byGrade, hasSubscription, initialQuery, grad
                         alt={item.title}
                         className="w-full h-full object-cover"
                       />
-                      {isLocked && (
-                        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                          <div className="text-white text-center">
-                            <div className="text-2xl mb-1">🔒</div>
-                            <div className="text-xs">نیاز به اشتراک</div>
-                          </div>
+                      {isLocked ? (
+                        <div className="absolute top-2 right-2 bg-amber-500/95 backdrop-blur-sm text-white px-2 py-0.5 rounded-full text-xs font-bold shadow flex items-center gap-1 z-10">
+                          <span>🔒</span>
+                          <span>اشتراکی</span>
                         </div>
-                      )}
+                      ) : null}
                       {item.tier_requirement === 'free' && (
                         <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-medium">
                           رایگان

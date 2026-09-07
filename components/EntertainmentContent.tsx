@@ -264,7 +264,7 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
                       key={item.id}
                       className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group"
                     >
-                      <div className="relative overflow-hidden" style={{ aspectRatio: '2/3' }}>
+                      <Link href={`/watch/${item.id}`} className="relative overflow-hidden block" style={{ aspectRatio: '2/3' }}>
                         <img
                           src={item.thumbnail_url || '/placeholder.jpg'}
                           alt={item.title}
@@ -275,11 +275,9 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
                         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/20 to-transparent"></div>
                         
                         {isLocked && (
-                          <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center transition-opacity">
-                            <div className="text-white text-center transform group-hover:scale-110 transition-transform">
-                              <div className="text-3xl mb-2 drop-shadow-lg">🔒</div>
-                              <div className="text-sm font-medium">نیاز به اشتراک</div>
-                            </div>
+                          <div className="absolute top-3 right-3 bg-amber-500/95 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1 z-10">
+                            <span className="text-xs">🔒</span>
+                            <span>اشتراکی</span>
                           </div>
                         )}
                         {item.tier_requirement === 'free' && (
@@ -287,7 +285,7 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
                             رایگان
                           </div>
                         )}
-                      </div>
+                      </Link>
                       
                       <div className="p-4 flex flex-col flex-1 bg-white">
                         <div className="flex items-center gap-1.5 mb-2 flex-wrap">
