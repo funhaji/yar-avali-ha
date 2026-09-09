@@ -36,13 +36,13 @@ async function getData(userId: string) {
     console.error('Slides table not found or error fetching slides:', error)
     // Table doesn't exist yet, return empty array
   }
-  // Get purchased digital items
+  // Get purchased digital items (only for completed or approved orders)
   const purchasedDigital = await query<any>(
     `SELECT DISTINCT s.id, s.title, s.thumbnail_url, s.is_downloadable, s.file_url, s.content_type, s.storage_provider 
      FROM yar_order_items oi
      JOIN yar_orders o ON oi.order_id = o.id
      JOIN yar_store_items s ON oi.store_item_id = s.id
-     WHERE o.user_id = $1 AND s.is_digital = true
+     WHERE o.user_id = $1 AND s.is_digital = true AND o.status IN ('completed', 'approved')
      ORDER BY s.id DESC`,
     [userId]
   )

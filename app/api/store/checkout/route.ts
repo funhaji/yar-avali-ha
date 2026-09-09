@@ -4,7 +4,7 @@ import { validateSession } from '@/lib/auth'
 import { getCart, clearCart } from '@/lib/cart'
 import { query } from '@/lib/db'
 import { Resend } from 'resend'
-import { requestZarinpalPayment } from '@/lib/zarinpal'
+import { requestZarinpalPayment, getCanonicalSiteUrl } from '@/lib/zarinpal'
 
 export async function POST(request: Request) {
   try {
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
     }
 
-    // Calculate total
+    // Calculate total (in Rials: price_cents = Tomans * 10)
     let total_cents = 0
     for (const item of cart) {
       const price = item.discount_price_cents !== null ? item.discount_price_cents : (item.price_cents || 0)
@@ -36,9 +36,17 @@ export async function POST(request: Request) {
     }
 
     const isFree = total_cents === 0
+
+    // Validate minimum Shetab banking transaction for gateway (minimum 10,000 Rials / 1,000 Tomans)
+    if (payment_method === 'gateway' && !isFree && total_cents < 10000) {
+      return NextResponse.json({
+        error: 'حداقل مبلغ جهت پرداخت آنلاین بانکی ۱,۰۰۰ تومان است. برای مبالغ کمتر لطفاً روش کارت به کارت را انتخاب نمایید.'
+      }, { status: 400 })
+    }
+
     const initialStatus = isFree ? 'completed' : (payment_method === 'gateway' ? 'pending_payment' : 'pending_approval')
 
-    // 1. Create order
+    // 1. Create order in database
     const orderResult = await query(
       `INSERT INTO yar_orders (user_id, full_name, phone, shipping_address, total_cents, notes, payment_method, postal_code, receipt_url, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
@@ -67,7 +75,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // 3. Clear cart
+    // 3. Clear selected items from cart
     if (selected_item_ids && Array.isArray(selected_item_ids) && selected_item_ids.length > 0) {
       for (const item of cart) {
         await query('DELETE FROM yar_cart_items WHERE id = $1 AND user_id = $2', [item.id, user.id])
@@ -78,9 +86,7 @@ export async function POST(request: Request) {
 
     // 4. If online payment gateway (and not free), initiate Zarinpal payment request
     if (payment_method === 'gateway' && !isFree) {
-      const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000'
-      const proto = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https')
-      const siteUrl = `${proto}://${host}`
+      const siteUrl = getCanonicalSiteUrl(request)
       const callbackUrl = `${siteUrl}/api/store/payment/callback?order_id=${orderId}`
 
       const zarinResult = await requestZarinpalPayment({
@@ -93,7 +99,6 @@ export async function POST(request: Request) {
       })
 
       if (!zarinResult.success || !zarinResult.paymentUrl) {
-        // Return clear error so user can choose card2card or retry
         return NextResponse.json({
           error: zarinResult.error || 'خطا در اتصال به درگاه پرداخت زرین‌پال'
         }, { status: 400 })

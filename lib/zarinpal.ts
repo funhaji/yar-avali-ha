@@ -24,6 +24,27 @@ export async function getZarinpalConfig(): Promise<ZarinpalConfig> {
   }
 }
 
+/**
+ * Resolves the canonical public site URL for Vercel, custom domains, and local development.
+ */
+export function getCanonicalSiteUrl(request?: Request): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, '')
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.replace(/\/+$/, '')}`
+  }
+  if (request) {
+    const fwdHost = request.headers.get('x-forwarded-host')
+    const host = fwdHost || request.headers.get('host') || ''
+    const proto = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https')
+    if (host) {
+      return `${proto}://${host}`.replace(/\/+$/, '')
+    }
+  }
+  return 'https://www.yaravaliha.ir'
+}
+
 export type PaymentRequestParams = {
   amount: number // in Rials
   description: string
@@ -46,7 +67,7 @@ export async function requestZarinpalPayment(params: PaymentRequestParams): Prom
   if (!config.merchantId) {
     return {
       success: false,
-      error: 'مرچنت‌آیدی یا کد زرین‌پال در پنل مدیریت تنظیم نشده است.'
+      error: 'مرچنت‌آیدی یا کد درگاه زرین‌پال در پنل مدیریت تنظیم نشده است.'
     }
   }
 
@@ -78,11 +99,16 @@ export async function requestZarinpalPayment(params: PaymentRequestParams): Prom
   }
 
   try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 15000)
+
     const res = await fetch(endpoint, {
       method: 'POST',
       headers,
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     })
+    clearTimeout(timeout)
 
     const data = await res.json()
 
@@ -120,7 +146,9 @@ export async function requestZarinpalPayment(params: PaymentRequestParams): Prom
     console.error('Zarinpal requestPayment fetch error:', err)
     return {
       success: false,
-      error: err.message || 'خطای غیرمنتظره در اتصال به درگاه زرین‌پال'
+      error: err.name === 'AbortError' 
+        ? 'مهلت زمان اتصال به زرین‌پال به پایان رسید. لطفاً مجدداً تلاش کنید.'
+        : (err.message || 'خطای غیرمنتظره در اتصال به درگاه زرین‌پال')
     }
   }
 }
@@ -165,11 +193,16 @@ export async function verifyZarinpalPayment(amount: number, authority: string): 
   }
 
   try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 15000)
+
     const res = await fetch(endpoint, {
       method: 'POST',
       headers,
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     })
+    clearTimeout(timeout)
 
     const data = await res.json()
 
@@ -231,7 +264,9 @@ export async function verifyZarinpalPayment(amount: number, authority: string): 
     console.error('Zarinpal verifyPayment fetch error:', err)
     return {
       success: false,
-      error: err.message || 'خطای شبکه در اتصال به سرور زرین‌پال'
+      error: err.name === 'AbortError'
+        ? 'مهلت زمان تایید با زرین‌پال به پایان رسید. لطفاً مجدداً بررسی کنید.'
+        : (err.message || 'خطای شبکه در اتصال به سرور زرین‌پال')
     }
   }
 }

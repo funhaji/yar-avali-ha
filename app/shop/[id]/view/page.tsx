@@ -24,7 +24,7 @@ async function getStoreContentData(contentId: string, userId: string, fileIndex:
     const orders = await query(`
       SELECT 1 FROM yar_order_items oi
       JOIN yar_orders o ON oi.order_id = o.id
-      WHERE o.user_id = $1 AND oi.store_item_id = $2
+      WHERE o.user_id = $1 AND oi.store_item_id = $2 AND o.status IN ('completed', 'approved')
     `, [userId, contentId])
     hasAccess = orders.length > 0
   }
