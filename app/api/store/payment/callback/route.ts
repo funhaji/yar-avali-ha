@@ -69,12 +69,9 @@ async function handlePaymentCallback(request: Request) {
 
     // 3. If Status is not OK (user cancelled or payment failed)
     if (status !== 'OK') {
-      await query(
-        `UPDATE yar_orders SET status = 'failed' WHERE id = $1`,
-        [order.id]
-      )
+      // Keep order as pending_payment so user can retry or pay via card-to-card or cancel
       return NextResponse.redirect(
-        new URL(`/shop/checkout/result?order_id=${order.id}&status=failed&message=${encodeURIComponent('پرداخت انجام نشد یا توسط کاربر لغو شد.')}`, siteUrl)
+        new URL(`/shop/checkout/result?order_id=${order.id}&status=failed&message=${encodeURIComponent('پرداخت توسط کاربر لغو شد یا انجام نشد. می‌توانید از طریق پیشخوان کاربری مجدداً پرداخت را انجام دهید.')}`, siteUrl)
       )
     }
 
@@ -82,10 +79,6 @@ async function handlePaymentCallback(request: Request) {
     const verification = await verifyZarinpalPayment(order.total_cents, authority)
 
     if (!verification.success) {
-      await query(
-        `UPDATE yar_orders SET status = 'failed' WHERE id = $1`,
-        [order.id]
-      )
       const errorMsg = verification.error || 'تایید تراکنش با خطا مواجه شد.'
       return NextResponse.redirect(
         new URL(`/shop/checkout/result?order_id=${order.id}&status=failed&message=${encodeURIComponent(errorMsg)}`, siteUrl)

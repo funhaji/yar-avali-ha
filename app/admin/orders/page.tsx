@@ -3,10 +3,14 @@ import { SiteHeader } from '@/components/SiteHeader'
 import { requireAdmin } from '@/lib/teachers'
 import { query } from '@/lib/db'
 import OrdersManager from '@/components/admin/OrdersManager'
+import { cleanupExpiredOrders } from '@/lib/orders'
 
 export default async function AdminOrdersPage() {
   const admin = await requireAdmin()
   if (!admin) redirect('/')
+
+  // Auto-cleanup expired orders
+  await cleanupExpiredOrders()
 
   // Fetch all orders
   const orders = await query(`

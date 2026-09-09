@@ -190,6 +190,9 @@ ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS payment_authority VARCHAR(255);
 ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS payment_card_pan VARCHAR(50);
 ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP;
 
+CREATE INDEX IF NOT EXISTS idx_yar_orders_user_status ON yar_orders(user_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_yar_orders_expiry ON yar_orders(status, paid_at, created_at);
+
 -- Order items table
 CREATE TABLE IF NOT EXISTS yar_order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

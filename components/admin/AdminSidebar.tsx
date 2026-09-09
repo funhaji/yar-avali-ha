@@ -13,7 +13,7 @@ const MENU_ITEMS = [
   { href: '/dashboard', label: 'پیشخوان کاربری', icon: LayoutDashboard },
   { href: '/admin', label: 'پیشخوان ادمین', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'سفارشات', icon: ShoppingBag },
-  { href: '/admin/settings?tab=payment', label: 'درگاه و کارت بانکی', icon: CreditCard },
+  { href: '/admin/payment', label: 'تنظیمات درگاه و پرداخت', icon: CreditCard },
   { href: '/admin/content', label: 'مدیریت محتوا', icon: FileVideo },
   { href: '/admin/settings', label: 'تنظیمات سایت', icon: Settings },
   { href: '/admin/categories', label: 'ترتیب دسته‌بندی‌ها', icon: Settings },

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useCart } from '@/lib/store-context'
-import { ShoppingBag, X, Plus, Minus, Trash2, ArrowLeft, Loader2 } from 'lucide-react'
+import { ShoppingBag, X, Plus, Minus, Trash2, ArrowLeft, Loader2, Clock } from 'lucide-react'
 import Link from 'next/link'
 
 export function CartDrawer() {
@@ -29,9 +29,19 @@ export function CartDrawer() {
             سبد خرید
             <span className="badge badge-tangerine text-xs">{totalItems}</span>
           </div>
-          <button onClick={() => setDrawerOpen(false)} className="icon-button">
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard#orders"
+              onClick={() => setDrawerOpen(false)}
+              className="text-xs font-bold text-teal hover:text-teal-deep bg-teal/10 hover:bg-teal/20 py-1 px-2.5 rounded-lg flex items-center gap-1 transition-colors"
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>پیگیری سفارش‌ها</span>
+            </Link>
+            <button onClick={() => setDrawerOpen(false)} className="icon-button">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
@@ -56,9 +66,14 @@ export function CartDrawer() {
             <div className="flex flex-col items-center justify-center flex-1 text-center text-ink-soft gap-4">
               <ShoppingBag className="w-12 h-12 opacity-30" />
               <p>سبد خرید خالیه.</p>
-              <Link href="/shop" onClick={() => setDrawerOpen(false)} className="button button-primary mt-2">
-                بازگشت به فروشگاه
-              </Link>
+              <div className="flex flex-col gap-2 w-full px-6 mt-2">
+                <Link href="/shop" onClick={() => setDrawerOpen(false)} className="button button-primary justify-center">
+                  بازگشت به فروشگاه
+                </Link>
+                <Link href="/dashboard#orders" onClick={() => setDrawerOpen(false)} className="button button-ghost border border-line-soft justify-center text-xs font-bold">
+                  <Clock className="w-3.5 h-3.5 ml-1" /> مشاهده و پیگیری سفارش‌های من
+                </Link>
+              </div>
             </div>
           ) : (
             <>
@@ -140,6 +155,16 @@ export function CartDrawer() {
               ادامه جهت تسویه حساب
               <ArrowLeft className="w-5 h-5" />
             </Link>
+            <div className="mt-3 text-center">
+              <Link
+                href="/dashboard#orders"
+                onClick={() => setDrawerOpen(false)}
+                className="text-xs text-ink-soft hover:text-teal inline-flex items-center gap-1 font-bold transition-colors"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>مشاهده سفارش‌ها و خریدهای قبلی</span>
+              </Link>
+            </div>
           </div>
         )}
       </div>

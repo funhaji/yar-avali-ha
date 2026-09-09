@@ -169,45 +169,7 @@ const DEFAULT_SETTINGS = [
   { key: 'tt_card2_btn_desc', label: 'توضیحات زیر دکمه کارت ۲', type: 'textarea', placeholder: 'ظرفیت دوره محدود است...', category: 'teacher_training' },
   { key: 'tt_card2_btn_id', label: 'آیدی پشتیبانی کارت ۲', type: 'text', placeholder: '@yar_avali_ha', category: 'teacher_training' },
 
-  // Payment & Banking Settings
-  { 
-    key: 'payment_gateway_enabled', 
-    label: 'فعال‌سازی درگاه پرداخت آنلاین زرین‌پال', 
-    type: 'checkbox', 
-    category: 'payment',
-    description: 'با تیک زدن این گزینه، گزینه پرداخت آنلاین در مرحله تسویه حساب فعال می‌شود.'
-  },
-  { 
-    key: 'zarinpal_merchant_id', 
-    label: 'کد مرچنت یا اکسس توکن زرین‌پال (Merchant ID / Access Token)', 
-    type: 'text', 
-    placeholder: 'مثلاً: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx یا Access Token', 
-    category: 'payment',
-    description: 'مرچنت کد ۳۶ رقمی درگاه زرین‌پال یا اکسس توکن احراز هویت. این کلید برای اتصال به زرین‌پال ضروری است.'
-  },
-  { 
-    key: 'zarinpal_sandbox', 
-    label: 'حالت تستی / آزمایشی زرین‌پال (Sandbox)', 
-    type: 'checkbox', 
-    category: 'payment',
-    description: 'صرفاً برای تست. در صورت تیک خوردن، تراکنش‌ها به صورت آزمایشی در sandbox.zarinpal.com انجام می‌شوند. در سایت واقعی خاموش نگه دارید.'
-  },
-  { 
-    key: 'admin_card_number', 
-    label: 'شماره کارت بانکی (جهت پرداخت کارت به کارت)', 
-    type: 'text', 
-    placeholder: 'مثلاً: ۶۰۳۷-۹۹۷۱-xxxx-xxxx', 
-    category: 'payment',
-    description: 'شماره کارت ۱۶ رقمی که در صفحه تسویه حساب به خریدار برای واریز کارت به کارت نمایش داده می‌شود.'
-  },
-  { 
-    key: 'admin_card_name', 
-    label: 'نام صاحب حساب کارت بانکی', 
-    type: 'text', 
-    placeholder: 'مثلاً: علی احمدی', 
-    category: 'payment',
-    description: 'نام و نام خانوادگی صاحب کارت بانکی جهت اطمینان خریدار.'
-  },
+
 
 
 
@@ -298,7 +260,6 @@ export function SettingsManager({ initialSettings, initialTab }: Props) {
 
   const TABS = [
     { id: 'general', label: 'عمومی' },
-    { id: 'payment', label: '💳 درگاه پرداخت و کارت به کارت' },
     { id: 'store', label: 'فروشگاه' },
       { id: 'header_menu', label: 'منوی سایت' },
     { id: 'home', label: 'صفحه اصلی (ویژگی‌ها)' },

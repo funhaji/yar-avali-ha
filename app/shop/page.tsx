@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import { getStoreItems, getCategories } from '@/lib/store'
 import { ProductCard } from '@/components/shop/ProductCard'
+import { PendingOrderBanner } from '@/components/shop/PendingOrderBanner'
+import { getUserPendingOrder } from '@/lib/orders'
 import { ShopGrid } from '@/components/shop/ShopGrid'
 import { ShopSortSelect } from '@/components/shop/ShopSortSelect'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'

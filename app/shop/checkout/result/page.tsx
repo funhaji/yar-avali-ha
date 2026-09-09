@@ -176,8 +176,8 @@ export default async function CheckoutResultPage({ searchParams }: { searchParam
 
             {/* Action Buttons for retry */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
-              <Link href="/shop/checkout" className="button button-primary w-full sm:w-auto justify-center button-lg">
-                تلاش مجدد برای پرداخت
+              <Link href="/dashboard#orders" className="button button-primary w-full sm:w-auto justify-center button-lg">
+                تکمیل یا پرداخت مجدد سفارش در پیشخوان
               </Link>
               <Link href="/shop" className="button button-ghost border border-line-soft w-full sm:w-auto justify-center">
                 بازگشت به فروشگاه

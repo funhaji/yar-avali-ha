@@ -5,6 +5,7 @@ import { getCart, clearCart } from '@/lib/cart'
 import { query } from '@/lib/db'
 import { Resend } from 'resend'
 import { requestZarinpalPayment, getCanonicalSiteUrl } from '@/lib/zarinpal'
+import { cleanupExpiredOrders } from '@/lib/orders'
 
 export async function POST(request: Request) {
   try {
@@ -26,6 +27,29 @@ export async function POST(request: Request) {
 
     if (cart.length === 0) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
+    }
+
+    // Auto-cleanup any old expired orders for this user
+    await cleanupExpiredOrders(user.id);
+
+    // Mixed cart validation: if any physical item is in cart, require shipping details
+    const hasPhysicalItems = cart.some(item => !item.is_digital);
+    if (hasPhysicalItems) {
+      if (!shipping_address || shipping_address.trim().length < 5) {
+        return NextResponse.json({
+          error: 'سفارش شما شامل کالای فیزیکی است. لطفاً آدرس پستی دقیق خود را وارد نمایید.'
+        }, { status: 400 });
+      }
+      if (!postal_code || postal_code.trim().length < 5) {
+        return NextResponse.json({
+          error: 'سفارش شما شامل کالای فیزیکی است. لطفاً کد پستی معتبر را وارد نمایید.'
+        }, { status: 400 });
+      }
+      if (!phone || phone.trim().length < 8) {
+        return NextResponse.json({
+          error: 'لطفاً شماره تماس معتبر جهت هماهنگی ارسال وارد نمایید.'
+        }, { status: 400 });
+      }
     }
 
     // Calculate total (in Rials: price_cents = Tomans * 10)

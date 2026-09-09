@@ -8,6 +8,8 @@ import { validateSession } from '@/lib/auth'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { AccountControls } from '@/components/AccountControls'
 import { HomepageSlider } from '@/components/HomepageSlider'
+import { UserOrdersSection } from '@/components/dashboard/UserOrdersSection'
+import { getUserOrders } from '@/lib/orders'
 import { getSettings } from '@/lib/settings'
 
 async function getData(userId: string) {
@@ -36,29 +38,7 @@ async function getData(userId: string) {
     console.error('Slides table not found or error fetching slides:', error)
     // Table doesn't exist yet, return empty array
   }
-  // Get purchased digital items (only for completed or approved orders)
-  const purchasedDigital = await query<any>(
-    `SELECT DISTINCT s.id, s.title, s.thumbnail_url, s.is_downloadable, s.file_url, s.content_type, s.storage_provider 
-     FROM yar_order_items oi
-     JOIN yar_orders o ON oi.order_id = o.id
-     JOIN yar_store_items s ON oi.store_item_id = s.id
-     WHERE o.user_id = $1 AND s.is_digital = true AND o.status IN ('completed', 'approved')
-     ORDER BY s.id DESC`,
-    [userId]
-  )
-  
-  // Get purchased physical items
-  const purchasedPhysical = await query<any>(
-    `SELECT DISTINCT s.id, s.title, s.thumbnail_url, o.status, o.created_at
-     FROM yar_order_items oi
-     JOIN yar_orders o ON oi.order_id = o.id
-     JOIN yar_store_items s ON oi.store_item_id = s.id
-     WHERE o.user_id = $1 AND s.is_digital = false
-     ORDER BY o.created_at DESC`,
-    [userId]
-  )
-  
-  return { hasSubscription, continuing, watched, slides, purchasedDigital, purchasedPhysical }
+  return { hasSubscription, continuing, watched, slides }
 }
 
 function firstName(name: string) {
@@ -70,9 +50,10 @@ export default async function DashboardPage() {
   const user = token ? await validateSession(token) : null
   if (!user) redirect('/login')
 
-  const [{ hasSubscription, continuing, watched, slides, purchasedDigital, purchasedPhysical }, settings] = await Promise.all([
+  const [{ hasSubscription, continuing, watched, slides }, settings, userOrders] = await Promise.all([
     getData(user.id),
     getSettings(['site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone']),
+    getUserOrders(user.id),
   ])
   const primary = continuing[0]
 
@@ -193,91 +174,9 @@ export default async function DashboardPage() {
           </section>
         )}
 
-        {/* Purchased Digital Items - New Section */}
-        <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }} className="slide-up">
-          <div className="rail-head" style={{ marginBottom: '.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <ShoppingBag className="w-5 h-5 text-teal" />
-            <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--ink)' }}>کتابخانه دیجیتال شما</span>
-          </div>
-          {purchasedDigital && purchasedDigital.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {purchasedDigital.map((item: any) => (
-                <div key={item.id} className="card p-4 flex flex-col hover-lift border border-line-soft">
-                  <div className="aspect-square bg-cream rounded-lg overflow-hidden mb-4 relative">
-                    {item.thumbnail_url ? (
-                      <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-ink-soft opacity-30">
-                        <ShoppingBag className="w-8 h-8" />
-                      </div>
-                    )}
-                  </div>
-                  <h4 className="font-bold text-sm mb-4 line-clamp-2 leading-snug flex-1">{item.title}</h4>
-                  
-                  {item.content_type === 'video' || item.content_type === 'pdf' || item.content_type === 'image' ? (
-                    <Link href={`/shop/${item.id}/view`} className="button button-primary w-full justify-center text-sm">
-                      <Play className="w-4 h-4" /> مشاهده
-                    </Link>
-                  ) : item.file_url ? (
-                    <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="button button-primary w-full justify-center text-sm">
-                      {item.is_downloadable ? <><Download className="w-4 h-4" /> دانلود</> : <><ExternalLink className="w-4 h-4" /> دریافت فایل</>}
-                    </a>
-                  ) : (
-                    <button disabled className="button w-full justify-center text-sm bg-line-soft text-ink-soft cursor-not-allowed">
-                      فایل آماده نیست
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="card p-8 text-center border-dashed">
-              <p className="font-bold text-ink-soft">هنوز محصول دیجیتالی خریداری نکردید.</p>
-              <Link href="/shop" className="button button-ghost mt-4">مشاهده فروشگاه</Link>
-            </div>
-          )}
-        </section>
-
-        {/* Purchased Physical Items - New Section */}
-        <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }} className="slide-up">
-          <div className="rail-head" style={{ marginBottom: '.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <ShoppingBag className="w-5 h-5 text-teal" />
-            <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--ink)' }}>سفارشات فیزیکی شما</span>
-          </div>
-          {purchasedPhysical && purchasedPhysical.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {purchasedPhysical.map((item: any) => (
-                <Link href={`/shop/${item.id}`} key={item.id} className="card p-4 flex flex-col hover-lift border border-line-soft">
-                  <div className="aspect-square bg-cream rounded-lg overflow-hidden mb-4 relative">
-                    {item.thumbnail_url ? (
-                      <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-ink-soft opacity-30">
-                        <ShoppingBag className="w-8 h-8" />
-                      </div>
-                    )}
-                  </div>
-                  <h4 className="font-bold text-sm mb-2 line-clamp-2 leading-snug flex-1">{item.title}</h4>
-                  <div className="text-xs text-ink-soft mb-4">
-                    ثبت شده در: {new Date(item.created_at).toLocaleDateString('fa-IR')}
-                  </div>
-                  <div className={`button w-full justify-center text-sm ${item.status === 'completed' || item.status === 'shipped' ? 'button-primary' : 'bg-cream text-teal'}`}>
-                    وضعیت: {
-                      item.status === 'completed' ? 'تکمیل شده' :
-                      item.status === 'shipped' ? 'ارسال شده' :
-                      item.status === 'processing' ? 'در حال پردازش' :
-                      item.status === 'cancelled' ? 'لغو شده' : 'در انتظار'
-                    }
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="card p-8 text-center border-dashed">
-              <p className="font-bold text-ink-soft">شما هنوز سفارش فیزیکی ثبت نکردید.</p>
-              <Link href="/shop" className="button button-ghost mt-4">مشاهده فروشگاه</Link>
-            </div>
-          )}
+        {/* User Orders & Digital/Physical Library */}
+        <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
+          <UserOrdersSection initialOrders={userOrders} />
         </section>
 
         {/* Three doors - curriculum, entertainment, worksheets */}

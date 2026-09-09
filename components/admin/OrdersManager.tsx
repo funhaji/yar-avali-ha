@@ -53,7 +53,7 @@ export default function OrdersManager({ initialOrders }: { initialOrders: any[] 
           <h1 className="display" style={{ fontSize: '2.5rem' }}>سفارشات مشتریان</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/admin/settings?tab=payment" className="button button-ghost flex items-center gap-2 text-xs font-bold border border-line-soft hover:border-teal px-3 py-2 rounded-xl">
+          <Link href="/admin/payment" className="button button-ghost flex items-center gap-2 text-xs font-bold border border-line-soft hover:border-teal px-3 py-2 rounded-xl">
             <CreditCard className="w-4 h-4 text-teal" />
             <span>تنظیمات درگاه و شماره کارت</span>
           </Link>

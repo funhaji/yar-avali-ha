@@ -49,7 +49,7 @@ export default async function AdminPage() {
         
                 {/* Quick Shortcut to Payment & Card Settings */}
         <Link 
-          href="/admin/settings?tab=payment"
+          href="/admin/payment"
           className="card p-5 flex items-center justify-between hover:border-teal transition-all group"
           style={{ background: 'var(--paper)', border: '1px solid var(--line-soft)' }}
         >
