@@ -1,7 +1,11 @@
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowLeft, BookOpen, Clapperboard, Crown, Play, Download, ExternalLink, ShoppingBag, HeartHandshake } from 'lucide-react'
+import { 
+  ArrowLeft, BookOpen, Clapperboard, Crown, Play, Download, 
+  ExternalLink, ShoppingBag, HeartHandshake, FileText, Sparkles, 
+  KeyRound, ShieldCheck, Film 
+} from 'lucide-react'
 import { query } from '@/lib/db'
 import { hasActiveSubscription } from '@/lib/subscriptions'
 import { validateSession } from '@/lib/auth'
@@ -26,7 +30,7 @@ async function getData(userId: string) {
   const continuing = history.filter((x) => !x.completed && x.progress_seconds > 0).slice(0, 5)
   const watched = history.filter((x) => x.completed).slice(0, 6)
   
-  // Get active slides - with error handling for when table doesn't exist
+  // Get active slides - with error handling
   let slides: any[] = []
   try {
     slides = await query<any>(
@@ -36,8 +40,8 @@ async function getData(userId: string) {
     )
   } catch (error) {
     console.error('Slides table not found or error fetching slides:', error)
-    // Table doesn't exist yet, return empty array
   }
+  
   return { hasSubscription, continuing, watched, slides }
 }
 
@@ -58,7 +62,7 @@ export default async function DashboardPage() {
   const primary = continuing[0]
 
   return (
-    <div className="page">
+    <div className="page bg-[#f8fafc] min-h-screen flex flex-col">
       <SiteHeader 
         userName={user.name} 
         isAdmin={user.role === 'admin'} 
@@ -66,30 +70,64 @@ export default async function DashboardPage() {
         siteName={settings.site_name || undefined}
       />
 
-      <main className="shell section" style={{ paddingTop: 'clamp(1.6rem, 4vw, 2.6rem)' }}>
-        {/* Quiet greeting row — not a headline moment, just orientation */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: 'clamp(1.6rem, 4vw, 2.4rem)' }}>
-          <p style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--ink-soft)' }}>
-            سلام {firstName(user.name)} 👋
-          </p>
-          {!hasSubscription && (
-            <Link href="/subscription" className="chip" style={{ background: 'var(--ink)', color: 'var(--paper)', fontSize: '.82rem', padding: '.4rem .85rem' }}>
-              <Crown style={{ width: 14, height: 14 }} /> اشتراک نداری — فعال کن
-            </Link>
-          )}
-        </div>
+      <main className="shell py-8 md:py-12 flex-1 space-y-10">
+        {/* Welcome Profile Hero Card */}
+        <section className="card p-6 md:p-8 rounded-[2rem] bg-gradient-to-r from-teal/15 via-teal/5 to-amber-500/10 border border-teal/20 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 slide-up">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-teal text-white flex items-center justify-center font-black text-2xl shadow-md shrink-0">
+              {user.name.slice(0, 1)}
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl md:text-2xl font-black text-ink">سلام، {user.name} عزیز! 👋</h1>
+                {hasSubscription ? (
+                  <span className="badge bg-amber-100 text-amber-800 border-amber-300 font-bold text-xs flex items-center gap-1">
+                    <Crown className="w-3.5 h-3.5 text-amber-600" /> اشتراک ویژه فعال
+                  </span>
+                ) : (
+                  <span className="badge bg-gray-100 text-gray-700 border-gray-300 text-xs">
+                    کاربر عادی
+                  </span>
+                )}
+              </div>
+              <p className="text-xs md:text-sm text-ink-soft">
+                به پیشخوان آموزشی یار اولی‌ها خوش آمدید. از این بخش به دوره‌ها، فایل‌ها و سفارشات دسترسی دارید.
+              </p>
+            </div>
+          </div>
 
-        {/* Homepage Slider - replaces continue watching hero */}
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+            {!hasSubscription ? (
+              <Link 
+                href="/subscription" 
+                className="button bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-md flex items-center gap-2 text-sm transition-all hover:shadow-lg"
+              >
+                <Crown className="w-4 h-4" />
+                <span>فعال‌سازی اشتراک ویژه</span>
+              </Link>
+            ) : (
+              <Link 
+                href="/entertainment" 
+                className="button button-ghost border border-teal/30 bg-white/90 text-teal-deep font-bold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 shadow-sm"
+              >
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>کتابخانه انیمه و فیلم‌ها</span>
+              </Link>
+            )}
+          </div>
+        </section>
+
+        {/* Homepage Slider */}
         {slides && slides.length > 0 ? (
-          <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
+          <section className="slide-up">
             <HomepageSlider slides={slides} />
           </section>
         ) : primary ? (
-          /* Fallback: show continue watching if no slides */
-          <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
+          /* Fallback: Continue Watching Hero */
+          <section className="slide-up">
             <Link
               href={`/watch/${primary.content_id}`}
-              className="card card-hover"
+              className="card card-hover overflow-hidden rounded-3xl"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'minmax(0,1fr)',
@@ -109,7 +147,7 @@ export default async function DashboardPage() {
                 <span className="chip" style={{ background: 'rgba(255,255,255,.15)', color: 'var(--paper)', width: 'fit-content', marginBottom: '.7rem', backdropFilter: 'blur(4px)' }}>
                   ادامه تماشا
                 </span>
-                <h1 className="section-title text-balance" style={{ fontSize: 'clamp(1.5rem, 3.4vw, 2.2rem)', maxWidth: '26ch' }}>{primary.title}</h1>
+                <h2 className="section-title text-balance" style={{ fontSize: 'clamp(1.5rem, 3.4vw, 2.2rem)', maxWidth: '26ch' }}>{primary.title}</h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
                   <span className="button button-primary">
                     <Play style={{ width: 18, height: 18 }} /> ادامه بده
@@ -121,7 +159,7 @@ export default async function DashboardPage() {
                   ) : null}
                 </div>
               </div>
-              {/* progress bar */}
+              {/* Progress Bar */}
               {primary.duration_seconds ? (
                 <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 4, background: 'rgba(255,255,255,.2)', zIndex: 1 }}>
                   <div style={{ height: '100%', width: `${Math.min(100, Math.round((primary.progress_seconds / primary.duration_seconds) * 100))}%`, background: 'var(--teal)' }} />
@@ -129,31 +167,20 @@ export default async function DashboardPage() {
               ) : null}
             </Link>
           </section>
-        ) : (
-          /* Empty state: no history yet — this is the actual first-run moment, treat it as one */
-          <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-            <div className="card" style={{ padding: 'clamp(2rem, 5vw, 3rem)', textAlign: 'center', border: '1px dashed var(--line-soft)' }}>
-              <p style={{ fontWeight: 800, fontSize: '1.2rem' }}>هنوز چیزی شروع نکردی</p>
-              <p className="muted" style={{ marginTop: '.4rem' }}>یک درس یا یک انیمه رو امتحان کن — همینجا برات نگه می‌داریم.</p>
-              <div className="button-row" style={{ justifyContent: 'center', marginTop: '1.4rem' }}>
-                <Link href="/curriculum" className="button button-primary">شروع یک درس</Link>
-                <Link href="/entertainment" className="button button-ghost">دیدن کتابخانه</Link>
-              </div>
-            </div>
-          </section>
-        )}
+        ) : null}
 
-        {/* Continue watching queue - smaller cards below slider */}
+        {/* Continue Watching Queue */}
         {continuing.length > 0 && (
-          <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-            <div className="rail-head" style={{ marginBottom: '.9rem' }}>
-              <span style={{ fontWeight: 700, fontSize: '.95rem', color: 'var(--ink-soft)' }}>ادامه تماشا</span>
+          <section className="space-y-4 slide-up">
+            <div className="flex items-center gap-2">
+              <Film className="w-5 h-5 text-teal" />
+              <h3 className="font-bold text-lg text-ink">ادامه تماشا</h3>
             </div>
-            <div className="rail" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))' }}>
+            <div className="rail" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
               {continuing.map((x) => {
                 const pct = x.duration_seconds ? Math.min(100, Math.round((x.progress_seconds / x.duration_seconds) * 100)) : 0
                 return (
-                  <Link href={`/watch/${x.content_id}`} key={x.id} className="card card-hover rail-card">
+                  <Link href={`/watch/${x.content_id}`} key={x.id} className="card card-hover rail-card rounded-2xl overflow-hidden border border-line-soft">
                     <div className="rail-poster" style={{ aspectRatio: '16/9' }}>
                       {x.thumbnail_url ? (
                         <img src={x.thumbnail_url || "/placeholder.svg"} alt={x.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -164,8 +191,8 @@ export default async function DashboardPage() {
                         <div style={{ height: '100%', width: `${pct}%`, background: 'var(--teal)' }} />
                       </div>
                     </div>
-                    <div className="rail-body" style={{ padding: '.6rem .7rem .75rem' }}>
-                      <div className="rail-title" style={{ fontSize: '.85rem' }}>{x.title}</div>
+                    <div className="rail-body p-3">
+                      <div className="rail-title text-xs font-bold line-clamp-1">{x.title}</div>
                     </div>
                   </Link>
                 )
@@ -174,57 +201,94 @@ export default async function DashboardPage() {
           </section>
         )}
 
-        {/* User Orders & Digital/Physical Library */}
-        <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
+        {/* User Orders & Purchases Section */}
+        <section className="slide-up">
           <UserOrdersSection initialOrders={userOrders} />
         </section>
 
-        {/* Three doors - curriculum, entertainment, worksheets */}
-        <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-          <div style={{ display: 'grid', gap: '1.1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
+        {/* Quick Access Grid (4 Doors) */}
+        <section className="space-y-4 slide-up">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-teal" />
+            <h3 className="font-bold text-lg text-ink">دسترسی سریع</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link 
+              href="/worksheets" 
+              className="card card-hover p-6 rounded-3xl border border-line-soft bg-gradient-to-br from-amber-50/70 to-paper flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-base text-ink mb-0.5">کاربرگ‌ها</h4>
+                  <p className="text-xs text-ink-soft">فایل‌های تمرینی PDF</p>
+                </div>
+              </div>
+              <ArrowLeft className="w-5 h-5 text-ink-soft group-hover:text-amber-700 group-hover:-translate-x-1 transition-all" />
+            </Link>
 
-            <Link href="/worksheets" className="card card-hover" style={{ padding: '1.5rem', border: '1px solid var(--line-soft)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.9rem' }}>
-                <div className="tile-ico" style={{ background: '#fff4e6', color: '#e65100', marginBottom: 0 }}>📄</div>
+            <Link 
+              href="/entertainment" 
+              className="card card-hover p-6 rounded-3xl border border-line-soft bg-gradient-to-br from-rose-50/70 to-paper flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Clapperboard className="w-6 h-6" />
+                </div>
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>کاربرگ‌ها</div>
-                  <div className="muted" style={{ fontSize: '.85rem' }}>فایل‌های PDF تمرینی</div>
+                  <h4 className="font-bold text-base text-ink mb-0.5">انیمه و فیلم</h4>
+                  <p className="text-xs text-ink-soft">کتابخانه سرگرمی و فیلم</p>
                 </div>
               </div>
-              <ArrowLeft style={{ width: 18, opacity: .4 }} />
+              <ArrowLeft className="w-5 h-5 text-ink-soft group-hover:text-rose-700 group-hover:-translate-x-1 transition-all" />
             </Link>
-            <Link href="/entertainment" className="card card-hover" style={{ padding: '1.5rem', border: '1px solid var(--line-soft)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.9rem' }}>
-                <div className="tile-ico" style={{ background: '#fde3ef', color: '#c2185b', marginBottom: 0 }}><Clapperboard /></div>
+
+            <Link 
+              href="/shop" 
+              className="card card-hover p-6 rounded-3xl border border-line-soft bg-gradient-to-br from-teal/10 to-paper flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-teal/15 text-teal flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <ShoppingBag className="w-6 h-6" />
+                </div>
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>انیمه و فیلم</div>
-                  <div className="muted" style={{ fontSize: '.85rem' }}>کتابخانه سرگرمی</div>
+                  <h4 className="font-bold text-base text-ink mb-0.5">فروشگاه کتاب</h4>
+                  <p className="text-xs text-ink-soft">کتاب‌ها و لوازم‌التحریر</p>
                 </div>
               </div>
-              <ArrowLeft style={{ width: 18, opacity: .4 }} />
+              <ArrowLeft className="w-5 h-5 text-ink-soft group-hover:text-teal group-hover:-translate-x-1 transition-all" />
             </Link>
-            <Link href="/teachers" className="card card-hover" style={{ padding: '1.5rem', border: '1px solid var(--line-soft)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.9rem' }}>
-                <div className="tile-ico" style={{ background: '#e0f0ff', color: '#2563eb', marginBottom: 0 }}><HeartHandshake /></div>
+
+            <Link 
+              href="/teachers" 
+              className="card card-hover p-6 rounded-3xl border border-line-soft bg-gradient-to-br from-blue-50/70 to-paper flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <HeartHandshake className="w-6 h-6" />
+                </div>
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>معلم‌های یاراولیها</div>
-                  <div className="muted" style={{ fontSize: '.85rem' }}>آشنایی با تیم آموزشی ما</div>
+                  <h4 className="font-bold text-base text-ink mb-0.5">معلم‌های ما</h4>
+                  <p className="text-xs text-ink-soft">آشنایی با اساتید یار اولی‌ها</p>
                 </div>
               </div>
-              <ArrowLeft style={{ width: 18, opacity: .4 }} />
+              <ArrowLeft className="w-5 h-5 text-ink-soft group-hover:text-blue-700 group-hover:-translate-x-1 transition-all" />
             </Link>
           </div>
         </section>
 
-        {/* Recently watched — secondary, denser, quieter than continue-watching */}
+        {/* Recently Watched */}
         {watched.length > 0 && (
-          <section style={{ marginBottom: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-            <div className="rail-head" style={{ marginBottom: '.9rem' }}>
-              <span style={{ fontWeight: 700, fontSize: '.95rem', color: 'var(--ink-soft)' }}>دیده‌های اخیر</span>
+          <section className="space-y-4 slide-up">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-teal" />
+              <h3 className="font-bold text-lg text-ink">دیده‌های اخیر</h3>
             </div>
-            <div className="rail" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))' }}>
+            <div className="rail" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}>
               {watched.map((x) => (
-                <Link href={`/watch/${x.content_id}`} key={x.id} className="card card-hover rail-card">
+                <Link href={`/watch/${x.content_id}`} key={x.id} className="card card-hover rail-card rounded-2xl overflow-hidden border border-line-soft">
                   <div className="rail-poster" style={{ aspectRatio: '16/9' }}>
                     {x.thumbnail_url ? (
                       <img src={x.thumbnail_url || "/placeholder.svg"} alt={x.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -234,8 +298,8 @@ export default async function DashboardPage() {
                       </div>
                     )}
                   </div>
-                  <div className="rail-body" style={{ padding: '.6rem .7rem .75rem' }}>
-                    <div className="rail-title" style={{ fontSize: '.82rem' }}>{x.title}</div>
+                  <div className="rail-body p-2.5">
+                    <div className="rail-title text-xs font-bold line-clamp-1">{x.title}</div>
                   </div>
                 </Link>
               ))}
@@ -243,9 +307,10 @@ export default async function DashboardPage() {
           </section>
         )}
 
-        <div className="card" style={{ border: '1px solid var(--line-soft)' }}>
+        {/* Account Security */}
+        <section className="card p-6 md:p-8 rounded-3xl border border-line-soft bg-paper slide-up">
           <AccountControls />
-        </div>
+        </section>
       </main>
 
       <SiteFooter 
