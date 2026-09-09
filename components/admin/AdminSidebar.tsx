@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { 
   LayoutDashboard, FileVideo, Settings, Image as ImageIcon, 
   Users, HeartHandshake, Link2, MessageCircle, BookOpen, 
-  FileText, Newspaper, ExternalLink, Menu, X, MessageSquare, ShoppingBag
+  FileText, Newspaper, ExternalLink, Menu, X, MessageSquare, ShoppingBag, CreditCard
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -13,6 +13,7 @@ const MENU_ITEMS = [
   { href: '/dashboard', label: 'پیشخوان کاربری', icon: LayoutDashboard },
   { href: '/admin', label: 'پیشخوان ادمین', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'سفارشات', icon: ShoppingBag },
+  { href: '/admin/settings?tab=payment', label: 'درگاه و کارت بانکی', icon: CreditCard },
   { href: '/admin/content', label: 'مدیریت محتوا', icon: FileVideo },
   { href: '/admin/settings', label: 'تنظیمات سایت', icon: Settings },
   { href: '/admin/categories', label: 'ترتیب دسته‌بندی‌ها', icon: Settings },

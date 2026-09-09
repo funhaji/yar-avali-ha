@@ -170,17 +170,50 @@ const DEFAULT_SETTINGS = [
   { key: 'tt_card2_btn_id', label: 'آیدی پشتیبانی کارت ۲', type: 'text', placeholder: '@yar_avali_ha', category: 'teacher_training' },
 
   // Payment & Banking Settings
-  { key: 'payment_gateway_enabled', label: 'فعال‌سازی درگاه پرداخت آنلاین زرین‌پال', type: 'checkbox', category: 'payment' },
-  { key: 'zarinpal_merchant_id', label: 'کد مرچنت یا اکسس توکن زرین‌پال (Merchant ID / Access Token)', type: 'text', placeholder: 'مثلاً: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx یا Access Token', category: 'payment' },
-  { key: 'zarinpal_sandbox', label: 'حالت تستی / آزمایشی زرین‌پال (Sandbox)', type: 'checkbox', category: 'payment' },
-  { key: 'admin_card_number', label: 'شماره کارت بانکی (جهت کارت به کارت)', type: 'text', placeholder: 'مثلاً: ۶۰۳۷-۹۹۷۱-xxxx-xxxx', category: 'payment' },
-  { key: 'admin_card_name', label: 'نام صاحب حساب کارت', type: 'text', placeholder: 'مثلاً: علی احمدی', category: 'payment' },
+  { 
+    key: 'payment_gateway_enabled', 
+    label: 'فعال‌سازی درگاه پرداخت آنلاین زرین‌پال', 
+    type: 'checkbox', 
+    category: 'payment',
+    description: 'با تیک زدن این گزینه، گزینه پرداخت آنلاین در مرحله تسویه حساب فعال می‌شود.'
+  },
+  { 
+    key: 'zarinpal_merchant_id', 
+    label: 'کد مرچنت یا اکسس توکن زرین‌پال (Merchant ID / Access Token)', 
+    type: 'text', 
+    placeholder: 'مثلاً: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx یا Access Token', 
+    category: 'payment',
+    description: 'مرچنت کد ۳۶ رقمی درگاه زرین‌پال یا اکسس توکن احراز هویت. این کلید برای اتصال به زرین‌پال ضروری است.'
+  },
+  { 
+    key: 'zarinpal_sandbox', 
+    label: 'حالت تستی / آزمایشی زرین‌پال (Sandbox)', 
+    type: 'checkbox', 
+    category: 'payment',
+    description: 'صرفاً برای تست. در صورت تیک خوردن، تراکنش‌ها به صورت آزمایشی در sandbox.zarinpal.com انجام می‌شوند. در سایت واقعی خاموش نگه دارید.'
+  },
+  { 
+    key: 'admin_card_number', 
+    label: 'شماره کارت بانکی (جهت پرداخت کارت به کارت)', 
+    type: 'text', 
+    placeholder: 'مثلاً: ۶۰۳۷-۹۹۷۱-xxxx-xxxx', 
+    category: 'payment',
+    description: 'شماره کارت ۱۶ رقمی که در صفحه تسویه حساب به خریدار برای واریز کارت به کارت نمایش داده می‌شود.'
+  },
+  { 
+    key: 'admin_card_name', 
+    label: 'نام صاحب حساب کارت بانکی', 
+    type: 'text', 
+    placeholder: 'مثلاً: علی احمدی', 
+    category: 'payment',
+    description: 'نام و نام خانوادگی صاحب کارت بانکی جهت اطمینان خریدار.'
+  },
 
 
 
 ]
 
-export function SettingsManager({ initialSettings }: Props) {
+export function SettingsManager({ initialSettings, initialTab }: Props) {
   const [settings, setSettings] = useState<Record<string, string>>(() => {
     const obj: Record<string, string> = {}
     initialSettings.forEach(s => {
@@ -261,10 +294,12 @@ export function SettingsManager({ initialSettings }: Props) {
     }
   }
 
-  const [activeTab, setActiveTab] = useState('general')
+  const [activeTab, setActiveTab] = useState(initialTab || 'general')
 
   const TABS = [
     { id: 'general', label: 'عمومی' },
+    { id: 'payment', label: '💳 درگاه پرداخت و کارت به کارت' },
+    { id: 'store', label: 'فروشگاه' },
       { id: 'header_menu', label: 'منوی سایت' },
     { id: 'home', label: 'صفحه اصلی (ویژگی‌ها)' },
     
@@ -275,7 +310,6 @@ export function SettingsManager({ initialSettings }: Props) {
     { id: 'about', label: 'درباره ما' },
     { id: 'teacher_training', label: 'تربیت معلم' },
     { id: 'entertainment', label: 'محتوای آموزشی' },
-      { id: 'store', label: 'فروشگاه' },
   ]
 
   return (
@@ -300,9 +334,12 @@ export function SettingsManager({ initialSettings }: Props) {
         <div className="grid gap-6">
           {DEFAULT_SETTINGS.filter(s => (s as any).category === activeTab).map((setting) => (
             <div key={setting.key}>
-              <label className="block font-medium mb-2">
+              <label className="block font-medium mb-1">
                 {setting.label}
               </label>
+              {(setting as any).description && (
+                <p className="text-xs text-gray-500 mb-2 leading-relaxed">{(setting as any).description}</p>
+              )}
               {setting.type === 'textarea' ? (
                 <textarea
                   value={settings[setting.key] || ''}

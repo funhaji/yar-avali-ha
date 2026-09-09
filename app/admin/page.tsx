@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { BookOpen, ExternalLink, HeartHandshake, KeyRound, Link2, Users, FileVideo, Settings, MessageCircle, FileText, Newspaper, Image } from 'lucide-react'
+import { BookOpen, CreditCard, ExternalLink, HeartHandshake, KeyRound, Link2, Users, FileVideo, Settings, MessageCircle, FileText, Newspaper, Image } from 'lucide-react'
 import { query } from '@/lib/db'
 import { validateSession } from '@/lib/auth'
 import { SiteHeader } from '@/components/SiteHeader'
@@ -47,6 +47,26 @@ export default async function AdminPage() {
           <DatabaseMigration />
         </div>
         
+                {/* Quick Shortcut to Payment & Card Settings */}
+        <Link 
+          href="/admin/settings?tab=payment"
+          className="card p-5 flex items-center justify-between hover:border-teal transition-all group"
+          style={{ background: 'var(--paper)', border: '1px solid var(--line-soft)' }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-teal/10 text-teal group-hover:bg-teal group-hover:text-white transition-colors">
+              <CreditCard className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-bold text-ink text-lg">تنظیمات درگاه پرداخت زرین‌پال و کارت به کارت</h3>
+              <p className="text-sm text-ink-soft">تعیین کد مرچنت / اکسس توکن زرین‌پال، حالت آزمایشی (Sandbox) و شماره کارت بانکی فروشگاه</p>
+            </div>
+          </div>
+          <span className="text-sm font-bold text-teal flex items-center gap-1 group-hover:translate-x-[-4px] transition-transform">
+            مدیریت درگاه و کارت ←
+          </span>
+        </Link>
+
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="card p-6 flex flex-col gap-4" style={{ background: 'var(--paper)' }}>
             <div className="flex items-center gap-3 text-ink-soft">

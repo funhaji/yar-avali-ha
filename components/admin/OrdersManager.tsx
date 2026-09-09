@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { ShoppingBag, Loader2, CheckCircle2, XCircle, Clock, Package, Eye } from 'lucide-react'
+import Link from 'next/link'
+import { ShoppingBag, CreditCard, Loader2, CheckCircle2, XCircle, Clock, Package, Eye } from 'lucide-react'
 
 export default function OrdersManager({ initialOrders }: { initialOrders: any[] }) {
   const [orders, setOrders] = useState(initialOrders)
@@ -50,6 +51,12 @@ export default function OrdersManager({ initialOrders }: { initialOrders: any[] 
         <div>
           <span className="section-kicker"><ShoppingBag /> مدیریت فروشگاه</span>
           <h1 className="display" style={{ fontSize: '2.5rem' }}>سفارشات مشتریان</h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href="/admin/settings?tab=payment" className="button button-ghost flex items-center gap-2 text-xs font-bold border border-line-soft hover:border-teal px-3 py-2 rounded-xl">
+            <CreditCard className="w-4 h-4 text-teal" />
+            <span>تنظیمات درگاه و شماره کارت</span>
+          </Link>
         </div>
         <div className="flex bg-cream p-1 rounded-xl border border-line-soft">
           {['all', 'pending_approval', 'approved', 'processing', 'completed'].map(f => (
