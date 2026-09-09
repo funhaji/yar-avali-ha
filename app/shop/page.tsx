@@ -55,8 +55,12 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   })
   
   
+  const token = (await cookies()).get('session_token')?.value
+  const user = token ? await validateSession(token).catch(() => null) : null
+  const settings = await getCachedSettings(['site_name', 'site_logo_url', 'shop_cat_order', 'shop_subcat_order'])
+
   let shopCatOrder = [];
-  let shopSubcatOrder = {};
+  let shopSubcatOrder: Record<string, string[]> = {};
   try {
     if (settings.shop_cat_order) shopCatOrder = JSON.parse(settings.shop_cat_order);
     if (settings.shop_subcat_order) shopSubcatOrder = JSON.parse(settings.shop_subcat_order);
@@ -70,11 +74,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     if (idxB !== -1) return 1;
     return b.count - a.count; // fallback to count
   })
-
-
-  const token = (await cookies()).get('session_token')?.value
-  const user = token ? await validateSession(token).catch(() => null) : null
-  const settings = await getCachedSettings(['site_name', 'site_logo_url', 'shop_cat_order', 'shop_subcat_order'])
 
   return (
     <div className="page bg-cream">

@@ -44,19 +44,22 @@ export function ProductCard({ product }: { product: StoreItem }) {
         )}
       </div>
 
-      <div className="relative aspect-square bg-cream overflow-hidden">
-        {product.thumbnail_url ? (
-          <img 
-            src={product.thumbnail_url} 
-            alt={product.title} 
-            loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-ink-soft opacity-30 group-hover:scale-105 transition-transform duration-500">
-            <ImageIcon className="w-16 h-16" />
-          </div>
-        )}
+            <div className="relative aspect-square bg-cream overflow-hidden">
+        {(() => {
+          const thumb = product.thumbnail_url || (Array.isArray(product.images) && product.images[0]) || (typeof product.images === 'string' && product.images.split(',')[0]?.trim()) || null;
+          return thumb ? (
+            <img 
+              src={thumb} 
+              alt={product.title} 
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-ink-soft opacity-30 group-hover:scale-105 transition-transform duration-500">
+              <ImageIcon className="w-16 h-16" />
+            </div>
+          );
+        })()}
         
         {/* Overlay Add to cart button (desktop mostly) */}
         {product.price_cents !== null && (

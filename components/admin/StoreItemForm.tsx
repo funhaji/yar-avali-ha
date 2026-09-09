@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Save, Image as ImageIcon, Loader2, ArrowRight, Trash2, Upload, Info } from 'lucide-react'
+import { Save, Image as ImageIcon, Loader2, ArrowRight, Trash2, Upload, Info, ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import type { StoreItem } from '@/lib/store'
 import Link from 'next/link'
 
@@ -123,7 +123,13 @@ function MultipleFileUpload({ name, label, kind, defaultValue }: { name: string,
 function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
   const [images, setImages] = useState<string[]>(() => {
     if (Array.isArray(initialImages)) return initialImages.filter(Boolean)
-    if (typeof initialImages === 'string') return (initialImages as string).split(',').map((s: string) => s.trim()).filter(Boolean)
+    if (typeof initialImages === 'string') {
+      try {
+        const parsed = JSON.parse(initialImages as string)
+        if (Array.isArray(parsed)) return parsed.filter(Boolean)
+      } catch {}
+      return (initialImages as string).split(',').map((s: string) => s.trim()).filter(Boolean)
+    }
     return []
   })
   const [uploading, setUploading] = useState(false)
@@ -135,23 +141,37 @@ function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
     if (!files || files.length === 0) return
     
     setUploading(true)
-    const newUrls: string[] = []
+    const fileList = Array.from(files)
     
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
+    // Parallel upload for all selected files
+    const uploadPromises = fileList.map(async (file) => {
       const fd = new FormData()
       fd.append('file', file)
       fd.append('kind', 'thumbnail')
       try {
         const res = await fetch('/api/admin/content/upload', { method: 'POST', body: fd })
         const data = await res.json()
-        if (res.ok && data.url) newUrls.push(data.url)
-      } catch (err) {
-        console.error(err)
+        if (res.ok && data.url) {
+          return { success: true, url: data.url, name: file.name }
+        } else {
+          return { success: false, error: data.error || 'خطا در آپلود', name: file.name }
+        }
+      } catch (err: any) {
+        return { success: false, error: err.message || 'خطای شبکه', name: file.name }
       }
+    })
+
+    const results = await Promise.all(uploadPromises)
+    const successful = results.filter(r => r.success && r.url).map(r => r.url!)
+    const failed = results.filter(r => !r.success)
+
+    if (successful.length > 0) {
+      setImages(prev => [...prev, ...successful])
     }
-    
-    setImages(prev => [...prev, ...newUrls])
+    if (failed.length > 0) {
+      alert('خطا در آپلود برخی فایل‌ها:\n' + failed.map(f => `- ${f.name}: ${f.error}`).join('\n'))
+    }
+
     setUploading(false)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
@@ -163,16 +183,31 @@ function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
   }
 
   function removeImage(index: number) {
-    setImages(images.filter((_, i) => i !== index))
+    setImages(prev => prev.filter((_, i) => i !== index))
+  }
+
+  function moveImage(fromIndex: number, toIndex: number) {
+    if (toIndex < 0 || toIndex >= images.length) return
+    setImages(prev => {
+      const arr = [...prev]
+      const [item] = arr.splice(fromIndex, 1)
+      arr.splice(toIndex, 0, item)
+      return arr
+    })
+  }
+
+  function makeFirst(index: number) {
+    if (index === 0) return
+    moveImage(index, 0)
   }
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <label className="font-bold text-sm">گالری تصاویر محصول (عکس‌های بیشتر)</label>
-        <span className="text-xs text-ink-soft">{images.length} تصویر اضافه شده</span>
+        <span className="text-xs text-ink-soft bg-paper px-2.5 py-1 rounded-full border border-line-soft">{images.length} تصویر در گالری</span>
       </div>
-      <input type="hidden" name="images" value={images.join(',')} />
+      <input type="hidden" name="images" value={JSON.stringify(images)} />
       
       {/* Upload button & manual input row */}
       <div className="flex flex-wrap gap-2 items-center">
@@ -183,7 +218,7 @@ function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
           className="button button-ghost bg-white border border-line-soft hover:border-teal text-teal font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-sm cursor-pointer"
         >
           {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-          <span>{uploading ? 'در حال آپلود...' : 'انتخاب و آپلود چند عکس به صورت همزمان'}</span>
+          <span>{uploading ? 'در حال آپلود عکس‌ها...' : 'انتخاب و آپلود چند عکس همزمان'}</span>
         </button>
         <input 
           type="file" 
@@ -215,23 +250,60 @@ function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
         </div>
       </div>
 
-      {/* Images preview list */}
+      {/* Images preview list with reordering */}
       {images.length > 0 && (
         <div className="flex flex-wrap gap-3 mt-3 p-3 bg-cream/50 rounded-2xl border border-line-soft">
           {images.map((url, i) => (
-            <div key={i} className="relative w-24 h-24 rounded-xl border-2 border-line-soft overflow-hidden group bg-paper shadow-sm">
-              <img src={url} alt="" className="w-full h-full object-contain p-1" />
-              <div className="absolute top-1 right-1 bg-black/60 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md backdrop-blur-sm">
-                #{i + 1}
+            <div key={i} className="relative w-28 h-28 rounded-xl border-2 border-line-soft overflow-hidden group bg-paper shadow-sm flex flex-col justify-between">
+              <div className="relative w-full h-20 bg-cream/20 flex items-center justify-center overflow-hidden">
+                <img src={url} alt="" className="w-full h-full object-contain p-1" />
+                <div className="absolute top-1 right-1 bg-black/65 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+                  #{i + 1}
+                </div>
+                {i === 0 && (
+                  <div className="absolute top-1 left-1 bg-teal text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
+                    اصلی
+                  </div>
+                )}
               </div>
-              <button 
-                type="button" 
-                onClick={() => removeImage(i)} 
-                className="absolute inset-0 bg-ink/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-berry/80 cursor-pointer"
-                title="حذف این تصویر"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+
+              {/* Action bar under thumbnail */}
+              <div className="flex items-center justify-between bg-paper px-1 py-0.5 border-t border-line-soft text-ink-soft">
+                <button 
+                  type="button" 
+                  disabled={i === 0} 
+                  onClick={() => moveImage(i, i - 1)} 
+                  title="انتقال به قبلی"
+                  className="p-1 hover:text-teal disabled:opacity-20 disabled:hover:text-ink-soft"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => makeFirst(i)} 
+                  title="تبدیل به اولین عکس"
+                  className={`p-1 hover:text-amber-500 ${i === 0 ? 'text-amber-500' : ''}`}
+                >
+                  <Star className="w-3.5 h-3.5" />
+                </button>
+                <button 
+                  type="button" 
+                  disabled={i === images.length - 1} 
+                  onClick={() => moveImage(i, i + 1)} 
+                  title="انتقال به بعدی"
+                  className="p-1 hover:text-teal disabled:opacity-20 disabled:hover:text-ink-soft"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => removeImage(i)} 
+                  title="حذف تصویر"
+                  className="p-1 hover:text-berry text-berry/80"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -278,8 +350,19 @@ export function StoreItemForm({ initialData, defaultCategory, existingCategories
     const tagsStr = formData.get('tags') as string
     const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()) : null
 
-    const imagesStr = formData.get('images') as string
-    const images = imagesStr ? imagesStr.split(',').map(s => s.trim()).filter(Boolean) : []
+    const rawImagesStr = formData.get('images') as string
+    let images: string[] = []
+    if (rawImagesStr) {
+      try {
+        const parsed = JSON.parse(rawImagesStr)
+        if (Array.isArray(parsed)) images = parsed.map(s => String(s).trim()).filter(Boolean)
+        else images = rawImagesStr.split(',').map(s => s.trim()).filter(Boolean)
+      } catch {
+        images = rawImagesStr.split(',').map(s => s.trim()).filter(Boolean)
+      }
+    }
+    const rawThumb = (formData.get('thumbnail_url') as string)?.trim() || null
+    const finalThumb = rawThumb || (images.length > 0 ? images[0] : null)
 
     const rawPixeldrainId = formData.get('pixeldrain_id') as string || ''
     const videoUrl = formData.get('video_url') as string || ''
@@ -298,7 +381,7 @@ export function StoreItemForm({ initialData, defaultCategory, existingCategories
       is_downloadable: isDownloadable,
       is_published: isPublished,
       display_order: displayOrder,
-      thumbnail_url: formData.get('thumbnail_url') || null,
+      thumbnail_url: finalThumb,
       video_url: formData.get('teaser_video_url') || null,
       images,
       category: formData.get('category') || null,

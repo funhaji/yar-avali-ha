@@ -29,12 +29,21 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const hasDiscount = product.discount_price_cents !== null
   const price = hasDiscount ? product.discount_price_cents! : product.price_cents
   
-  // Combine thumbnail and images
-  const gallery = []
-  if (product.thumbnail_url) gallery.push(product.thumbnail_url)
-  if (product.images && product.images.length > 0) {
-    gallery.push(...product.images)
+  // Combine thumbnail and gallery images with robust parsing
+  const allImages: string[] = []
+  if (product.thumbnail_url) allImages.push(product.thumbnail_url)
+  if (Array.isArray(product.images)) {
+    allImages.push(...product.images)
+  } else if (typeof product.images === 'string') {
+    try {
+      const parsed = JSON.parse(product.images)
+      if (Array.isArray(parsed)) allImages.push(...parsed)
+      else allImages.push(...(product.images as string).replace(/[{}]/g, '').split(','))
+    } catch {
+      allImages.push(...(product.images as string).replace(/[{}]/g, '').split(','))
+    }
   }
+  const gallery = Array.from(new Set(allImages.map(s => (s || '').trim()).filter(Boolean)))
 
   const relatedItems = await getRelatedStoreItems(product.id, 3)
   const comments = await getStoreComments(product.id)
