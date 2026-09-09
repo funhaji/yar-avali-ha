@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useCart } from '@/lib/store-context'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, CreditCard, Globe, UploadCloud, Loader2, CheckCircle2, User, Phone, MapPin, Mail, ShieldCheck, Check, ShoppingCart, ChevronLeft } from 'lucide-react'
+import { ArrowRight, LogIn, CreditCard, Globe, UploadCloud, Loader2, CheckCircle2, User, Phone, MapPin, Mail, ShieldCheck, Check, ShoppingCart, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { SiteHeader } from '@/components/SiteHeader'
 
@@ -29,6 +29,25 @@ export default function CheckoutPage() {
   const [gatewayEnabled, setGatewayEnabled] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [user, setUser] = useState<{ id: string; name: string; email: string; phone?: string; role: string } | null>(null)
+  const [authChecked, setAuthChecked] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/auth/session')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.user) {
+          setUser(data.user)
+          setForm(prev => ({
+            ...prev,
+            fullName: prev.fullName || data.user.name || '',
+            phone: prev.phone || data.user.phone || ''
+          }))
+        }
+      })
+      .catch(() => {})
+      .finally(() => setAuthChecked(true))
+  }, [])
 
   useEffect(() => {
     fetch('/api/public-settings?keys=admin_card_number,admin_card_name,payment_gateway_enabled')
@@ -82,6 +101,11 @@ export default function CheckoutPage() {
   }
 
   const submitOrder = async () => {
+    if (!user) {
+      alert('برای نهایی‌سازی سفارش، لطفاً ابتدا وارد حساب کاربری خود شوید.')
+      router.push('/login?redirect=/shop/checkout')
+      return
+    }
     if (form.paymentMethod === 'card2card' && !form.receiptUrl && totalPrice > 0) {
       alert('لطفاً تصویر رسید پرداخت را آپلود کنید.')
       return
@@ -132,7 +156,7 @@ export default function CheckoutPage() {
   if (cartLoading && step !== 3) {
     return (
       <div className="page bg-background min-h-screen">
-        <SiteHeader />
+        <SiteHeader userName={user?.name} isAdmin={user?.role === 'admin'} />
         <main className="container mx-auto px-4 py-20 flex justify-center">
           <Loader2 className="w-10 h-10 animate-spin text-teal" />
         </main>
@@ -142,7 +166,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="page fade-in bg-[#f8fafc] min-h-screen pb-20 font-sans">
-      <SiteHeader />
+      <SiteHeader userName={user?.name} isAdmin={user?.role === 'admin'} />
       
       <main className="max-w-6xl mx-auto px-4 py-8 md:py-12">
         
@@ -202,6 +226,28 @@ export default function CheckoutPage() {
                     </div>
                     اطلاعات {hasPhysicalItems ? 'ارسال' : 'خریدار'}
                   </h2>
+
+                  {/* Guest Warning / Login CTA */}
+                  {authChecked && !user && (
+                    <div className="mb-8 p-5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 slide-up">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 font-bold text-sm">
+                          <LogIn className="w-4 h-4 text-amber-700" />
+                          <span>شما وارد حساب کاربری خود نشده‌اید!</span>
+                        </div>
+                        <p className="text-xs text-amber-900/80 leading-relaxed">
+                          برای دسترسی به فایل‌های دیجیتال و پیگیری سفارش، لطفاً وارد حساب خود شوید یا حساب جدید بسازید.
+                        </p>
+                      </div>
+                      <Link 
+                        href="/login?redirect=/shop/checkout"
+                        className="button bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl shrink-0 shadow-sm flex items-center gap-1.5"
+                      >
+                        <LogIn className="w-3.5 h-3.5" />
+                        <span>ورود به حساب</span>
+                      </Link>
+                    </div>
+                  )}
                   
                   <div className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-6">

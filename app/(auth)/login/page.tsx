@@ -1,11 +1,13 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, LogIn, Sparkles } from 'lucide-react'
 import { ClientSiteBrand } from '@/components/ClientSiteName'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectUrl = searchParams.get('redirect')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -30,7 +32,7 @@ export default function LoginPage() {
         return
       }
       
-      router.push(d.role === 'admin' ? '/admin' : '/dashboard')
+      router.push(redirectUrl || (d.role === 'admin' ? '/admin' : '/dashboard'))
       router.refresh()
     } catch {
       setError('خطا در برقراری ارتباط')
@@ -59,36 +61,44 @@ export default function LoginPage() {
             ایمیل
             <input 
               type="email" 
-              dir="ltr" 
               value={email} 
               onChange={e => setEmail(e.target.value)} 
-              placeholder="name@example.com" 
+              placeholder="you@example.com" 
               required 
+              autoComplete="email" 
+              dir="ltr"
             />
           </label>
-          
           <label>
             رمز عبور
             <input 
               type="password" 
               value={password} 
               onChange={e => setPassword(e.target.value)} 
+              placeholder="••••••••" 
               required 
+              autoComplete="current-password" 
+              dir="ltr"
             />
           </label>
-          
           <button className="button button-primary button-lg" disabled={loading}>
             {loading ? 'در حال ورود...' : 'ورود به حساب'}
-            <ArrowLeft />
           </button>
         </form>
         
-        <p style={{ marginTop: '1.4rem', textAlign: 'center' }}>
-          حساب نداری؟ <a href="/register" style={{ fontWeight: 800, color: 'var(--tangerine)' }}>همین حالا بساز</a>
-        </p>
-        
-        <Sparkles style={{ position: 'absolute', left: 24, top: 24, color: 'var(--sunflower)' }} />
+        <div className="auth-alt">
+          <span>حساب نداری؟</span>
+          <a href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'}>ثبت‌نام رایگان</a>
+        </div>
       </section>
     </main>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-ink-soft">در حال بارگذاری...</div>}>
+      <LoginForm />
+    </Suspense>
   )
 }

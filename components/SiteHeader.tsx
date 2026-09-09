@@ -29,14 +29,31 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
   // Need to handle hydration mismatch for cart by only rendering after mount
   const [mounted, setMounted] = useState(false)
   const { totalItems, setDrawerOpen } = useCart()
+  const [sessionUser, setSessionUser] = useState<{ name: string; role: string } | null>(null)
 
   useEffect(() => {
     setMounted(true)
     const onScroll = () => setScrolled(window.scrollY > 8)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
+
+    // If userName prop wasn't passed from server component, check session client-side
+    if (!userName) {
+      fetch('/api/auth/session')
+        .then(r => r.json())
+        .then(data => {
+          if (data?.user) {
+            setSessionUser(data.user)
+          }
+        })
+        .catch(() => {})
+    }
+
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [userName])
+
+  const effectiveUserName = userName || sessionUser?.name
+  const effectiveIsAdmin = isAdmin || sessionUser?.role === 'admin'
 
   async function logout() {
     await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'logout' }) })
@@ -79,7 +96,7 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
             ))}
           </div>
         <div className="nav-actions">
-          {userName && (
+          {effectiveUserName && (
             <button 
               onClick={() => setDrawerOpen(true)}
               className="icon-button relative ml-2" 
@@ -93,8 +110,8 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
               )}
             </button>
           )}
-          {userName ? <>
-            <Link href={isAdmin ? '/admin' : '/dashboard'} className="button button-ghost"><LayoutDashboard /> {isAdmin ? 'مدیریت' : 'داشبورد'}</Link>
+          {effectiveUserName ? <>
+            <Link href={effectiveIsAdmin ? '/admin' : '/dashboard'} className="button button-ghost"><LayoutDashboard /> {effectiveIsAdmin ? 'مدیریت' : 'داشبورد'}</Link>
             <button className="icon-button" onClick={logout} aria-label="خروج"><LogOut /></button>
           </> : <>
             <Link href="/login" className="button button-ghost">ورود</Link>

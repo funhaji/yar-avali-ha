@@ -1,11 +1,13 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, UserPlus } from 'lucide-react'
 import { ClientSiteBrand } from '@/components/ClientSiteName'
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectUrl = searchParams.get('redirect')
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -44,7 +46,7 @@ export default function RegisterPage() {
         return
       }
       
-      router.push('/dashboard')
+      router.push(redirectUrl || '/dashboard')
       router.refresh()
     } catch {
       setError('خطا در برقراری ارتباط')
@@ -60,48 +62,91 @@ export default function RegisterPage() {
       <section className="card auth-card">
         <ClientSiteBrand />
         
-        <span className="section-kicker"><UserPlus /> عضویت رایگان</span>
-        <h1 className="section-title">یک حساب تازه بساز</h1>
+        <span className="section-kicker"><UserPlus /> شروع یک دوستی</span>
+        <h1 className="section-title">حساب کاربری جدید</h1>
+        <p className="muted" style={{ marginTop: '.5rem', marginBottom: '1.5rem' }}>
+          ثبت‌نام ساده است — فقط اطلاعات پایه‌ای.
+        </p>
         
-        {error && <div className="alert-error" role="alert" style={{ marginTop: '1rem' }}>{error}</div>}
+        {error && <div className="alert-error" role="alert">{error}</div>}
         
-        <form onSubmit={submit} className="form-stack" style={{ marginTop: '1.2rem' }}>
+        <form onSubmit={submit} className="form-stack" style={{ marginTop: '1rem' }}>
           <label>
             نام و نام خانوادگی
-            <input value={form.name} onChange={e => set('name', e.target.value)} required />
+            <input 
+              type="text" 
+              value={form.name} 
+              onChange={e => set('name', e.target.value)} 
+              placeholder="مثلاً علی رضایی" 
+              required 
+            />
           </label>
-          
           <label>
             ایمیل
-            <input type="email" dir="ltr" value={form.email} onChange={e => set('email', e.target.value)} required />
+            <input 
+              type="email" 
+              value={form.email} 
+              onChange={e => set('email', e.target.value)} 
+              placeholder="you@example.com" 
+              required 
+              autoComplete="email" 
+              dir="ltr"
+            />
           </label>
-          
           <label>
-            شماره تلفن <small className="muted">اختیاری</small>
-            <input type="tel" dir="ltr" value={form.phone} onChange={e => set('phone', e.target.value)} />
+            شماره موبایل
+            <input 
+              type="tel" 
+              value={form.phone} 
+              onChange={e => set('phone', e.target.value)} 
+              placeholder="09123456789" 
+              dir="ltr"
+            />
           </label>
-          
           <label>
             رمز عبور
-            <input type="password" value={form.password} onChange={e => set('password', e.target.value)} minLength={8} required />
-            <small className="muted">حداقل ۸ کاراکتر، شامل حرف و عدد</small>
+            <input 
+              type="password" 
+              value={form.password} 
+              onChange={e => set('password', e.target.value)} 
+              placeholder="حداقل ۸ کاراکتر" 
+              required 
+              minLength={8}
+              autoComplete="new-password" 
+              dir="ltr"
+            />
           </label>
-          
           <label>
-            تکرار رمز
-            <input type="password" value={form.confirmPassword} onChange={e => set('confirmPassword', e.target.value)} required />
+            تکرار رمز عبور
+            <input 
+              type="password" 
+              value={form.confirmPassword} 
+              onChange={e => set('confirmPassword', e.target.value)} 
+              placeholder="تکرار همان رمز" 
+              required 
+              minLength={8}
+              autoComplete="new-password" 
+              dir="ltr"
+            />
           </label>
-          
           <button className="button button-primary button-lg" disabled={loading}>
-            {loading ? 'در حال ساخت...' : 'ساخت حساب'}
-            <ArrowLeft />
+            {loading ? 'در حال ثبت‌نام...' : 'ساخت حساب کاربری'}
           </button>
         </form>
         
-        <p style={{ marginTop: '1.2rem', textAlign: 'center' }}>
-          قبلاً عضو شدی؟ <a href="/login" style={{ fontWeight: 800, color: 'var(--tangerine)' }}>وارد شو</a>
-        </p>
+        <div className="auth-alt">
+          <span>قبلاً ثبت‌نام کردی؟</span>
+          <a href={redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'}>ورود به حساب</a>
+        </div>
       </section>
     </main>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-ink-soft">در حال بارگذاری...</div>}>
+      <RegisterForm />
+    </Suspense>
   )
 }
