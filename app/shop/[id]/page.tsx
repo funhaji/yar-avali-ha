@@ -4,6 +4,7 @@ import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getStoreItemById, getRelatedStoreItems, getStoreComments } from '@/lib/store'
 import { ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Download, Image as ImageIcon, MessageSquare } from 'lucide-react'
 import { ProductCard } from '@/components/shop/ProductCard'
+import { ProductImageGallery } from '@/components/shop/ProductImageGallery'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { validateSession } from '@/lib/auth'
@@ -66,27 +67,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                   <iframe src={getEmbedUrl(product.video_url)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
                 </div>
               )}
-              <div className="aspect-square bg-paper border border-line-soft rounded-2xl overflow-hidden relative shadow-sm">
-                {gallery.length > 0 ? (
-                  <img src={gallery[0]} alt={product.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-ink-soft opacity-30">
-                    <ImageIcon className="w-24 h-24" />
-                  </div>
-                )}
-                {product.is_digital && (
-                  <div className="absolute top-4 right-4 badge bg-teal text-paper shadow-lg scale-in">
-                    محصول دیجیتال
-                  </div>
-                )}
-              </div>
-              {gallery.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 snap-x hide-scrollbar">
-                  {gallery.map((img, i) => (
-                    <img key={i} src={img} alt="" className="w-20 h-20 rounded-xl object-cover border border-line-soft shrink-0 snap-start" />
-                  ))}
-                </div>
-              )}
+                            <ProductImageGallery 
+                images={gallery} 
+                title={product.title} 
+                isDigital={product.is_digital} 
+              />
             </div>
 
             {/* Info */}

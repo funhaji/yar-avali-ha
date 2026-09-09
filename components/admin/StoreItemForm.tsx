@@ -121,8 +121,13 @@ function MultipleFileUpload({ name, label, kind, defaultValue }: { name: string,
 }
 
 function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
-  const [images, setImages] = useState<string[]>(initialImages)
+  const [images, setImages] = useState<string[]>(() => {
+    if (Array.isArray(initialImages)) return initialImages.filter(Boolean)
+    if (typeof initialImages === 'string') return (initialImages as string).split(',').map((s: string) => s.trim()).filter(Boolean)
+    return []
+  })
   const [uploading, setUploading] = useState(false)
+  const [newUrlInput, setNewUrlInput] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -140,15 +145,21 @@ function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
       try {
         const res = await fetch('/api/admin/content/upload', { method: 'POST', body: fd })
         const data = await res.json()
-        if (res.ok) newUrls.push(data.url)
+        if (res.ok && data.url) newUrls.push(data.url)
       } catch (err) {
         console.error(err)
       }
     }
     
-    setImages([...images, ...newUrls])
+    setImages(prev => [...prev, ...newUrls])
     setUploading(false)
     if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  function addManualUrl() {
+    if (!newUrlInput.trim()) return
+    setImages(prev => [...prev, newUrlInput.trim()])
+    setNewUrlInput('')
   }
 
   function removeImage(index: number) {
@@ -156,26 +167,75 @@ function GalleryUpload({ initialImages = [] }: { initialImages?: string[] }) {
   }
 
   return (
-    <div>
-      <label>گالری تصاویر</label>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <label className="font-bold text-sm">گالری تصاویر محصول (عکس‌های بیشتر)</label>
+        <span className="text-xs text-ink-soft">{images.length} تصویر اضافه شده</span>
+      </div>
       <input type="hidden" name="images" value={images.join(',')} />
       
-      <div className="flex flex-wrap gap-4 mt-2">
-        {images.map((url, i) => (
-          <div key={i} className="relative w-24 h-24 rounded-xl border border-line-soft overflow-hidden group">
-            <img src={url} alt="" className="w-full h-full object-cover" />
-            <button type="button" onClick={() => removeImage(i)} className="absolute inset-0 bg-ink/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Trash2 className="w-5 h-5" />
-            </button>
-          </div>
-        ))}
-        
-        <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading} className="w-24 h-24 rounded-xl border-2 border-dashed border-line-soft flex flex-col items-center justify-center text-ink-soft hover:bg-cream hover:border-teal transition-colors">
-          {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Upload className="w-6 h-6 mb-1" />}
-          <span className="text-xs">{uploading ? 'آپلود...' : 'اضافه کردن'}</span>
+      {/* Upload button & manual input row */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <button 
+          type="button" 
+          onClick={() => fileInputRef.current?.click()} 
+          disabled={uploading} 
+          className="button button-ghost bg-white border border-line-soft hover:border-teal text-teal font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-sm cursor-pointer"
+        >
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          <span>{uploading ? 'در حال آپلود...' : 'انتخاب و آپلود چند عکس به صورت همزمان'}</span>
         </button>
-        <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple accept="image/*" className="hidden" />
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          onChange={handleFileChange} 
+          multiple 
+          accept="image/*" 
+          className="hidden" 
+        />
+
+        {/* Manual URL entry */}
+        <div className="flex gap-1.5 flex-1 min-w-[240px]">
+          <input 
+            type="text" 
+            dir="ltr" 
+            placeholder="یا افزودن لینک مستقیم عکس..." 
+            value={newUrlInput} 
+            onChange={e => setNewUrlInput(e.target.value)} 
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addManualUrl(); } }}
+            className="flex-1 text-xs px-3 py-2 rounded-xl border border-line-soft bg-paper"
+          />
+          <button 
+            type="button" 
+            onClick={addManualUrl} 
+            className="button button-ghost border border-line-soft px-3 py-1.5 text-xs rounded-xl shrink-0"
+          >
+            + افزودن با لینک
+          </button>
+        </div>
       </div>
+
+      {/* Images preview list */}
+      {images.length > 0 && (
+        <div className="flex flex-wrap gap-3 mt-3 p-3 bg-cream/50 rounded-2xl border border-line-soft">
+          {images.map((url, i) => (
+            <div key={i} className="relative w-24 h-24 rounded-xl border-2 border-line-soft overflow-hidden group bg-paper shadow-sm">
+              <img src={url} alt="" className="w-full h-full object-contain p-1" />
+              <div className="absolute top-1 right-1 bg-black/60 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+                #{i + 1}
+              </div>
+              <button 
+                type="button" 
+                onClick={() => removeImage(i)} 
+                className="absolute inset-0 bg-ink/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-berry/80 cursor-pointer"
+                title="حذف این تصویر"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -219,7 +279,7 @@ export function StoreItemForm({ initialData, defaultCategory, existingCategories
     const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()) : null
 
     const imagesStr = formData.get('images') as string
-    const images = imagesStr ? imagesStr.split(',').filter(Boolean) : null
+    const images = imagesStr ? imagesStr.split(',').map(s => s.trim()).filter(Boolean) : []
 
     const rawPixeldrainId = formData.get('pixeldrain_id') as string || ''
     const videoUrl = formData.get('video_url') as string || ''
@@ -498,18 +558,10 @@ export function StoreItemForm({ initialData, defaultCategory, existingCategories
         </div>
         
         <div className="mt-4 border-t border-line-soft pt-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label>عکس‌های دیگر (با ویرگول جدا کنید)
-                <input name="images" defaultValue={initialData?.images?.join(',') || ''} placeholder="https://..., https://..." />
-              </label>
-            </div>
-            
-            <div>
-              <label>لینک ویدیو معرفی (آپارات و ...)
-                <input name="teaser_video_url" dir="ltr" defaultValue={initialData?.video_url || ''} placeholder="https://www.aparat.com/v/..." />
-              </label>
-            </div>
+          <div>
+            <label>لینک ویدیو معرفی (آپارات و ...)
+              <input name="teaser_video_url" dir="ltr" defaultValue={initialData?.video_url || ''} placeholder="https://www.aparat.com/v/..." />
+            </label>
           </div>
           <label>برچسب‌ها (با کاما جدا بشن)
             <input name="tags" defaultValue={initialData?.tags?.join(', ') || ''} placeholder="کودک, آموزشی, ریاضی" />
