@@ -186,6 +186,9 @@ CREATE TABLE IF NOT EXISTS yar_orders (
 ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50);
 ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS postal_code VARCHAR(50);
 ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS receipt_url VARCHAR(1000);
+ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS payment_authority VARCHAR(255);
+ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS payment_card_pan VARCHAR(50);
+ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP;
 
 -- Order items table
 CREATE TABLE IF NOT EXISTS yar_order_items (

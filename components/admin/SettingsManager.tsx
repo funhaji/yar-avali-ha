@@ -169,6 +169,14 @@ const DEFAULT_SETTINGS = [
   { key: 'tt_card2_btn_desc', label: 'توضیحات زیر دکمه کارت ۲', type: 'textarea', placeholder: 'ظرفیت دوره محدود است...', category: 'teacher_training' },
   { key: 'tt_card2_btn_id', label: 'آیدی پشتیبانی کارت ۲', type: 'text', placeholder: '@yar_avali_ha', category: 'teacher_training' },
 
+  // Payment & Banking Settings
+  { key: 'payment_gateway_enabled', label: 'فعال‌سازی درگاه پرداخت آنلاین زرین‌پال', type: 'checkbox', category: 'payment' },
+  { key: 'zarinpal_merchant_id', label: 'کد مرچنت یا اکسس توکن زرین‌پال (Merchant ID / Access Token)', type: 'text', placeholder: 'مثلاً: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx یا Access Token', category: 'payment' },
+  { key: 'zarinpal_sandbox', label: 'حالت تستی / آزمایشی زرین‌پال (Sandbox)', type: 'checkbox', category: 'payment' },
+  { key: 'admin_card_number', label: 'شماره کارت بانکی (جهت کارت به کارت)', type: 'text', placeholder: 'مثلاً: ۶۰۳۷-۹۹۷۱-xxxx-xxxx', category: 'payment' },
+  { key: 'admin_card_name', label: 'نام صاحب حساب کارت', type: 'text', placeholder: 'مثلاً: علی احمدی', category: 'payment' },
+
+
 
 ]
 

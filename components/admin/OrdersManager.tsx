@@ -115,7 +115,13 @@ export default function OrdersManager({ initialOrders }: { initialOrders: any[] 
                   <div>
                     <h3 className="font-bold mb-3 border-b pb-2">اطلاعات ارسال و پرداخت</h3>
                     <div className="text-sm space-y-2">
-                      <div className="flex justify-between"><span className="text-ink-soft">روش پرداخت:</span> <span className="font-bold">{order.payment_method === 'gateway' ? 'درگاه اینترنتی' : 'کارت به کارت'}</span></div>
+                      <div className="flex justify-between"><span className="text-ink-soft">روش پرداخت:</span> <span className="font-bold">{order.payment_method === 'gateway' ? 'درگاه اینترنتی (زرین‌پال)' : 'کارت به کارت'}</span></div>
+                      {order.payment_gateway_ref && (
+                        <div className="flex justify-between"><span className="text-ink-soft">کد پیگیری زرین‌پال:</span> <span className="font-mono font-bold text-teal" dir="ltr">{order.payment_gateway_ref}</span></div>
+                      )}
+                      {order.payment_card_pan && (
+                        <div className="flex justify-between"><span className="text-ink-soft">کارت پرداخت‌کننده:</span> <span className="font-mono text-xs text-ink-soft" dir="ltr">{order.payment_card_pan}</span></div>
+                      )}
                       <div className="flex justify-between"><span className="text-ink-soft">کد پستی:</span> <span>{order.postal_code || '-'}</span></div>
                       <div><span className="text-ink-soft block mb-1">آدرس:</span> <div className="bg-cream p-2 rounded text-ink leading-relaxed">{order.shipping_address || 'ندارد'}</div></div>
                     </div>

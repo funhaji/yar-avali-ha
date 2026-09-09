@@ -4,6 +4,7 @@ import { validateSession } from '@/lib/auth'
 import { getCart, clearCart } from '@/lib/cart'
 import { query } from '@/lib/db'
 import { Resend } from 'resend'
+import { requestZarinpalPayment } from '@/lib/zarinpal'
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +35,8 @@ export async function POST(request: Request) {
       total_cents += price * item.quantity
     }
 
-    const initialStatus = payment_method === 'gateway' ? 'pending_payment' : 'pending_approval'
+    const isFree = total_cents === 0
+    const initialStatus = isFree ? 'completed' : (payment_method === 'gateway' ? 'pending_payment' : 'pending_approval')
 
     // 1. Create order
     const orderResult = await query(
@@ -74,19 +76,55 @@ export async function POST(request: Request) {
       await clearCart(user.id)
     }
 
-    // 4. Create admin notification
+    // 4. If online payment gateway (and not free), initiate Zarinpal payment request
+    if (payment_method === 'gateway' && !isFree) {
+      const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000'
+      const proto = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https')
+      const siteUrl = `${proto}://${host}`
+      const callbackUrl = `${siteUrl}/api/store/payment/callback?order_id=${orderId}`
+
+      const zarinResult = await requestZarinpalPayment({
+        amount: total_cents,
+        description: `سفارش شماره ${orderId.slice(0, 8)} در سایت یار اولی‌ها`,
+        orderId,
+        callbackUrl,
+        mobile: phone || user.phone,
+        email: user.email
+      })
+
+      if (!zarinResult.success || !zarinResult.paymentUrl) {
+        // Return clear error so user can choose card2card or retry
+        return NextResponse.json({
+          error: zarinResult.error || 'خطا در اتصال به درگاه پرداخت زرین‌پال'
+        }, { status: 400 })
+      }
+
+      // Save authority to order
+      await query(
+        `UPDATE yar_orders SET payment_authority = $1 WHERE id = $2`,
+        [zarinResult.authority, orderId]
+      )
+
+      return NextResponse.json({
+        success: true,
+        orderId,
+        paymentUrl: zarinResult.paymentUrl
+      })
+    }
+
+    // 5. Create admin notification for card2card or free orders
     await query(
       `INSERT INTO yar_admin_notifications (type, title, message, link_url)
        VALUES ($1, $2, $3, $4)`,
       [
         'order', 
         `سفارش جدید از ${full_name || user.name}`, 
-        `مبلغ: ${total_cents / 10} تومان`,
+        `مبلغ: ${total_cents / 10} تومان (${payment_method === 'card2card' ? 'کارت به کارت' : 'رایگان'})`,
         `/admin/store/orders/${orderId}`
       ]
     )
 
-    // 5. Send Email via Resend if API key exists
+    // 6. Send Email via Resend if configured
     if (process.env.RESEND_API_KEY && process.env.ADMIN_EMAIL) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY)
@@ -100,7 +138,7 @@ export async function POST(request: Request) {
               <p>مشتری: ${full_name || user.name}</p>
               <p>شماره تماس: ${phone || user.phone}</p>
               <p>مبلغ کل: ${total_cents / 10} تومان</p>
-              <p><a href="https://yourwebsite.com/admin/store/orders/${orderId}">مشاهده سفارش</a></p>
+              <p>روش پرداخت: ${payment_method === 'card2card' ? 'کارت به کارت' : 'رایگان'}</p>
             </div>
           `
         })

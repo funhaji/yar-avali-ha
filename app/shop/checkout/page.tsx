@@ -26,18 +26,26 @@ export default function CheckoutPage() {
   })
   
   const [adminCard, setAdminCard] = useState({ number: '', name: '' })
+  const [gatewayEnabled, setGatewayEnabled] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    fetch('/api/public-settings?keys=admin_card_number,admin_card_name')
+    fetch('/api/public-settings?keys=admin_card_number,admin_card_name,payment_gateway_enabled')
       .then(r => r.json())
       .then(data => {
         setAdminCard({
           number: data.admin_card_number || 'شماره کارتی ثبت نشده است',
           name: data.admin_card_name || 'نامشخص'
         })
+        if (data.payment_gateway_enabled === 'false') {
+          setGatewayEnabled(false)
+          setForm(prev => ({ ...prev, paymentMethod: 'card2card' }))
+        } else {
+          setGatewayEnabled(true)
+        }
       })
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -98,8 +106,14 @@ export default function CheckoutPage() {
       
       const data = await res.json()
       if (res.ok) {
-        if (form.paymentMethod === 'gateway') {
-          alert('درگاه پرداخت در آینده اضافه خواهد شد. سفارش شما فعلا ثبت شد.')
+        if (form.paymentMethod === 'gateway' && data.paymentUrl) {
+          // Clear ordered items from cart before redirecting
+          for (const id of selectedItemIds) {
+            await removeFromCart(id)
+          }
+          // Redirect user directly to Zarinpal gateway
+          window.location.href = data.paymentUrl
+          return
         }
         for (const id of selectedItemIds) {
           await removeFromCart(id)
@@ -309,13 +323,16 @@ export default function CheckoutPage() {
                           </div>
                         </label>
 
-                        <label className={`relative cursor-pointer rounded-3xl p-6 flex flex-col gap-5 transition-all duration-300 border-2 overflow-hidden group ${form.paymentMethod === 'gateway' ? 'border-teal bg-teal/5 shadow-md shadow-teal/10' : 'border-line-soft hover:border-gray-300 bg-white hover:bg-gray-50'}`}>
+                        <label className={`relative ${gatewayEnabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'} rounded-3xl p-6 flex flex-col gap-5 transition-all duration-300 border-2 overflow-hidden group ${form.paymentMethod === 'gateway' ? 'border-teal bg-teal/5 shadow-md shadow-teal/10' : 'border-line-soft hover:border-gray-300 bg-white hover:bg-gray-50'}`}>
                           <input 
                             type="radio" 
                             name="payment" 
                             className="hidden" 
+                            disabled={!gatewayEnabled}
                             checked={form.paymentMethod === 'gateway'}
-                            onChange={() => setForm({...form, paymentMethod: 'gateway'})}
+                            onChange={() => {
+                              if (gatewayEnabled) setForm({...form, paymentMethod: 'gateway'})
+                            }}
                           />
                           <div className={`absolute top-5 left-5 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${form.paymentMethod === 'gateway' ? 'border-teal bg-teal text-white' : 'border-gray-300'}`}>
                             {form.paymentMethod === 'gateway' && <Check className="w-4 h-4" />}
@@ -324,11 +341,25 @@ export default function CheckoutPage() {
                             <Globe className="w-8 h-8" />
                           </div>
                           <div>
-                            <div className={`font-bold text-xl mb-1 ${form.paymentMethod === 'gateway' ? 'text-teal-deep' : 'text-ink'}`}>درگاه پرداخت اینترنتی</div>
-                            <div className="text-sm text-ink-soft">پرداخت آنلاین و سریع</div>
+                            <div className={`font-bold text-xl mb-1 ${form.paymentMethod === 'gateway' ? 'text-teal-deep' : 'text-ink'}`}>
+                              درگاه پرداخت اینترنتی
+                              {!gatewayEnabled && <span className="text-xs mr-2 font-normal text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">غیرفعال موقت</span>}
+                            </div>
+                            <div className="text-sm text-ink-soft">پرداخت آنلاین با کلیه کارت‌های عضو شتاب (زرین‌پال)</div>
                           </div>
                         </label>
                       </div>
+
+                      {form.paymentMethod === 'gateway' && (
+                        <div className="bg-teal/5 p-6 rounded-3xl border border-teal/20 space-y-3">
+                          <div className="flex items-center gap-2 text-teal font-bold text-base">
+                            <ShieldCheck className="w-5 h-5" /> پرداخت مستقیم و امن
+                          </div>
+                          <p className="text-ink-soft leading-relaxed text-sm">
+                            با کلیک روی دکمه زیر، مستقیماً به درگاه پرداخت رسمی زرین‌پال منتقل خواهید شد. پس از پرداخت با هر کارت شتاب، بلافاصله به سایت بازگشته و دسترسی شما به محصولات فعال می‌شود.
+                          </p>
+                        </div>
+                      )}
 
                       {form.paymentMethod === 'card2card' && (
                         <div className="bg-gray-50/80 p-6 md:p-8 rounded-3xl border border-line-soft space-y-6">
