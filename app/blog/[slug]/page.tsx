@@ -1,13 +1,13 @@
-import { headers } from 'next/headers'
+export const revalidate = 300
+
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { query } from '@/lib/db'
-import { validateSession } from '@/lib/auth'
 import { SiteHeader } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
 import VideoPlayer from '@/components/VideoPlayer'
 
-async function getBlogPost(slug: string) {
+async function getBlogPost(slug: string, incrementView = false) {
   const posts = await query(`
     SELECT 
       p.id, 
@@ -31,19 +31,20 @@ async function getBlogPost(slug: string) {
     return null
   }
   
-  // Increment view count
-  await query(`
-    UPDATE yar_blog_posts 
-    SET view_count = view_count + 1 
-    WHERE slug = $1
-  `, [slug])
+  if (incrementView) {
+    query(`
+      UPDATE yar_blog_posts 
+      SET view_count = view_count + 1 
+      WHERE slug = $1
+    `, [slug]).catch(() => {})
+  }
   
   return posts[0]
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = await getBlogPost(slug)
+  const post = await getBlogPost(slug, false)
   
   if (!post) {
     return {
@@ -59,12 +60,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const headersList = await headers()
-  const token = headersList.get('cookie')?.split('session_token=')[1]?.split(';')[0]
-  const user = token ? await validateSession(token).catch(() => null) : null
-  
   const [post, settings] = await Promise.all([
-    getBlogPost(slug),
+    getBlogPost(slug, true),
     getSettings(['site_logo_url', 'site_name']),
   ])
   
@@ -75,8 +72,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteLogo={settings.site_logo_url || undefined}
         siteName={settings.site_name || undefined}
       />

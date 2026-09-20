@@ -11,7 +11,7 @@ export function SupportBubbleWrapper({
   socialTelegram,
   socialWhatsapp
 }: {
-  isLoggedIn: boolean
+  isLoggedIn?: boolean
   contactPhone?: string
   contactEmail?: string
   socialInstagram?: string
@@ -20,14 +20,15 @@ export function SupportBubbleWrapper({
 }) {
   const pathname = usePathname()
   
-  // Don't show on admin pages
   if (pathname?.startsWith('/admin')) {
     return null
   }
 
+  const effectiveIsLoggedIn = isLoggedIn ?? (typeof document !== 'undefined' && document.cookie.includes('session_token'))
+
   return (
     <SupportBubble
-      isLoggedIn={isLoggedIn}
+      isLoggedIn={effectiveIsLoggedIn}
       contactPhone={contactPhone}
       contactEmail={contactEmail}
       socialInstagram={socialInstagram}

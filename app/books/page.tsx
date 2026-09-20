@@ -1,28 +1,23 @@
+export const revalidate = 1800
+
 import Link from 'next/link'
 import { ArrowRight, BookOpen } from 'lucide-react'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
-import { cookies } from 'next/headers'
-import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
-import { query } from '@/lib/db'
 import { ProductCard } from '@/components/shop/ProductCard'
 
 import { getCachedSettings, getCachedStoreItems } from '@/lib/cache'
 
 export default async function BooksPage() {
-  const token = (await cookies()).get('session_token')?.value
-  const user = token ? await validateSession(token).catch(() => null) : null
   
   const settingsData = await getCachedSettings(['site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone'])
   const s = settingsData as Record<string, string | null>
 
-  const books = await getCachedStoreItems('کتاب')
+  const books = await getCachedStoreItems('کتاب').catch(() => [])
   
   return (
     <div className="page bg-cream text-ink">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteLogo={s?.site_logo_url || undefined}
         siteName={s?.site_name || undefined}
       />
@@ -43,13 +38,7 @@ export default async function BooksPage() {
             </p>
           </div>
 
-          {user?.role === 'admin' && (
-            <div className="flex justify-center mb-8">
-              <Link href="/admin/store/new?category=کتاب" className="button button-primary">
-                + افزودن کتاب جدید
-              </Link>
-            </div>
-          )}
+
 
           {books.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">

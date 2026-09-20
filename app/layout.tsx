@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Vazirmatn } from 'next/font/google'
 import './globals.css'
-import { cookies } from 'next/headers'
-import { validateSession } from '@/lib/auth'
 import { CartProvider } from '@/lib/store-context'
 import { SettingsProvider } from '@/lib/settings-context'
 import { CartDrawer } from '@/components/shop/CartDrawer'
@@ -31,9 +29,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = { themeColor: '#fbf3e4', width: 'device-width', initialScale: 1, maximumScale: 5 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  // Get user session
-  const token = (await cookies()).get('session_token')?.value
-  const user = token ? await validateSession(token).catch(() => null) : null
   
   // Get settings
   const allSettings: Record<string, string | null> = await getSettings([
@@ -93,7 +88,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             {children}
             <CartDrawer />
             <SupportBubbleWrapper
-              isLoggedIn={!!user}
               contactPhone={(allSettings?.contact_phone as string) || undefined}
               contactEmail={(allSettings?.contact_email as string) || undefined}
               socialInstagram={(allSettings?.social_instagram as string) || undefined}

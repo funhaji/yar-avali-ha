@@ -1,8 +1,8 @@
+export const revalidate = 300
+
 import { Metadata } from 'next'
-import { headers } from 'next/headers'
 import Link from 'next/link'
 import { query } from '@/lib/db'
-import { validateSession } from '@/lib/auth'
 import { SiteHeader } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
 
@@ -23,23 +23,15 @@ async function getNewsPosts() {
   return posts
 }
 
-
-
 export default async function NewsPage() {
-  const headersList = await headers()
-  const token = headersList.get('cookie')?.split('session_token=')[1]?.split(';')[0]
-  const user = token ? await validateSession(token).catch(() => null) : null
-  
   const [posts, settings] = await Promise.all([
-    getNewsPosts(),
-    getSettings(['site_logo_url', 'site_name']),
+    getNewsPosts().catch(() => []),
+    getSettings(['site_logo_url', 'site_name']).catch(() => ({})),
   ])
   
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteLogo={settings.site_logo_url || undefined}
         siteName={settings.site_name || undefined}
       />
@@ -106,7 +98,6 @@ export default async function NewsPage() {
     </div>
   )
 }
-
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

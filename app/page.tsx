@@ -1,8 +1,7 @@
 import Link from 'next/link'
-import { cookies } from 'next/headers'
 import { ArrowLeft, BookOpen, Clapperboard, HeartHandshake, Palette, Rocket, ShieldCheck, Sparkles, Star } from 'lucide-react'
-import { validateSession } from '@/lib/auth'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
+import { HeroCta } from '@/components/HeroCta'
 import { Reveal } from '@/components/Reveal'
 
 import { icons } from 'lucide-react';
@@ -17,7 +16,7 @@ import { getCachedSettings, getCachedTeachers, getCachedStoreItems, getCachedCon
 import { query } from '@/lib/db'
 import { ProductCard } from '@/components/shop/ProductCard'
 
-export const revalidate = 60; // ISR: 1 minute
+export const revalidate = 300;
 
 async function getHomePageContent() {
   const settingsKeys = [
@@ -70,9 +69,7 @@ async function getHomePageContent() {
 }
 
 export default async function HomePage() {
-  const token = (await cookies()).get('session_token')?.value
-  const [user, teachers, { settings, storeItems, news }] = await Promise.all([
-    token ? validateSession(token).catch(() => null) : Promise.resolve(null),
+  const [teachers, { settings, storeItems, news }] = await Promise.all([
     getCachedTeachers().catch(() => []),
     getHomePageContent().catch((e) => {
       console.error("HomePage Error:", e);
@@ -86,7 +83,6 @@ export default async function HomePage() {
   // Use settings or fallback to defaults
   const heroTitle = s?.hero_title || 'درس بخون، انیمه ببین، با خانواده'
   const heroSubtitle = s?.hero_subtitle || 'درس‌های تصویری برای کلاس اول تا سوم، در کنار کتابخانه‌ای از انیمه و فیلم‌های مناسب هر سن — همه در یک اشتراک.'
-  const ctaText = s?.hero_cta_text || (user ? 'رفتن به داشبورد' : 'رایگان شروع کن')
   
   // Stats configuration
   const statLessonsCount = s?.stat_lessons_count || '120'
@@ -99,8 +95,6 @@ export default async function HomePage() {
   return (
     <div className="page">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteLogo={s?.site_logo_url || undefined}
         siteName={s?.site_name || undefined}
       />
@@ -118,7 +112,7 @@ export default async function HomePage() {
             <h1 className="display text-balance">{heroTitle}</h1>
             <p className="lead" style={{ marginTop: '1.1rem' }}>{heroSubtitle}</p>
             <div className="button-row" style={{ marginTop: '1.6rem' }}>
-              <Link href={user ? '/dashboard' : '/register'} className="button button-primary button-lg">{ctaText} <ArrowLeft /></Link>
+              <HeroCta defaultText={s?.hero_cta_text} />
               <Link href="/subscription" className="button button-ghost button-lg">اشتراک‌ها</Link>
             </div>
             <div className="hero-trust">

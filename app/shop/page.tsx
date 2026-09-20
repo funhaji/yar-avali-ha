@@ -1,3 +1,5 @@
+export const revalidate = 120
+
 import { Metadata } from 'next'
 import { getStoreItems, getCategories } from '@/lib/store'
 import { ProductCard } from '@/components/shop/ProductCard'
@@ -8,8 +10,6 @@ import { ShopSortSelect } from '@/components/shop/ShopSortSelect'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { ShoppingBag, Search, Filter } from 'lucide-react'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
-import { validateSession } from '@/lib/auth'
 import { getCachedStoreItems, getCachedSettings } from '@/lib/cache'
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
@@ -55,10 +55,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       }
     }
   })
-  
-  
-  const token = (await cookies()).get('session_token')?.value
-  const user = token ? await validateSession(token).catch(() => null) : null
   const settings = await getCachedSettings(['site_name', 'site_logo_url', 'shop_cat_order', 'shop_subcat_order'])
 
   let shopCatOrder = [];
@@ -80,8 +76,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   return (
     <div className="page bg-cream">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteName={settings.site_name || undefined}
         siteLogo={settings.site_logo_url || undefined}
       />

@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 
 let connectionString: string | undefined;
+let sqlInstance: ReturnType<typeof neon> | null = null;
 
 export function getConnectionString(): string {
   if (!connectionString) {
@@ -12,8 +13,18 @@ export function getConnectionString(): string {
   return connectionString;
 }
 
+function getSql() {
+  if (!sqlInstance) {
+    sqlInstance = neon(getConnectionString());
+  }
+  return sqlInstance;
+}
+
 export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
-  const sql = neon(getConnectionString());
+  if (!process.env.DATABASE_URL) {
+    return [] as T[];
+  }
+  const sql = getSql();
   const result = await sql(text, params || []);
   return result as T[];
 }

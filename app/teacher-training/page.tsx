@@ -1,17 +1,15 @@
+export const revalidate = 3600
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, PlayCircle, GraduationCap, Users } from 'lucide-react'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
-import { cookies } from 'next/headers'
-import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
 import { getEmbedUrl } from '@/lib/video'
 
 
 
 export default async function TeacherTrainingPage() {
-  const token = (await cookies()).get('session_token')?.value
-  const user = token ? await validateSession(token).catch(() => null) : null
   
   const settingsData = await getSettings([
     'tt_card1_title', 'tt_card1_desc', 'tt_card1_btn_title', 'tt_card1_btn_desc', 'tt_card1_btn_id',
@@ -25,8 +23,6 @@ export default async function TeacherTrainingPage() {
   return (
     <div className="page bg-cream text-ink flex flex-col min-h-screen">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteLogo={s?.site_logo_url || undefined}
         siteName={s?.site_name || undefined}
       />

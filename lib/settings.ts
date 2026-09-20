@@ -21,34 +21,23 @@ export type HomepageSection = {
   updated_at: Date
 }
 
+import { getCachedSettings, getCachedAllSettings } from './cache'
+import { revalidateTag } from 'next/cache'
+
 // Get a single setting by key
 export async function getSetting(key: string): Promise<string | null> {
-  const results = await query<SiteSetting>(
-    'SELECT * FROM yar_site_settings WHERE setting_key = $1',
-    [key]
-  )
-  return results.length > 0 ? results[0].setting_value : null
+  const settings = await getCachedSettings([key]);
+  return settings[key] ?? null;
 }
 
 // Get multiple settings by keys
 export async function getSettings(keys: string[]): Promise<Record<string, string | null>> {
-  const results = await query<SiteSetting>(
-    'SELECT * FROM yar_site_settings WHERE setting_key = ANY($1)',
-    [keys]
-  )
-  const settings: Record<string, string | null> = {}
-  keys.forEach(key => {
-    settings[key] = null
-  })
-  results.forEach(setting => {
-    settings[setting.setting_key] = setting.setting_value
-  })
-  return settings
+  return getCachedSettings(keys);
 }
 
 // Get all settings
 export async function getAllSettings(): Promise<SiteSetting[]> {
-  return query<SiteSetting>('SELECT * FROM yar_site_settings ORDER BY setting_key')
+  return getCachedAllSettings();
 }
 
 // Set a setting value
@@ -60,11 +49,13 @@ export async function setSetting(key: string, value: string, type: string = 'tex
      DO UPDATE SET setting_value = $2, setting_type = $3, updated_at = NOW()`,
     [key, value, type]
   )
+  try { revalidateTag('settings') } catch {}
 }
 
 // Delete a setting
 export async function deleteSetting(key: string): Promise<void> {
   await query('DELETE FROM yar_site_settings WHERE setting_key = $1', [key])
+  try { revalidateTag('settings') } catch {}
 }
 
 // Bulk set multiple settings
@@ -89,6 +80,7 @@ export async function setSettingsBatch(settings: {key: string, value: string, ty
      DO UPDATE SET setting_value = EXCLUDED.setting_value, setting_type = EXCLUDED.setting_type, updated_at = NOW()`,
     params
   )
+  try { revalidateTag('settings') } catch {}
 }
 
 // Get all homepage sections

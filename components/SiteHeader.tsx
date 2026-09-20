@@ -38,7 +38,7 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
     window.addEventListener('scroll', onScroll, { passive: true })
 
     // If userName prop wasn't passed from server component, check session client-side
-    if (!userName) {
+    if (!userName && typeof document !== 'undefined' && document.cookie.includes('session_token')) {
       fetch('/api/auth/session')
         .then(r => r.json())
         .then(data => {

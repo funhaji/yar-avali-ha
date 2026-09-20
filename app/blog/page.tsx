@@ -1,23 +1,16 @@
+export const revalidate = 300
+
 import { Metadata } from 'next'
-import { headers } from 'next/headers'
 import Link from 'next/link'
 import { query } from '@/lib/db'
-import { validateSession } from '@/lib/auth'
 import { SiteHeader } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
-
 import { getCachedBlogPosts, getCachedSettings } from '@/lib/cache'
 
-
-
-export default async function BlogPage({ searchParams }: { searchParams: Promise<{ category?: string, search?: string }> }) {
-  const headersList = await headers()
-  const token = headersList.get('cookie')?.split('session_token=')[1]?.split(';')[0]
-  const user = token ? await validateSession(token).catch(() => null) : null
-  
+export default async function BlogPage({ searchParams }: { searchParams: Promise<{ category?: string, subcategory?: string, search?: string }> }) {
   const [posts, settings] = await Promise.all([
-    getCachedBlogPosts(),
-    getCachedSettings(['site_logo_url', 'site_name']),
+    getCachedBlogPosts().catch(() => []),
+    getCachedSettings(['site_logo_url', 'site_name', 'blog_cat_order', 'blog_subcat_order']).catch(() => ({})),
   ])
   
   const siteName = settings.site_name || 'یار اولی‌ها'
@@ -80,8 +73,6 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
   return (
     <div className="page bg-cream min-h-screen">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteLogo={settings.site_logo_url || undefined}
         siteName={siteName}
       />

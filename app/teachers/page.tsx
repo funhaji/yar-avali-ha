@@ -2,20 +2,14 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
-import { getVisibleTeachers } from '@/lib/teachers'
-import { cookies } from 'next/headers'
-import { validateSession } from '@/lib/auth'
+import { getCachedTeachers } from '@/lib/cache'
 import { Sparkles, Users } from 'lucide-react'
 
-export const dynamic = 'force-dynamic'
-
-
+export const revalidate = 3600
 
 export default async function TeachersPage() {
-  const token = (await cookies()).get('session_token')?.value
-  const [user, teachers, settingsData] = await Promise.all([
-    token ? validateSession(token).catch(() => null) : Promise.resolve(null),
-    getVisibleTeachers().catch(() => []),
+  const [teachers, settingsData] = await Promise.all([
+    getCachedTeachers().catch(() => []),
     getSettings([
       'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone'
     ])
@@ -26,8 +20,6 @@ export default async function TeachersPage() {
   return (
     <div className="page bg-cream text-ink flex flex-col min-h-screen">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteLogo={s?.site_logo_url || undefined}
         siteName={s?.site_name || undefined}
       />
@@ -82,7 +74,6 @@ export default async function TeachersPage() {
     </div>
   )
 }
-
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

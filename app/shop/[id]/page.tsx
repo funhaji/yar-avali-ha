@@ -1,3 +1,5 @@
+export const revalidate = 120
+
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
@@ -6,8 +8,6 @@ import { ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Download, Image as 
 import { ProductCard } from '@/components/shop/ProductCard'
 import { ProductImageGallery } from '@/components/shop/ProductImageGallery'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
-import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
 import { AddToCartButton } from './AddToCartButton'
 import { icons } from 'lucide-react';
@@ -47,16 +47,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   const relatedItems = await getRelatedStoreItems(product.id, 3)
   const comments = await getStoreComments(product.id)
-
-  const token = (await cookies()).get('session_token')?.value
-  const user = token ? await validateSession(token).catch(() => null) : null
   const settings = await getSettings(['site_name', 'site_logo_url', 'contact_phone', 'contact_telegram_id'])
 
   return (
     <div className="page bg-cream">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteName={settings.site_name || undefined}
         siteLogo={settings.site_logo_url || undefined}
       />

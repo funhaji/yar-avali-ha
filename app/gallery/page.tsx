@@ -1,21 +1,17 @@
 import Link from 'next/link'
 import { ArrowRight, Image as ImageIcon } from 'lucide-react'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
-import { cookies } from 'next/headers'
-import { validateSession } from '@/lib/auth'
 import { query } from '@/lib/db'
 
-export const revalidate = 60
+export const revalidate = 3600
 
 export default async function GalleryPage() {
-  const token = (await cookies()).get('session_token')?.value
-  const user = token ? await validateSession(token).catch(() => null) : null
   
   const images = await query(`SELECT * FROM yar_gallery ORDER BY created_at DESC`)
   
   return (
     <div className="page flex flex-col min-h-screen">
-      <SiteHeader userName={user?.name} isAdmin={user?.role === 'admin'} />
+      <SiteHeader />
       
       <main className="shell section flex-1 py-12">
         <div className="max-w-6xl mx-auto">

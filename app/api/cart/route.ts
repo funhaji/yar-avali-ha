@@ -6,10 +6,10 @@ import { getCart, addToCart, updateCartQuantity, removeFromCart, clearCart } fro
 export async function GET(request: Request) {
   try {
     const token = (await cookies()).get('session_token')?.value
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!token) return NextResponse.json([])
     
     const user = await validateSession(token)
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) return NextResponse.json([])
 
     const cart = await getCart(user.id)
     return NextResponse.json(cart)

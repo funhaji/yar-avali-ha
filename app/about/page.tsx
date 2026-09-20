@@ -1,22 +1,14 @@
 import Link from 'next/link'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
-import { getVisibleTeachers } from '@/lib/teachers'
-import { cookies } from 'next/headers'
-import { validateSession } from '@/lib/auth'
 import { HeartHandshake, Sparkles } from 'lucide-react'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 
 export default async function AboutPage() {
-  const token = (await cookies()).get('session_token')?.value
-  const [user, settingsData] = await Promise.all([
-    token ? validateSession(token).catch(() => null) : Promise.resolve(null),
-    
-    getSettings([
-      'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone',
-      'about_title', 'about_subtitle', 'about_content', 'about_image'
-    ])
+  const settingsData = await getSettings([
+    'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone',
+    'about_title', 'about_subtitle', 'about_content', 'about_image'
   ])
 
   const s = settingsData as Record<string, string | null>
@@ -24,8 +16,6 @@ export default async function AboutPage() {
   return (
     <div className="page bg-cream text-ink">
       <SiteHeader 
-        userName={user?.name} 
-        isAdmin={user?.role === 'admin'} 
         siteLogo={s?.site_logo_url || undefined}
         siteName={s?.site_name || undefined}
       />

@@ -41,7 +41,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [hasInitializedSelection, setHasInitializedSelection] = useState(false)
 
   useEffect(() => {
-    fetchCart()
+    if (typeof document !== 'undefined' && document.cookie.includes('session_token')) {
+      fetchCart()
+    } else {
+      setIsLoading(false)
+    }
   }, [])
 
   async function fetchCart() {
