@@ -1,12 +1,13 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getTeacherById } from '@/lib/teachers'
+import { getTeacherById, getApprovedTeacherReviews } from '@/lib/teachers'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { cookies } from 'next/headers'
 import { validateSession } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
-import { GraduationCap, MapPin, Building2, ChevronRight, Phone, Medal, Award, Trophy, Video } from 'lucide-react'
+import { GraduationCap, MapPin, Building2, ChevronRight, Phone, Medal, Award, Trophy, Video, BookOpen, ShieldCheck, Star } from 'lucide-react'
 import { Reveal } from '@/components/Reveal'
+import { TeacherProfileReviewsClient } from '@/components/tutoring/TeacherProfileReviewsClient'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -22,6 +23,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   if (!teacher || !teacher.is_visible) {
     notFound()
   }
+
+  const reviews = await getApprovedTeacherReviews(id).catch(() => [])
 
   const token = (await cookies()).get('session_token')?.value
   const user = token ? await validateSession(token).catch(() => null) : null
@@ -63,8 +66,34 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
           <div className="z-10 text-center text-white px-4 mt-8 md:mt-0">
             <Reveal>
               <h1 className="text-4xl md:text-5xl font-black mb-3">{teacher.name}</h1>
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-bold">
-                {teacher.specialty || 'مدرس یاراولیها'}
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <span className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-bold">
+                  {teacher.specialty || 'مدرس یاراولیها'}
+                </span>
+                {(teacher.teaching_scope === 'teachers' || teacher.teaching_scope === 'both') && (
+                  <span className="inline-flex items-center gap-1.5 bg-purple-900/60 text-purple-100 backdrop-blur-sm px-3.5 py-1.5 rounded-full text-xs font-black border border-purple-300/40">
+                    <GraduationCap className="w-4 h-4" />
+                    مدرس دوره تربیت معلم
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center justify-center gap-2 mt-3 text-xs font-bold text-amber-300">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <Star
+                      key={star}
+                      className={`w-4 h-4 ${
+                        star <= Math.round(teacher.star_rating ?? 5)
+                          ? 'fill-amber-300 text-amber-300'
+                          : 'fill-white/20 text-white/20'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-white font-black">{teacher.star_rating ?? 5} از ۵</span>
+                {(teacher.review_count ?? reviews.length) > 0 && (
+                  <span className="text-white/80 font-bold">({teacher.review_count ?? reviews.length} نظر واقعی)</span>
+                )}
               </div>
             </Reveal>
           </div>
@@ -252,6 +281,118 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                   </div>
                 </Reveal>
               )}
+
+              {/* Teacher Training Section (تربیت معلم و آموزش همکاران) */}
+              {(teacher.teaching_scope === 'teachers' || teacher.teaching_scope === 'both' || (teacher.training_topics && teacher.training_topics.length > 0)) && (
+                <Reveal delay={380}>
+                  <div className="card p-6 md:p-8 border-2 border-purple-200 bg-purple-50/40 shadow-sm rounded-2xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-purple-200 pb-4 mb-5">
+                      <div className="flex items-center gap-2.5">
+                        <GraduationCap className="w-6 h-6 text-purple-700" />
+                        <h2 className="text-xl md:text-2xl font-black text-purple-950">
+                          بخش تخصصی تربیت معلم و همکاران
+                        </h2>
+                      </div>
+                      {teacher.training_certificate && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-100 text-purple-900 border border-purple-300 text-xs font-black">
+                          <ShieldCheck className="w-4 h-4 text-purple-700" />
+                          {teacher.training_certificate}
+                        </span>
+                      )}
+                    </div>
+
+                    {teacher.training_bio && (
+                      <div className="text-slate-700 text-sm leading-loose font-medium mb-5 whitespace-pre-line text-justify">
+                        {teacher.training_bio}
+                      </div>
+                    )}
+
+                    {teacher.training_topics && teacher.training_topics.length > 0 && (
+                      <div className="mb-5">
+                        <div className="text-xs font-black text-purple-900 mb-2">
+                          سرفصل‌ها و کارگاه‌های تدریس به همکاران:
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {teacher.training_topics.map((t, idx) => (
+                            <span
+                              key={idx}
+                              className="px-3 py-1.5 rounded-xl bg-white border border-purple-200 text-purple-950 text-xs font-bold shadow-2xs"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {teacher.training_target_levels && teacher.training_target_levels.length > 0 && (
+                      <div className="mb-5">
+                        <div className="text-xs font-black text-purple-900 mb-2">
+                          مخاطبان هدف دوره‌ها:
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {teacher.training_target_levels.map((lvl, idx) => (
+                            <span
+                              key={idx}
+                              className="px-3 py-1 rounded-lg bg-purple-100 text-purple-900 text-xs font-black border border-purple-200"
+                            >
+                              {lvl}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {teacher.training_pricing_options && teacher.training_pricing_options.length > 0 && (
+                      <div className="mb-5">
+                        <div className="text-xs font-black text-purple-900 mb-3">
+                          تعرفه‌ها و جلسات تربیت معلم:
+                        </div>
+                        <div className="grid sm:grid-cols-2 gap-3">
+                          {teacher.training_pricing_options.map((opt) => (
+                            <div
+                              key={opt.id}
+                              className="p-3.5 rounded-xl bg-white border-2 border-purple-200 flex flex-col justify-between"
+                            >
+                              <div className="font-black text-sm text-purple-950 mb-1">{opt.title}</div>
+                              {opt.description && (
+                                <p className="text-xs text-slate-600 mb-2 leading-relaxed">{opt.description}</p>
+                              )}
+                              <div className="flex items-center justify-between pt-2 border-t border-purple-100 text-xs">
+                                <span className="text-slate-500 font-bold">{opt.durationMinutes} دقیقه</span>
+                                <span className="font-black text-purple-700">
+                                  {opt.priceToman.toLocaleString('fa-IR')} تومان
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {teacher.training_video_url && (
+                      <div className="mt-5 pt-5 border-t border-purple-200">
+                        <div className="text-xs font-black text-purple-900 mb-2 flex items-center gap-2">
+                          <Video className="w-4 h-4 text-purple-700" />
+                          <span>ویدیو معرفی دوره‌های تربیت معلم</span>
+                        </div>
+                        <div className="aspect-video rounded-xl overflow-hidden border-2 border-purple-200 shadow-inner bg-slate-100">
+                          <iframe
+                            src={teacher.training_video_url.includes('aparat.com/v/') ? teacher.training_video_url.replace('/v/', '/video/video/embed/videohash/') + '/vt/frame' : teacher.training_video_url}
+                            className="w-full h-full"
+                            allowFullScreen
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Reveal>
+              )}
+
+              {/* Reviews and Ratings Section */}
+              <Reveal delay={400}>
+                <TeacherProfileReviewsClient teacher={teacher} initialReviews={reviews} />
+              </Reveal>
 
             </div>
           </div>

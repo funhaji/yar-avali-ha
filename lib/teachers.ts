@@ -2,9 +2,14 @@ import { cookies } from 'next/headers'
 import { query } from './db'
 import { validateSession } from './auth'
 
+export type TeachingScope = 'students' | 'teachers' | 'both'
+export type ReviewerRole = 'parent' | 'teacher'
+
 export interface PricingOption {
   duration_minutes: number
   price_toman: number
+  title?: string
+  description?: string
 }
 
 export interface AvailabilitySchedule {
@@ -47,6 +52,15 @@ export interface Teacher {
   grades?: string[] | null
   subjects?: string[] | null
   cities?: string[] | null
+
+  // Teacher training extensions (for teaching teachers)
+  teaching_scope?: TeachingScope | null
+  training_topics?: string[] | null
+  training_target_levels?: string[] | null
+  training_bio?: string | null
+  training_certificate?: string | null
+  training_video_url?: string | null
+  training_pricing_options?: PricingOption[] | null
 }
 
 export interface TutoringGrade {
@@ -76,6 +90,7 @@ export interface TutoringRequest {
   student_name: string
   phone: string
   teaching_mode: string
+  teaching_type?: 'student' | 'teacher_training' | null
   grade?: string | null
   subject?: string | null
   duration_minutes?: number | null
@@ -86,11 +101,30 @@ export interface TutoringRequest {
   created_at: Date
 }
 
+export interface TeacherReview {
+  id: string
+  teacher_id: string
+  teacher_name?: string
+  teacher_photo?: string | null
+  user_id?: string | null
+  reviewer_name: string
+  reviewer_role: ReviewerRole
+  rating: number
+  subject_or_topic?: string | null
+  comment: string
+  is_approved: boolean
+  created_at: Date
+}
+
 export function normalizeTeacher(t: any): Teacher {
   if (!t) return t
   let pricing = t.pricing_options
   if (typeof pricing === 'string') {
     try { pricing = JSON.parse(pricing) } catch { pricing = [] }
+  }
+  let trainingPricing = t.training_pricing_options
+  if (typeof trainingPricing === 'string') {
+    try { trainingPricing = JSON.parse(trainingPricing) } catch { trainingPricing = [] }
   }
   let schedule = t.availability_schedule
   if (typeof schedule === 'string') {
@@ -116,15 +150,30 @@ export function normalizeTeacher(t: any): Teacher {
   if (typeof cities === 'string') {
     try { cities = JSON.parse(cities) } catch { cities = cities.split(',').map((s: string) => s.trim()).filter(Boolean) }
   }
+  let trainingTopics = t.training_topics
+  if (typeof trainingTopics === 'string') {
+    try { trainingTopics = JSON.parse(trainingTopics) } catch { trainingTopics = trainingTopics.split(',').map((s: string) => s.trim()).filter(Boolean) }
+  }
+  let targetLevels = t.training_target_levels
+  if (typeof targetLevels === 'string') {
+    try { targetLevels = JSON.parse(targetLevels) } catch { targetLevels = targetLevels.split(',').map((s: string) => s.trim()).filter(Boolean) }
+  }
 
   return {
     ...t,
+    teaching_scope: t.teaching_scope || 'students',
     teaching_modes: Array.isArray(modes) && modes.length > 0 ? modes : ['online', 'in_person'],
     highlights: Array.isArray(highlights) ? highlights : [],
     grades: Array.isArray(grades) ? grades : [],
     subjects: Array.isArray(subjects) ? subjects : [],
     cities: Array.isArray(cities) ? cities : [],
     pricing_options: Array.isArray(pricing) ? pricing : [],
+    training_pricing_options: Array.isArray(trainingPricing) ? trainingPricing : [],
+    training_topics: Array.isArray(trainingTopics) ? trainingTopics : [],
+    training_target_levels: Array.isArray(targetLevels) ? targetLevels : [],
+    training_bio: t.training_bio || null,
+    training_certificate: t.training_certificate || null,
+    training_video_url: t.training_video_url || null,
     availability_schedule: schedule && typeof schedule === 'object' ? schedule : {},
     star_rating: t.star_rating !== null && t.star_rating !== undefined ? Number(t.star_rating) : 5.0,
     review_count: t.review_count ? Number(t.review_count) : 0,
@@ -193,6 +242,126 @@ export async function getTutoringRequests(status?: string): Promise<TutoringRequ
     LEFT JOIN yar_teachers t ON r.teacher_id = t.id
     ORDER BY r.created_at DESC
   `)
+}
+
+// ==========================================
+// Teacher Reviews & Real Ratings
+// ==========================================
+
+export async function getApprovedTeacherReviews(teacherId: string): Promise<TeacherReview[]> {
+  const rows = await query<TeacherReview>(`
+    SELECT r.*, t.name as teacher_name, t.photo_url as teacher_photo
+    FROM yar_teacher_reviews r
+    LEFT JOIN yar_teachers t ON r.teacher_id = t.id
+    WHERE r.teacher_id = $1 AND r.is_approved = true
+    ORDER BY r.created_at DESC
+  `, [teacherId])
+  return rows.map(r => ({ ...r, rating: Number(r.rating) }))
+}
+
+export async function getAllTeacherReviews(teacherId?: string, status?: string): Promise<TeacherReview[]> {
+  let sql = `
+    SELECT r.*, t.name as teacher_name, t.photo_url as teacher_photo
+    FROM yar_teacher_reviews r
+    LEFT JOIN yar_teachers t ON r.teacher_id = t.id
+    WHERE 1=1
+  `
+  const params: any[] = []
+  if (teacherId && teacherId !== 'all') {
+    params.push(teacherId)
+    sql += ` AND r.teacher_id = $${params.length}`
+  }
+  if (status === 'pending') {
+    sql += ` AND r.is_approved = false`
+  } else if (status === 'approved') {
+    sql += ` AND r.is_approved = true`
+  }
+  sql += ` ORDER BY r.created_at DESC`
+  const rows = await query<TeacherReview>(sql, params)
+  return rows.map(r => ({ ...r, rating: Number(r.rating) }))
+}
+
+export async function recalculateTeacherRating(teacherId: string): Promise<{ rating: number; count: number }> {
+  const stats = await query<{ avg_rating: string | null; total_count: string }>(`
+    SELECT 
+      AVG(rating) as avg_rating,
+      COUNT(*) as total_count
+    FROM yar_teacher_reviews
+    WHERE teacher_id = $1 AND is_approved = true
+  `, [teacherId])
+
+  const count = stats[0] ? Number(stats[0].total_count) : 0
+  const avg = stats[0]?.avg_rating ? Number(Number(stats[0].avg_rating).toFixed(1)) : 5.0
+
+  await query(`
+    UPDATE yar_teachers 
+    SET star_rating = $1, review_count = $2 
+    WHERE id = $3
+  `, [avg, count, teacherId])
+
+  return { rating: avg, count }
+}
+
+export async function createTeacherReview(data: {
+  teacher_id: string
+  user_id?: string | null
+  reviewer_name: string
+  reviewer_role: ReviewerRole
+  rating: number
+  subject_or_topic?: string | null
+  comment: string
+  is_approved?: boolean
+}): Promise<TeacherReview> {
+  const rows = await query<TeacherReview>(`
+    INSERT INTO yar_teacher_reviews (
+      teacher_id, user_id, reviewer_name, reviewer_role, rating, subject_or_topic, comment, is_approved
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING *
+  `, [
+    data.teacher_id,
+    data.user_id || null,
+    data.reviewer_name.trim(),
+    data.reviewer_role,
+    Math.max(1, Math.min(5, Math.round(data.rating))),
+    data.subject_or_topic?.trim() || null,
+    data.comment.trim(),
+    data.is_approved ?? false
+  ])
+
+  if (data.is_approved) {
+    await recalculateTeacherRating(data.teacher_id)
+  }
+
+  return rows[0]
+}
+
+export async function updateTeacherReviewStatus(reviewId: string, isApproved: boolean): Promise<boolean> {
+  const rows = await query<{ teacher_id: string }>(`
+    UPDATE yar_teacher_reviews 
+    SET is_approved = $1 
+    WHERE id = $2 
+    RETURNING teacher_id
+  `, [isApproved, reviewId])
+
+  if (rows[0]) {
+    await recalculateTeacherRating(rows[0].teacher_id)
+    return true
+  }
+  return false
+}
+
+export async function deleteTeacherReview(reviewId: string): Promise<boolean> {
+  const rows = await query<{ teacher_id: string }>(`
+    DELETE FROM yar_teacher_reviews 
+    WHERE id = $1 
+    RETURNING teacher_id
+  `, [reviewId])
+
+  if (rows[0]) {
+    await recalculateTeacherRating(rows[0].teacher_id)
+    return true
+  }
+  return false
 }
 
 export async function requireAdmin() {

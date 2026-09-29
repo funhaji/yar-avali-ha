@@ -11,6 +11,7 @@ export async function POST(request: Request) {
       student_name, 
       phone, 
       teaching_mode = 'online', 
+      teaching_type = 'student',
       grade, 
       subject, 
       duration_minutes, 
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
         student_name, 
         phone, 
         teaching_mode, 
+        teaching_type,
         grade, 
         subject, 
         duration_minutes, 
@@ -53,7 +55,7 @@ export async function POST(request: Request) {
         city, 
         notes, 
         status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'pending')
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending')
       RETURNING *
     `, [
       teacher_id,
@@ -61,6 +63,7 @@ export async function POST(request: Request) {
       student_name.trim(),
       phone.trim(),
       teaching_mode,
+      teaching_type === 'teacher_training' ? 'teacher_training' : 'student',
       grade || null,
       subject || null,
       duration_minutes ? Number(duration_minutes) : null,

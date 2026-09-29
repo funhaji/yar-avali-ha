@@ -17,7 +17,9 @@ export async function POST(request: Request) {
     education, location, workplace, experience_years, national_rank, provincial_rank, district_rank,
     contact_phone, telegram_id, whatsapp_id, eitaa_id, instagram_id,
     teaching_modes, badge_text, star_rating, review_count, successful_sessions,
-    highlights, pricing_options, availability_schedule, grades, subjects, cities
+    highlights, pricing_options, availability_schedule, grades, subjects, cities,
+    teaching_scope, training_topics, training_target_levels, training_bio,
+    training_certificate, training_video_url, training_pricing_options
   } = body
 
   if (!name) return NextResponse.json({ error: 'نام الزامی است' }, { status: 400 })
@@ -30,6 +32,12 @@ export async function POST(request: Request) {
   const pricingJson = JSON.stringify(Array.isArray(pricing_options) ? pricing_options : [])
   const availabilityJson = JSON.stringify(availability_schedule && typeof availability_schedule === 'object' ? availability_schedule : {})
 
+  // Teacher training arrays & json
+  const trainingTopicsArr = Array.from(new Set((Array.isArray(training_topics) ? training_topics : (typeof training_topics === 'string' ? training_topics.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
+  const targetLevelsArr = Array.from(new Set((Array.isArray(training_target_levels) ? training_target_levels : (typeof training_target_levels === 'string' ? training_target_levels.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
+  const trainingPricingJson = JSON.stringify(Array.isArray(training_pricing_options) ? training_pricing_options : [])
+  const validScope = ['students', 'teachers', 'both'].includes(teaching_scope) ? teaching_scope : 'students'
+
   try {
     const rows = await query(
       `INSERT INTO yar_teachers (
@@ -37,13 +45,16 @@ export async function POST(request: Request) {
         education, location, workplace, experience_years, national_rank, provincial_rank, district_rank,
         contact_phone, telegram_id, whatsapp_id, eitaa_id, instagram_id,
         teaching_modes, badge_text, star_rating, review_count, successful_sessions,
-        highlights, pricing_options, availability_schedule, grades, subjects, cities
+        highlights, pricing_options, availability_schedule, grades, subjects, cities,
+        teaching_scope, training_topics, training_target_levels, training_bio,
+        training_certificate, training_video_url, training_pricing_options
       ) VALUES (
         $1,$2,$3,$4,$5,$6,$7,
         $8,$9,$10,$11,$12,$13,$14,
         $15,$16,$17,$18,$19,
         $20,$21,$22,$23,$24,
-        $25,$26,$27,$28,$29,$30
+        $25,$26,$27,$28,$29,$30,
+        $31,$32,$33,$34,$35,$36,$37
       ) RETURNING *`,
       [
         name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, video_url || null,
@@ -57,7 +68,9 @@ export async function POST(request: Request) {
         star_rating !== undefined && star_rating !== null && star_rating !== '' ? Number(star_rating) : 5.0,
         review_count !== undefined && review_count !== null && review_count !== '' ? Number(review_count) : 0,
         successful_sessions !== undefined && successful_sessions !== null && successful_sessions !== '' ? Number(successful_sessions) : 0,
-        highlightsArr, pricingJson, availabilityJson, gradesArr, subjectsArr, citiesArr
+        highlightsArr, pricingJson, availabilityJson, gradesArr, subjectsArr, citiesArr,
+        validScope, trainingTopicsArr, targetLevelsArr, training_bio || null,
+        training_certificate || null, training_video_url || null, trainingPricingJson
       ]
     )
     revalidateTag('teachers')
@@ -78,7 +91,9 @@ export async function PUT(request: Request) {
     education, location, workplace, experience_years, national_rank, provincial_rank, district_rank,
     contact_phone, telegram_id, whatsapp_id, eitaa_id, instagram_id,
     teaching_modes, badge_text, star_rating, review_count, successful_sessions,
-    highlights, pricing_options, availability_schedule, grades, subjects, cities
+    highlights, pricing_options, availability_schedule, grades, subjects, cities,
+    teaching_scope, training_topics, training_target_levels, training_bio,
+    training_certificate, training_video_url, training_pricing_options
   } = body
 
   if (!id) return NextResponse.json({ error: 'ایدی الزامی است' }, { status: 400 })
@@ -91,6 +106,12 @@ export async function PUT(request: Request) {
   const pricingJson = JSON.stringify(Array.isArray(pricing_options) ? pricing_options : [])
   const availabilityJson = JSON.stringify(availability_schedule && typeof availability_schedule === 'object' ? availability_schedule : {})
 
+  // Teacher training arrays & json
+  const trainingTopicsArr = Array.from(new Set((Array.isArray(training_topics) ? training_topics : (typeof training_topics === 'string' ? training_topics.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
+  const targetLevelsArr = Array.from(new Set((Array.isArray(training_target_levels) ? training_target_levels : (typeof training_target_levels === 'string' ? training_target_levels.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
+  const trainingPricingJson = JSON.stringify(Array.isArray(training_pricing_options) ? training_pricing_options : [])
+  const validScope = ['students', 'teachers', 'both'].includes(teaching_scope) ? teaching_scope : 'students'
+
   try {
     const rows = await query(
       `UPDATE yar_teachers SET
@@ -99,8 +120,10 @@ export async function PUT(request: Request) {
         contact_phone=$15, telegram_id=$16, whatsapp_id=$17, eitaa_id=$18, instagram_id=$19,
         teaching_modes=$20, badge_text=$21, star_rating=$22, review_count=$23, successful_sessions=$24,
         highlights=$25, pricing_options=$26, availability_schedule=$27, grades=$28, subjects=$29, cities=$30,
+        teaching_scope=$31, training_topics=$32, training_target_levels=$33, training_bio=$34,
+        training_certificate=$35, training_video_url=$36, training_pricing_options=$37,
         updated_at=NOW()
-      WHERE id=$31 RETURNING *`,
+      WHERE id=$38 RETURNING *`,
       [
         name, specialty || null, bio || null, photo_url || null, display_order || 0, is_visible ?? true, video_url || null,
         education || null, location || null, workplace || null,
@@ -114,6 +137,8 @@ export async function PUT(request: Request) {
         review_count !== undefined && review_count !== null && review_count !== '' ? Number(review_count) : 0,
         successful_sessions !== undefined && successful_sessions !== null && successful_sessions !== '' ? Number(successful_sessions) : 0,
         highlightsArr, pricingJson, availabilityJson, gradesArr, subjectsArr, citiesArr,
+        validScope, trainingTopicsArr, targetLevelsArr, training_bio || null,
+        training_certificate || null, training_video_url || null, trainingPricingJson,
         id
       ]
     )
