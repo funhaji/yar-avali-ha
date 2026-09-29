@@ -373,19 +373,27 @@ export default async function HomePage() {
       <section className="section" id="teachers">
         <div className="shell">
           <Reveal>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
               <span className="section-kicker"><HeartHandshake /> تیم دوست‌داشتنی</span>
               <h2 className="section-title">معلم‌های ما را بشناسید</h2>
+              <p className="muted mt-2 max-w-xl text-sm md:text-base leading-relaxed">
+                هر درس را کسی می‌سازد که عاشق آموزش کودکان است.
+              </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
-              <p className="muted" style={{ maxWidth: '38ch', lineHeight: 1.7 }}>هر درس را کسی می‌سازد که عاشق آموزش کودکان است.</p>
-              <Link href="/teachers" className="button button-ghost whitespace-nowrap">مشاهده همه معلم‌ها <ArrowLeft className="w-4 h-4 mr-2" /></Link>
+            <div className="w-full sm:w-auto pt-1 md:pt-0 shrink-0">
+              <Link 
+                href="/teachers" 
+                className="button button-ghost w-full sm:w-auto justify-center text-center whitespace-nowrap min-h-[44px] px-6 py-2.5 touch-manipulation relative z-20 inline-flex items-center gap-2 font-bold cursor-pointer select-none"
+              >
+                <span>مشاهده همه معلم‌ها</span>
+                <ArrowLeft className="w-4 h-4 mr-2 pointer-events-none shrink-0" />
+              </Link>
             </div>
           </div>
 
           {teachers.length > 0 ? (
-            <div className="teacher-grid max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch', gap: '1rem' }}>
+            <div className="teacher-grid relative z-0 max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:pb-6 hide-scrollbar" style={{ WebkitOverflowScrolling: 'touch', gap: '1rem' }}>
               {teachers.map((t) => (
                 <Link href={`/teachers/${t.id}`} key={t.id} className="card card-hover teacher-card max-md:w-[260px] max-md:snap-center shrink-0 block">
                   {t.photo_url ? (
