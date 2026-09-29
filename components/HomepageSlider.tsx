@@ -57,11 +57,14 @@ export function HomepageSlider({ slides }: Props) {
   const currentSlide = slides[currentIndex]
 
   const SlideContent = () => (
-    <div className="relative w-full rounded-xl overflow-hidden bg-cream border border-line-soft">
+    <div
+      className="relative w-full rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-900"
+      style={{ aspectRatio: '16 / 7', minHeight: '160px' }}
+    >
       <img
         src={currentSlide.image_url}
         alt={currentSlide.title || 'اسلاید'}
-        className="w-full h-auto object-contain"
+        className="absolute inset-0 w-full h-full object-cover"
       />
       {currentSlide.title && (
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end">
@@ -89,17 +92,17 @@ export function HomepageSlider({ slides }: Props) {
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all z-10"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 sm:p-2 shadow-lg transition-all z-10 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="اسلاید قبلی"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all z-10"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 sm:p-2 shadow-lg transition-all z-10 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="اسلاید بعدی"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </>
       )}

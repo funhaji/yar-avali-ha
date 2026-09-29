@@ -55,10 +55,10 @@ export function UserDashboardHub({
   const pendingRequestsCount = tutoringRequests.filter(r => r.status === 'pending').length
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-5 sm:gap-8">
       {/* 1. TOP PROFILE & SUMMARY HERO */}
-      <section className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-300 shadow-md flex flex-col gap-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <section className="bg-white rounded-3xl p-4 sm:p-6 md:p-8 border-2 border-slate-300 shadow-md flex flex-col gap-4 sm:gap-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
           {/* User identity info */}
           <div className="flex items-center gap-4 sm:gap-5">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-teal-deep text-white flex items-center justify-center font-black text-2xl sm:text-3xl shadow-sm border-2 border-teal-700 shrink-0">
@@ -110,12 +110,11 @@ export function UserDashboardHub({
             </div>
           </div>
 
-          {/* Quick Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 lg:justify-end">
             {user.role === 'admin' && (
               <Link
                 href="/admin"
-                className="px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-black text-xs shadow-sm border-2 border-purple-700 flex items-center gap-2 transition-all hover:scale-102"
+                className="px-5 py-3 sm:py-2.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-black text-xs shadow-sm border-2 border-purple-700 flex items-center justify-center gap-2 transition-all hover:scale-102"
               >
                 <Settings className="w-4 h-4 text-purple-300" />
                 <span>ورود به پنل مدیریت سایت</span>
@@ -125,7 +124,7 @@ export function UserDashboardHub({
             {!subscription.isActive ? (
               <Link
                 href="/subscription"
-                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs shadow-sm border-2 border-amber-600 flex items-center gap-2 transition-all hover:scale-102"
+                className="px-5 py-3 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs shadow-sm border-2 border-amber-600 flex items-center justify-center gap-2 transition-all hover:scale-102"
               >
                 <Crown className="w-4 h-4 fill-white" />
                 <span>خرید اشتراک ویژه (دسترسی نامحدود)</span>
@@ -133,7 +132,7 @@ export function UserDashboardHub({
             ) : (
               <Link
                 href="/subscription"
-                className="px-4 py-2 rounded-xl bg-white hover:bg-amber-50 text-amber-900 font-bold text-xs border-2 border-amber-300 shadow-2xs transition-all flex items-center gap-1.5"
+                className="px-4 py-3 sm:py-2 rounded-xl bg-white hover:bg-amber-50 text-amber-900 font-bold text-xs border-2 border-amber-300 shadow-2xs transition-all flex items-center justify-center gap-1.5"
               >
                 <Crown className="w-3.5 h-3.5 text-amber-600" />
                 <span>تمدید یا تغییر پلن اشتراک</span>
@@ -312,10 +311,10 @@ export function UserDashboardHub({
 
       {/* TAB 1: OVERVIEW & COMPLETE PORTAL ACCESS */}
       {activeTab === 'overview' && (
-        <div className="flex flex-col gap-10 animate-in fade-in duration-200">
+        <div className="flex flex-col gap-6 sm:gap-10 animate-in fade-in duration-200">
           {/* SLIDER / BANNERS IF AVAILABLE */}
           {slides && slides.length > 0 && (
-            <section>
+            <section className="rounded-3xl overflow-hidden border-2 border-slate-300 shadow-sm bg-slate-900">
               <HomepageSlider slides={slides} />
             </section>
           )}
