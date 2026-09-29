@@ -339,8 +339,19 @@ export function TutoringBookingModal({
                       className="w-full px-3.5 py-2.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-bold focus:outline-none focus:border-teal transition-all shadow-xs"
                     >
                       <option value="">انتخاب پایه...</option>
-                      {modalGrades.map(g => (
-                        <option key={g.id} value={g.name}>{g.name}</option>
+                      {Object.entries(
+                        modalGrades.reduce((acc, g) => {
+                          const cat = g.category || 'دوره ابتدایی'
+                          if (!acc[cat]) acc[cat] = []
+                          acc[cat].push(g)
+                          return acc
+                        }, {} as Record<string, typeof modalGrades>)
+                      ).map(([cat, list]) => (
+                        <optgroup key={cat} label={`— ${cat} —`}>
+                          {list.map(g => (
+                            <option key={g.id} value={g.name}>{g.name}</option>
+                          ))}
+                        </optgroup>
                       ))}
                     </select>
                   </div>

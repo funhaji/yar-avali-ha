@@ -72,6 +72,14 @@ export async function POST(request: Request) {
       notes || null
     ])
 
+    if (userId) {
+      await query(
+        `INSERT INTO yar_teacher_interactions (user_id, teacher_id, interaction_type, metadata)
+         VALUES ($1, $2, $3, $4)`,
+        [userId, teacher_id, 'booking_request', JSON.stringify({ student_name, teaching_type })]
+      ).catch(() => {})
+    }
+
     return NextResponse.json({ 
       success: true, 
       message: 'درخواست شما با موفقیت ثبت شد. به زودی با شما تماس خواهیم گرفت.',

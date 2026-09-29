@@ -205,6 +205,9 @@ export function TeacherProfileReviewsClient({
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         teacher={teacher}
+        onOpenContact={() => {
+          window.scrollTo({ top: 300, behavior: 'smooth' })
+        }}
         onSuccess={() => {
           setStatusMessage('نظر شما با موفقیت ثبت شد و پس از بررسی و تایید مدیر سایت نمایش داده می‌شود.')
           refreshReviews()

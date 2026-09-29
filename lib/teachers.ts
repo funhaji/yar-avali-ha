@@ -66,6 +66,7 @@ export interface Teacher {
 export interface TutoringGrade {
   id: string
   name: string
+  category?: string | null
   display_order: number
   is_active: boolean
   created_at: Date
@@ -198,11 +199,11 @@ export async function getTeacherById(id: string): Promise<Teacher | null> {
 
 // Grades
 export async function getActiveTutoringGrades(): Promise<TutoringGrade[]> {
-  return query<TutoringGrade>('SELECT * FROM yar_tutoring_grades WHERE is_active = true ORDER BY display_order ASC, name ASC')
+  return query<TutoringGrade>('SELECT * FROM yar_tutoring_grades WHERE is_active = true ORDER BY category ASC, display_order ASC, name ASC')
 }
 
 export async function getAllTutoringGrades(): Promise<TutoringGrade[]> {
-  return query<TutoringGrade>('SELECT * FROM yar_tutoring_grades ORDER BY display_order ASC, name ASC')
+  return query<TutoringGrade>('SELECT * FROM yar_tutoring_grades ORDER BY category ASC, display_order ASC, name ASC')
 }
 
 // Subjects
@@ -362,6 +363,69 @@ export async function deleteTeacherReview(reviewId: string): Promise<boolean> {
     return true
   }
   return false
+}
+
+// ==========================================
+// Teacher Interactions & Review Eligibility
+// ==========================================
+
+export async function recordTeacherInteraction(
+  userId: string,
+  teacherId: string,
+  interactionType: string,
+  metadata: Record<string, any> = {}
+): Promise<void> {
+  await query(
+    `INSERT INTO yar_teacher_interactions (user_id, teacher_id, interaction_type, metadata)
+     VALUES ($1, $2, $3, $4)`,
+    [userId, teacherId, interactionType, JSON.stringify(metadata)]
+  )
+}
+
+export async function checkUserTeacherEligibility(
+  userId: string | null | undefined,
+  teacherId: string
+): Promise<{ canReview: boolean; reason?: 'unauthenticated' | 'no_interaction' | 'already_reviewed' }> {
+  if (!userId) {
+    return { canReview: false, reason: 'unauthenticated' }
+  }
+
+  // 1. Check if user already submitted a review for this teacher
+  const existingReviews = await query(
+    `SELECT id FROM yar_teacher_reviews 
+     WHERE user_id = $1 AND teacher_id = $2 
+     LIMIT 1`,
+    [userId, teacherId]
+  )
+  if (existingReviews.length > 0) {
+    return { canReview: false, reason: 'already_reviewed' }
+  }
+
+  // 2. Check if user has an interaction record (clicked phone, whatsapp, telegram, etc.)
+  const interactions = await query(
+    `SELECT id FROM yar_teacher_interactions 
+     WHERE user_id = $1 AND teacher_id = $2 
+     LIMIT 1`,
+    [userId, teacherId]
+  )
+
+  if (interactions.length > 0) {
+    return { canReview: true }
+  }
+
+  // 3. Check if user has submitted a tutoring booking request for this teacher
+  const requests = await query(
+    `SELECT id FROM yar_tutoring_requests 
+     WHERE user_id = $1 AND teacher_id = $2 
+     LIMIT 1`,
+    [userId, teacherId]
+  )
+
+  if (requests.length > 0) {
+    return { canReview: true }
+  }
+
+  return { canReview: false, reason: 'no_interaction' }
 }
 
 export async function requireAdmin() {

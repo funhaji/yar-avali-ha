@@ -6,6 +6,7 @@ import { Plus, Trash2, Edit2, Layers, BookOpen, Check, X, AlertCircle } from 'lu
 interface Grade {
   id: string
   name: string
+  category?: string | null
   display_order: number
   is_active: boolean
 }
@@ -27,6 +28,10 @@ export function TutoringTaxonomyManager() {
 
   // Grade form state
   const [gradeName, setGradeName] = useState('')
+  const [gradeCategory, setGradeCategory] = useState<string>('دوره ابتدایی')
+  const [customCategory, setCustomCategory] = useState<string>('')
+  const [isCustomCategory, setIsCustomCategory] = useState<boolean>(false)
+  const [filterGradeCategory, setFilterGradeCategory] = useState<string>('all')
   const [gradeOrder, setGradeOrder] = useState<number>(0)
   const [editingGrade, setEditingGrade] = useState<Grade | null>(null)
   const [savingGrade, setSavingGrade] = useState(false)
@@ -66,16 +71,25 @@ export function TutoringTaxonomyManager() {
     }
   }
 
+  const PRESET_CATEGORIES = [
+    'دوره ابتدایی',
+    'متوسطه اول (راهنمایی)',
+    'متوسطه دوم (دبیرستان)',
+    'کنکور و تیزهوشان',
+    'پیش‌دبستانی'
+  ]
+
   // --- Grade Handlers ---
   async function handleSaveGrade(e: React.FormEvent) {
     e.preventDefault()
     if (!gradeName.trim()) return
     setSavingGrade(true)
     try {
+      const finalCategory = isCustomCategory ? (customCategory.trim() || 'سایر') : gradeCategory
       const method = editingGrade ? 'PUT' : 'POST'
       const payload = editingGrade
-        ? { id: editingGrade.id, name: gradeName.trim(), display_order: gradeOrder, is_active: editingGrade.is_active }
-        : { name: gradeName.trim(), display_order: gradeOrder, is_active: true }
+        ? { id: editingGrade.id, name: gradeName.trim(), category: finalCategory, display_order: gradeOrder, is_active: editingGrade.is_active }
+        : { name: gradeName.trim(), category: finalCategory, display_order: gradeOrder, is_active: true }
 
       const res = await fetch('/api/admin/tutoring/grades', {
         method,
@@ -89,6 +103,8 @@ export function TutoringTaxonomyManager() {
       setGradeName('')
       setGradeOrder(0)
       setEditingGrade(null)
+      setIsCustomCategory(false)
+      setCustomCategory('')
       loadTaxonomies()
     } catch (err: any) {
       showMessage(err.message, 'error')
@@ -120,12 +136,25 @@ export function TutoringTaxonomyManager() {
     setEditingGrade(g)
     setGradeName(g.name)
     setGradeOrder(g.display_order)
+    const cat = g.category || 'دوره ابتدایی'
+    if (PRESET_CATEGORIES.includes(cat)) {
+      setGradeCategory(cat)
+      setIsCustomCategory(false)
+      setCustomCategory('')
+    } else {
+      setGradeCategory('سایر')
+      setIsCustomCategory(true)
+      setCustomCategory(cat)
+    }
   }
 
   function cancelEditGrade() {
     setEditingGrade(null)
     setGradeName('')
     setGradeOrder(0)
+    setGradeCategory('دوره ابتدایی')
+    setIsCustomCategory(false)
+    setCustomCategory('')
   }
 
   // --- Subject Handlers ---
@@ -223,6 +252,53 @@ export function TutoringTaxonomyManager() {
             <div className="font-black text-xs text-slate-900">
               {editingGrade ? 'ویرایش پایه تحصیلی' : 'افزودن پایه تحصیلی جدید'}
             </div>
+
+            {/* Category selection */}
+            <div>
+              <label className="block text-xs font-black text-slate-800 mb-1.5">دسته‌بندی پایه تحصیلی:</label>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {PRESET_CATEGORIES.map(cat => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => {
+                      setGradeCategory(cat)
+                      setIsCustomCategory(false)
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border ${
+                      !isCustomCategory && gradeCategory === cat
+                        ? 'bg-purple-800 text-white border-purple-900 shadow-2xs'
+                        : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setIsCustomCategory(true)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border ${
+                    isCustomCategory
+                      ? 'bg-purple-800 text-white border-purple-900 shadow-2xs'
+                      : 'bg-white text-purple-900 border-purple-300 hover:border-purple-400'
+                  }`}
+                >
+                  سایر / سفارشی...
+                </button>
+              </div>
+
+              {isCustomCategory && (
+                <input
+                  type="text"
+                  placeholder="نام دسته‌بندی سفارشی را تایپ کنید (مثلاً: دوره‌های آمادگی آزمون)"
+                  value={customCategory}
+                  onChange={e => setCustomCategory(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs bg-white border-2 border-purple-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-purple-600 shadow-xs mb-1"
+                  required={isCustomCategory}
+                />
+              )}
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="sm:col-span-2">
                 <input
@@ -274,36 +350,76 @@ export function TutoringTaxonomyManager() {
               برای فعال‌سازی فیلتر پایه در صفحه تدریس خصوصی، ابتدا پایه‌ها را از فرم بالا اضافه کنید.
             </div>
           ) : (
-            <div className="flex flex-col gap-2.5 max-h-[480px] overflow-y-auto pr-1">
-              {grades.map(g => (
-                <div
-                  key={g.id}
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-white border-2 border-slate-300 hover:border-slate-400 shadow-xs transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-xl bg-slate-200 border border-slate-300 text-slate-800 text-xs font-black flex items-center justify-center">
-                      {g.display_order}
-                    </span>
-                    <span className="font-black text-slate-900 text-sm">{g.name}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
+            <div className="flex flex-col gap-3">
+              {/* Category Filter for Grades */}
+              {Array.from(new Set(grades.map(g => g.category || 'دوره ابتدایی'))).length > 1 && (
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setFilterGradeCategory('all')}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-black border transition-all ${
+                      filterGradeCategory === 'all'
+                        ? 'bg-slate-900 text-white border-slate-900'
+                        : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
+                    }`}
+                  >
+                    همه ({grades.length})
+                  </button>
+                  {Array.from(new Set(grades.map(g => g.category || 'دوره ابتدایی'))).map(cat => (
                     <button
-                      onClick={() => startEditGrade(g)}
-                      className="p-1.5 text-slate-600 hover:text-teal hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-lg transition-colors"
-                      title="ویرایش"
+                      key={cat}
+                      type="button"
+                      onClick={() => setFilterGradeCategory(cat)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-black border transition-all ${
+                        filterGradeCategory === cat
+                          ? 'bg-purple-800 text-white border-purple-900'
+                          : 'bg-white text-purple-900 border-purple-200 hover:border-purple-300'
+                      }`}
                     >
-                      <Edit2 className="w-4 h-4" />
+                      {cat} ({grades.filter(g => (g.category || 'دوره ابتدایی') === cat).length})
                     </button>
-                    <button
-                      onClick={() => handleDeleteGrade(g.id, g.name)}
-                      className="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-lg transition-colors"
-                      title="حذف"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              )}
+
+              <div className="flex flex-col gap-2.5 max-h-[480px] overflow-y-auto pr-1">
+                {grades
+                  .filter(g => filterGradeCategory === 'all' || (g.category || 'دوره ابتدایی') === filterGradeCategory)
+                  .map(g => (
+                    <div
+                      key={g.id}
+                      className="flex items-center justify-between p-3.5 rounded-xl bg-white border-2 border-slate-300 hover:border-slate-400 shadow-xs transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="w-7 h-7 rounded-xl bg-slate-200 border border-slate-300 text-slate-800 text-xs font-black flex items-center justify-center">
+                          {g.display_order}
+                        </span>
+                        <div>
+                          <span className="font-black text-slate-900 text-sm block">{g.name}</span>
+                          <span className="text-[11px] font-black text-purple-900 bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200 inline-block mt-0.5">
+                            {g.category || 'دوره ابتدایی'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => startEditGrade(g)}
+                          className="p-1.5 text-slate-600 hover:text-teal hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-lg transition-colors"
+                          title="ویرایش"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteGrade(g.id, g.name)}
+                          className="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-lg transition-colors"
+                          title="حذف"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
         </section>

@@ -50,6 +50,15 @@ export function TeacherResumeModal({
       .catch(() => setReviewsLoading(false))
   }
 
+  function handleTrackInteraction(type: string) {
+    if (!teacher) return
+    fetch(`/api/teachers/${teacher.id}/interact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ interaction_type: type })
+    }).catch(() => {})
+  }
+
   useEffect(() => {
     if (isOpen && teacher) {
       loadReviews()
@@ -329,6 +338,7 @@ export function TeacherResumeModal({
                   {teacher.contact_phone && (
                     <a
                       href={`tel:${teacher.contact_phone}`}
+                      onClick={() => handleTrackInteraction('phone')}
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 border-2 border-slate-300 text-slate-800 text-xs font-bold transition-all shadow-xs"
                     >
                       <Phone className="w-3.5 h-3.5 text-teal" />
@@ -340,6 +350,7 @@ export function TeacherResumeModal({
                       href={teacher.telegram_id.startsWith('http') ? teacher.telegram_id : `https://t.me/${teacher.telegram_id.replace('@', '')}`}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() => handleTrackInteraction('telegram')}
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 border-2 border-sky-300 text-sky-900 text-xs font-bold transition-all shadow-xs"
                     >
                       <SendHorizontal className="w-3.5 h-3.5 text-sky-600" />
@@ -351,6 +362,7 @@ export function TeacherResumeModal({
                       href={teacher.whatsapp_id.startsWith('http') ? teacher.whatsapp_id : `https://wa.me/${teacher.whatsapp_id.replace(/^0/, '98')}`}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() => handleTrackInteraction('whatsapp')}
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-300 text-emerald-900 text-xs font-bold transition-all shadow-xs"
                     >
                       <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
@@ -618,6 +630,7 @@ export function TeacherResumeModal({
             <button
               type="button"
               onClick={() => {
+                handleTrackInteraction('booking_cta')
                 onClose()
                 onOpenBooking(teacher)
               }}
@@ -635,6 +648,7 @@ export function TeacherResumeModal({
         isOpen={isReviewFormOpen}
         onClose={() => setIsReviewFormOpen(false)}
         teacher={teacher}
+        onOpenContact={() => setActiveTab('resume')}
         onSuccess={() => {
           loadReviews()
         }}

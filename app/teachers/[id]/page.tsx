@@ -8,6 +8,7 @@ import { getSettings } from '@/lib/settings'
 import { GraduationCap, MapPin, Building2, ChevronRight, Phone, Medal, Award, Trophy, Video, BookOpen, ShieldCheck, Star } from 'lucide-react'
 import { Reveal } from '@/components/Reveal'
 import { TeacherProfileReviewsClient } from '@/components/tutoring/TeacherProfileReviewsClient'
+import { TeacherContactActionsClient } from '@/components/tutoring/TeacherContactActionsClient'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -170,45 +171,21 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                 </div>
               </Reveal>
 
-              {/* Socials / Contacts */}
+              {/* Socials / Contacts with Interaction Tracking */}
               {hasAnyContact && (
                 <Reveal delay={300}>
-                  <div className="card p-6 border border-line-soft bg-white shadow-sm rounded-2xl">
-                    <h3 className="font-bold text-lg mb-5 flex items-center gap-2 border-b border-line-soft pb-3">
-                      <Phone className="w-5 h-5 text-tangerine" /> راه‌های ارتباطی
+                  <div className="card p-6 border-2 border-slate-200 bg-white shadow-sm rounded-2xl">
+                    <h3 className="font-bold text-lg mb-5 flex items-center gap-2 border-b-2 border-slate-200 pb-3 text-slate-900">
+                      <Phone className="w-5 h-5 text-tangerine" /> راه‌های ارتباطی با استاد
                     </h3>
-                    <div className="flex flex-col gap-3">
-                      {hasPhone && (
-                        <a href={`tel:${teacher.contact_phone}`} className="flex items-center justify-between bg-slate-50 hover:bg-slate-100 text-slate-700 p-3 rounded-xl transition-colors border border-slate-100 group" dir="ltr">
-                          <span className="font-bold text-sm group-hover:text-slate-900">{teacher.contact_phone}</span>
-                          <div className="bg-white p-1.5 rounded-lg shadow-sm group-hover:shadow text-slate-500"><Phone className="w-4 h-4" /></div>
-                        </a>
-                      )}
-                      {hasTelegram && (
-                        <a href={`https://t.me/${teacher.telegram_id!.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-[#229ED9]/5 hover:bg-[#229ED9]/10 text-[#229ED9] p-3 rounded-xl transition-colors border border-[#229ED9]/10 group" dir="ltr">
-                          <span className="font-bold text-sm">@{teacher.telegram_id!.replace('@', '')}</span>
-                          <div className="bg-white p-1.5 rounded-lg shadow-sm text-[#229ED9]">تلگرام</div>
-                        </a>
-                      )}
-                      {hasWhatsapp && (
-                        <a href={`https://wa.me/${teacher.whatsapp_id!.replace(/^0/, '98').replace(/\+/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-[#25D366]/5 hover:bg-[#25D366]/10 text-[#25D366] p-3 rounded-xl transition-colors border border-[#25D366]/10 group" dir="ltr">
-                          <span className="font-bold text-sm">{teacher.whatsapp_id}</span>
-                          <div className="bg-white p-1.5 rounded-lg shadow-sm text-[#25D366]">واتساپ</div>
-                        </a>
-                      )}
-                      {hasInstagram && (
-                        <a href={`https://instagram.com/${teacher.instagram_id!.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-[#E1306C]/5 hover:bg-[#E1306C]/10 text-[#E1306C] p-3 rounded-xl transition-colors border border-[#E1306C]/10 group" dir="ltr">
-                          <span className="font-bold text-sm">@{teacher.instagram_id!.replace('@', '')}</span>
-                          <div className="bg-white p-1.5 rounded-lg shadow-sm text-[#E1306C]">اینستاگرام</div>
-                        </a>
-                      )}
-                      {hasEitaa && (
-                        <a href={`https://eitaa.com/${teacher.eitaa_id!.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-[#F26422]/5 hover:bg-[#F26422]/10 text-[#F26422] p-3 rounded-xl transition-colors border border-[#F26422]/10 group" dir="ltr">
-                          <span className="font-bold text-sm">@{teacher.eitaa_id!.replace('@', '')}</span>
-                          <div className="bg-white p-1.5 rounded-lg shadow-sm text-[#F26422]">ایتا</div>
-                        </a>
-                      )}
-                    </div>
+                    <TeacherContactActionsClient
+                      teacherId={teacher.id}
+                      contactPhone={teacher.contact_phone}
+                      telegramId={teacher.telegram_id}
+                      whatsappId={teacher.whatsapp_id}
+                      instagramId={teacher.instagram_id}
+                      eitaaId={teacher.eitaa_id}
+                    />
                   </div>
                 </Reveal>
               )}

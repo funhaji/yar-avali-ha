@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { X, Star, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { X, Star, Send, CheckCircle2, AlertCircle, Loader2, Lock, LogIn, PhoneCall } from 'lucide-react'
+import Link from 'next/link'
 import { Teacher } from '@/lib/teachers'
 
 interface TeacherReviewFormModalProps {
@@ -9,13 +10,15 @@ interface TeacherReviewFormModalProps {
   onClose: () => void
   teacher: Teacher | null
   onSuccess?: () => void
+  onOpenContact?: () => void
 }
 
 export function TeacherReviewFormModal({
   isOpen,
   onClose,
   teacher,
-  onSuccess
+  onSuccess,
+  onOpenContact
 }: TeacherReviewFormModalProps) {
   const [reviewerName, setReviewerName] = useState('')
   const [reviewerRole, setReviewerRole] = useState<'parent' | 'teacher'>('parent')
@@ -24,8 +27,34 @@ export function TeacherReviewFormModal({
   const [subjectOrTopic, setSubjectOrTopic] = useState('')
   const [comment, setComment] = useState('')
   const [loading, setLoading] = useState(false)
+  const [checkingEligibility, setCheckingEligibility] = useState(true)
+  const [eligibility, setEligibility] = useState<{ canReview: boolean; reason?: string }>({ canReview: false })
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string } | null>(null)
   const [error, setError] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
+
+  useEffect(() => {
+    if (isOpen && teacher) {
+      setCheckingEligibility(true)
+      fetch(`/api/teachers/${teacher.id}/reviews`)
+        .then(res => res.json())
+        .then(d => {
+          if (d.user) {
+            setCurrentUser(d.user)
+            if (!reviewerName) setReviewerName(d.user.name || '')
+          } else {
+            setCurrentUser(null)
+          }
+          if (d.eligibility) {
+            setEligibility(d.eligibility)
+          }
+          setCheckingEligibility(false)
+        })
+        .catch(() => {
+          setCheckingEligibility(false)
+        })
+    }
+  }, [isOpen, teacher?.id])
 
   if (!isOpen || !teacher) return null
 
@@ -106,7 +135,90 @@ export function TeacherReviewFormModal({
 
         {/* Content */}
         <div className="p-6">
-          {isSuccess ? (
+          {checkingEligibility ? (
+            <div className="flex flex-col items-center justify-center text-center py-12 gap-3">
+              <Loader2 className="w-8 h-8 text-teal animate-spin" />
+              <span className="text-xs font-bold text-slate-600">در حال بررسی دسترسی ثبت نظر...</span>
+            </div>
+          ) : !currentUser ? (
+            <div className="flex flex-col items-center text-center py-6 gap-3">
+              <div className="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-amber-300 text-amber-800 flex items-center justify-center">
+                <LogIn className="w-7 h-7 text-amber-700" />
+              </div>
+              <h4 className="text-base font-black text-slate-900">نیاز به ورود به حساب کاربری</h4>
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-sm">
+                برای ثبت نظر واقعی و امتیازدهی به استاد، ابتدا باید وارد حساب کاربری خود شده باشید.
+              </p>
+              <div className="flex items-center gap-2 mt-3">
+                <Link
+                  href="/login"
+                  className="px-5 py-2.5 bg-teal text-white rounded-xl font-black text-xs hover:bg-teal-deep transition-all shadow-xs border-2 border-teal-800"
+                >
+                  ورود به حساب کاربری
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-5 py-2.5 bg-white text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-100 transition-all border-2 border-slate-300"
+                >
+                  ثبت‌نام در سایت
+                </Link>
+              </div>
+            </div>
+          ) : !eligibility.canReview ? (
+            eligibility.reason === 'already_reviewed' ? (
+              <div className="flex flex-col items-center text-center py-6 gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-blue-100 border-2 border-blue-300 text-blue-700 flex items-center justify-center">
+                  <CheckCircle2 className="w-7 h-7" />
+                </div>
+                <h4 className="text-base font-black text-slate-900">نظر شما قبلاً ثبت شده است</h4>
+                <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-sm">
+                  شما قبلاً نظر و امتیاز خود را برای این استاد ثبت کرده‌اید. برای هر استاد امکان ثبت یک نظر وجود دارد.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="mt-3 px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs"
+                >
+                  متوجه شدم
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center text-center py-6 gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-rose-100 border-2 border-rose-300 text-rose-700 flex items-center justify-center">
+                  <Lock className="w-7 h-7" />
+                </div>
+                <h4 className="text-base font-black text-slate-900">ارتباط قبلی با استاد تایید نشد</h4>
+                <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-sm">
+                  تنها کاربرانی که واقعاً با این استاد جلسه داشته یا ارتباط برقرار کرده باشند (تماس تلفنی، پیام‌رسان‌ها یا ثبت رزرو کلاس) مجاز به ثبت نظر هستند.
+                </p>
+                <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-950 text-xs font-bold mt-1 max-w-sm text-right leading-relaxed">
+                  💡 برای ثبت نظر، ابتدا از طریق شماره تماس، تلگرام، واتساپ یا دکمه رزرو کلاس با این استاد ارتباط برقرار کنید.
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  {onOpenContact && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleReset()
+                        onOpenContact()
+                      }}
+                      className="px-5 py-2.5 bg-teal text-white rounded-xl font-black text-xs hover:bg-teal-deep transition-all shadow-xs border-2 border-teal-800 flex items-center gap-1.5"
+                    >
+                      <PhoneCall className="w-4 h-4" />
+                      <span>مشاهده راه‌های ارتباط با استاد</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs border border-slate-300 hover:bg-slate-200"
+                  >
+                    بستن
+                  </button>
+                </div>
+              </div>
+            )
+          ) : isSuccess ? (
             <div className="flex flex-col items-center text-center py-6 gap-3">
               <div className="w-16 h-16 rounded-full bg-emerald-100 border-2 border-emerald-300 text-emerald-700 flex items-center justify-center shadow-xs">
                 <CheckCircle2 className="w-9 h-9" />

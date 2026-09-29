@@ -135,10 +135,21 @@ export function TutoringFilterBar({
             className="w-full px-3.5 py-2.5 text-xs font-bold text-slate-900 bg-white border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-teal transition-all shadow-xs"
           >
             <option value="">همه پایه‌ها</option>
-            {grades.map(g => (
-              <option key={g.id} value={g.name}>
-                {g.name}
-              </option>
+            {Object.entries(
+              grades.reduce((acc, g) => {
+                const cat = g.category || 'دوره ابتدایی'
+                if (!acc[cat]) acc[cat] = []
+                acc[cat].push(g)
+                return acc
+              }, {} as Record<string, typeof grades>)
+            ).map(([cat, list]) => (
+              <optgroup key={cat} label={`— ${cat} —`}>
+                {list.map(g => (
+                  <option key={g.id} value={g.name}>
+                    {g.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

@@ -286,6 +286,55 @@ const MIGRATIONS = [
       CREATE INDEX IF NOT EXISTS idx_yar_tutoring_grades_order ON yar_tutoring_grades(display_order, name);
       CREATE INDEX IF NOT EXISTS idx_yar_tutoring_subjects_grade ON yar_tutoring_subjects(grade_id, display_order);
     `
+  },
+  {
+    version: 16,
+    name: 'teacher_training_and_reviews',
+    sql: `
+      ALTER TABLE yar_teachers
+        ADD COLUMN IF NOT EXISTS teaching_scope VARCHAR(50) DEFAULT 'students',
+        ADD COLUMN IF NOT EXISTS training_topics TEXT[] DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS training_target_levels TEXT[] DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS training_bio TEXT,
+        ADD COLUMN IF NOT EXISTS training_certificate VARCHAR(255),
+        ADD COLUMN IF NOT EXISTS training_video_url VARCHAR(1000),
+        ADD COLUMN IF NOT EXISTS training_pricing_options JSONB DEFAULT '[]';
+
+      CREATE TABLE IF NOT EXISTS yar_teacher_reviews (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        teacher_id UUID NOT NULL REFERENCES yar_teachers(id) ON DELETE CASCADE,
+        user_id UUID REFERENCES yar_users(id) ON DELETE SET NULL,
+        reviewer_name VARCHAR(255) NOT NULL,
+        reviewer_role VARCHAR(50) NOT NULL DEFAULT 'parent',
+        rating NUMERIC(2,1) NOT NULL DEFAULT 5.0,
+        subject_or_topic VARCHAR(255),
+        comment TEXT NOT NULL,
+        is_approved BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_teacher_reviews_teacher_approved ON yar_teacher_reviews(teacher_id, is_approved);
+      ALTER TABLE yar_tutoring_requests ADD COLUMN IF NOT EXISTS teaching_type VARCHAR(50) DEFAULT 'student';
+    `
+  },
+  {
+    version: 17,
+    name: 'grades_category_and_teacher_interactions',
+    sql: `
+      ALTER TABLE yar_tutoring_grades ADD COLUMN IF NOT EXISTS category VARCHAR(255) DEFAULT 'ابتدایی';
+      UPDATE yar_tutoring_grades SET category = 'ابتدایی' WHERE category IS NULL;
+
+      CREATE TABLE IF NOT EXISTS yar_teacher_interactions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES yar_users(id) ON DELETE CASCADE,
+        teacher_id UUID NOT NULL REFERENCES yar_teachers(id) ON DELETE CASCADE,
+        interaction_type VARCHAR(50) NOT NULL,
+        metadata JSONB DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_teacher_interactions_user_teacher ON yar_teacher_interactions(user_id, teacher_id);
+    `
   }
 ]
 

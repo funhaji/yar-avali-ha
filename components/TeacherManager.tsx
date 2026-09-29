@@ -405,6 +405,17 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
     setForm(f => ({ ...f, grades: updated }))
   }
 
+  function toggleCategoryGrades(categoryName: string, selectAll: boolean) {
+    const catGrades = availableGrades.filter(g => (g.category || 'دوره ابتدایی') === categoryName).map(g => g.name)
+    const current = new Set(form.grades || [])
+    if (selectAll) {
+      catGrades.forEach(g => current.add(g))
+    } else {
+      catGrades.forEach(g => current.delete(g))
+    }
+    setForm(f => ({ ...f, grades: Array.from(current) }))
+  }
+
   function selectAllGradeSubjects(gradeId: string, gradeName: string) {
     const gradeSubjects = availableSubjects.filter(s => s.grade_id === gradeId).map(s => s.name)
     const currentGrades = form.grades || []
@@ -971,70 +982,102 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
 
                   {/* Taxonomies: Grades & Subjects for Students */}
                   <div>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-4">
                       <label className="text-xs font-black text-slate-900">
-                        پایه‌ها و دروس تدریس دانش‌آموزان (انتخاب گزینه‌های فعال):
+                        پایه‌ها و دروس تدریس دانش‌آموزان (تفکیک بر اساس دسته‌بندی مقاطع):
                       </label>
                       <span className="text-xs font-bold text-teal-800 bg-teal/10 px-2.5 py-1 rounded-lg">
                         {form.grades?.length || 0} پایه انتخاب شده • {form.subjects?.length || 0} درس انتخاب شده
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {availableGrades.map(g => {
-                        const gradeSubjects = availableSubjects.filter(s => s.grade_id === g.id)
-                        const isGradeSelected = form.grades?.includes(g.name)
+                    <div className="flex flex-col gap-6">
+                      {Array.from(new Set(availableGrades.map(g => g.category || 'دوره ابتدایی'))).map(categoryName => {
+                        const categoryGrades = availableGrades.filter(g => (g.category || 'دوره ابتدایی') === categoryName)
+                        const allInCatSelected = categoryGrades.length > 0 && categoryGrades.every(g => form.grades?.includes(g.name))
 
                         return (
-                          <div
-                            key={g.id}
-                            className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
-                              isGradeSelected
-                                ? 'bg-teal/5 border-teal/40 shadow-xs'
-                                : 'bg-slate-50 border-slate-300'
-                            }`}
-                          >
-                            <div>
-                              <div className="flex items-center justify-between mb-3 border-b pb-2 border-slate-200">
-                                <label className="flex items-center gap-2 cursor-pointer text-xs font-black text-slate-900">
-                                  <input
-                                    type="checkbox"
-                                    checked={isGradeSelected}
-                                    onChange={() => toggleGrade(g.name)}
-                                    className="w-4 h-4 text-teal rounded border-slate-300 focus:ring-teal"
-                                  />
-                                  <span>{g.name}</span>
-                                </label>
-                                <button
-                                  type="button"
-                                  onClick={() => selectAllGradeSubjects(g.id, g.name)}
-                                  className="text-[11px] font-black text-teal hover:text-teal-deep px-2 py-0.5 rounded-md hover:bg-teal/10 transition-colors"
-                                >
-                                  انتخاب همه دروس
-                                </button>
+                          <div key={categoryName} className="p-4 rounded-2xl bg-white border-2 border-slate-300 shadow-2xs">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-200 pb-3 mb-4">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-teal"></span>
+                                <span className="font-black text-slate-900 text-sm">{categoryName}</span>
+                                <span className="text-[11px] font-bold text-slate-500">({categoryGrades.length} پایه)</span>
                               </div>
+                              <button
+                                type="button"
+                                onClick={() => toggleCategoryGrades(categoryName, !allInCatSelected)}
+                                className="text-xs font-black text-teal hover:text-teal-deep px-3 py-1 rounded-xl bg-teal/10 hover:bg-teal/20 transition-colors"
+                              >
+                                {allInCatSelected ? 'لغو انتخاب همه پایه‌های این دسته' : 'انتخاب همه پایه‌های این دسته'}
+                              </button>
+                            </div>
 
-                              <div className="flex flex-col gap-1.5">
-                                {gradeSubjects.map(s => {
-                                  const isSubjectSelected = form.subjects?.includes(s.name)
-                                  return (
-                                    <label
-                                      key={s.id}
-                                      className={`flex items-center gap-2 text-xs p-1.5 rounded-lg cursor-pointer transition-colors ${
-                                        isSubjectSelected ? 'bg-white font-bold text-teal-900' : 'text-slate-600 hover:bg-white/60'
-                                      }`}
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        checked={isSubjectSelected}
-                                        onChange={() => toggleSubject(s.name, g.name)}
-                                        className="w-3.5 h-3.5 text-teal rounded border-slate-300 focus:ring-teal"
-                                      />
-                                      <span>{s.name}</span>
-                                    </label>
-                                  )
-                                })}
-                              </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {categoryGrades.map(g => {
+                                const gradeSubjects = availableSubjects.filter(s => s.grade_id === g.id)
+                                const isGradeSelected = form.grades?.includes(g.name)
+
+                                return (
+                                  <div
+                                    key={g.id}
+                                    className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                                      isGradeSelected
+                                        ? 'bg-teal/5 border-teal/40 shadow-xs'
+                                        : 'bg-slate-50 border-slate-200'
+                                    }`}
+                                  >
+                                    <div>
+                                      <div className="flex items-center justify-between mb-3 border-b pb-2 border-slate-200">
+                                        <label className="flex items-center gap-2 cursor-pointer text-xs font-black text-slate-900">
+                                          <input
+                                            type="checkbox"
+                                            checked={isGradeSelected}
+                                            onChange={() => toggleGrade(g.name)}
+                                            className="w-4 h-4 text-teal rounded border-slate-300 focus:ring-teal"
+                                          />
+                                          <span>{g.name}</span>
+                                        </label>
+                                        {gradeSubjects.length > 0 && (
+                                          <button
+                                            type="button"
+                                            onClick={() => selectAllGradeSubjects(g.id, g.name)}
+                                            className="text-[11px] font-black text-teal hover:text-teal-deep px-2 py-0.5 rounded-md hover:bg-teal/10 transition-colors"
+                                          >
+                                            انتخاب همه دروس
+                                          </button>
+                                        )}
+                                      </div>
+
+                                      {gradeSubjects.length > 0 ? (
+                                        <div className="flex flex-col gap-1.5">
+                                          {gradeSubjects.map(s => {
+                                            const isSubjectSelected = form.subjects?.includes(s.name)
+                                            return (
+                                              <label
+                                                key={s.id}
+                                                className={`flex items-center gap-2 text-xs p-1.5 rounded-lg cursor-pointer transition-colors ${
+                                                  isSubjectSelected ? 'bg-white font-bold text-teal-900' : 'text-slate-600 hover:bg-white/60'
+                                                }`}
+                                              >
+                                                <input
+                                                  type="checkbox"
+                                                  checked={isSubjectSelected}
+                                                  onChange={() => toggleSubject(s.name, g.name)}
+                                                  className="w-3.5 h-3.5 text-teal rounded border-slate-300 focus:ring-teal"
+                                                />
+                                                <span>{s.name}</span>
+                                              </label>
+                                            )
+                                          })}
+                                        </div>
+                                      ) : (
+                                        <span className="text-[11px] text-slate-400 italic">درسی برای این پایه ثبت نشده</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )
+                              })}
                             </div>
                           </div>
                         )

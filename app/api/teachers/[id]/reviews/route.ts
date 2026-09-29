@@ -15,12 +15,21 @@ export async function GET(
     }
 
     const reviews = await getApprovedTeacherReviews(id)
+
+    const token = (await cookies()).get('session_token')?.value
+    const user = token ? await validateSession(token).catch(() => null) : null
+
+    const { checkUserTeacherEligibility } = await import('@/lib/teachers')
+    const eligibility = user ? await checkUserTeacherEligibility(user.id, id) : { canReview: false, reason: 'unauthenticated' }
+
     return NextResponse.json({
       reviews,
       stats: {
         star_rating: teacher.star_rating || 5.0,
         review_count: teacher.review_count || 0
-      }
+      },
+      user: user ? { id: user.id, name: user.name } : null,
+      eligibility
     })
   } catch (err: any) {
     return NextResponse.json({ error: 'خطا در بارگذاری نظرات: ' + err.message }, { status: 500 })
@@ -59,14 +68,33 @@ export async function POST(
       return NextResponse.json({ error: 'متن نظر باید حداقل ۵ کاراکتر باشد' }, { status: 400 })
     }
 
-    // Check optional authenticated user session
+    // Enforce registered user and interaction requirement
     const token = (await cookies()).get('session_token')?.value
     const user = token ? await validateSession(token).catch(() => null) : null
+
+    if (!user) {
+      return NextResponse.json({
+        error: 'برای ثبت نظر و امتیاز، ابتدا باید وارد حساب کاربری خود شوید.'
+      }, { status: 401 })
+    }
+
+    const { checkUserTeacherEligibility } = await import('@/lib/teachers')
+    const eligibility = await checkUserTeacherEligibility(user.id, id)
+    if (!eligibility.canReview) {
+      if (eligibility.reason === 'already_reviewed') {
+        return NextResponse.json({
+          error: 'شما قبلاً نظر و امتیاز خود را برای این استاد ثبت کرده‌اید.'
+        }, { status: 400 })
+      }
+      return NextResponse.json({
+        error: 'تنها کاربرانی که با این استاد ارتباط برقرار کرده (تماس، پیام‌رسان‌ها یا درخواست کلاس) امکان ثبت نظر و امتیاز را دارند.'
+      }, { status: 403 })
+    }
 
     // By default, require admin approval (is_approved: false)
     const review = await createTeacherReview({
       teacher_id: id,
-      user_id: user?.id || null,
+      user_id: user.id,
       reviewer_name: reviewer_name.trim(),
       reviewer_role: reviewer_role as 'parent' | 'teacher',
       rating: numRating,
