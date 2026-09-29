@@ -76,6 +76,11 @@ export function TutoringBookingModal({
 
   const activePricing = pricingOptions.find(p => p.duration_minutes === selectedDuration) || pricingOptions[0]
 
+  // Filter grades to those taught by this teacher (or all if none specified)
+  const modalGrades = teacher?.grades && teacher.grades.length > 0
+    ? grades.filter(g => teacher.grades?.some(tg => tg.includes(g.name) || g.name.includes(tg)))
+    : grades
+
   // Filter subjects for the selected grade
   const availableSubjects = grade
     ? subjects.filter(s => {
@@ -83,6 +88,10 @@ export function TutoringBookingModal({
         return matchingGrade ? s.grade_id === matchingGrade.id : true
       })
     : subjects
+
+  const modalSubjects = teacher?.subjects && teacher.subjects.length > 0
+    ? availableSubjects.filter(s => teacher.subjects?.some(ts => ts.includes(s.name) || s.name.includes(ts)))
+    : availableSubjects
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -240,7 +249,7 @@ export function TutoringBookingModal({
                     className="w-full px-3.5 py-2.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-bold focus:outline-none focus:border-teal shadow-xs"
                   >
                     <option value="">انتخاب پایه...</option>
-                    {grades.map(g => (
+                    {modalGrades.map(g => (
                       <option key={g.id} value={g.name}>{g.name}</option>
                     ))}
                   </select>
@@ -253,7 +262,7 @@ export function TutoringBookingModal({
                     className="w-full px-3.5 py-2.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-bold focus:outline-none focus:border-teal shadow-xs"
                   >
                     <option value="">انتخاب درس...</option>
-                    {availableSubjects.map(s => (
+                    {modalSubjects.map(s => (
                       <option key={s.id} value={s.name}>{s.name}</option>
                     ))}
                   </select>

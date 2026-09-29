@@ -190,6 +190,33 @@ export function TeacherResumeModal({
             </div>
           )}
 
+          {/* Grades & Subjects */}
+          {((teacher.grades && teacher.grades.length > 0) || (teacher.subjects && teacher.subjects.length > 0)) && (
+            <div className="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
+              <h3 className="text-xs font-black text-slate-900 mb-2.5">پایه‌ها و دروس تحت تدریس</h3>
+              {teacher.grades && teacher.grades.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap mb-2">
+                  <span className="text-xs font-bold text-slate-600">پایه‌ها:</span>
+                  {teacher.grades.map(g => (
+                    <span key={g} className="px-2.5 py-1 rounded-xl bg-teal/15 text-teal-900 border border-teal/30 text-xs font-black">
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {teacher.subjects && teacher.subjects.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-slate-600">دروس:</span>
+                  {teacher.subjects.map(s => (
+                    <span key={s} className="px-2.5 py-1 rounded-xl bg-white text-slate-800 border border-slate-300 text-xs font-bold">
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Pricing Options */}
           {teacher.pricing_options && teacher.pricing_options.length > 0 && (
             <div>

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { revalidateTag } from 'next/cache'
+import { revalidateTag, revalidatePath } from 'next/cache'
 import { del } from '@vercel/blob'
 import { query } from '@/lib/db'
-import { getAllTeachers, requireAdmin } from '@/lib/teachers'
+import { getAllTeachers, requireAdmin, normalizeTeacher } from '@/lib/teachers'
 
 export async function GET() {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'دسترسی غیرمجاز' }, { status: 403 })
@@ -24,9 +24,9 @@ export async function POST(request: Request) {
 
   const modesArr = Array.isArray(teaching_modes) && teaching_modes.length > 0 ? teaching_modes : ['online', 'in_person']
   const highlightsArr = Array.isArray(highlights) ? highlights : (typeof highlights === 'string' ? highlights.split('\n').map((s: string) => s.trim()).filter(Boolean) : [])
-  const gradesArr = Array.isArray(grades) ? grades : (typeof grades === 'string' ? grades.split(',').map((s: string) => s.trim()).filter(Boolean) : [])
-  const subjectsArr = Array.isArray(subjects) ? subjects : (typeof subjects === 'string' ? subjects.split(',').map((s: string) => s.trim()).filter(Boolean) : [])
-  const citiesArr = Array.isArray(cities) ? cities : (typeof cities === 'string' ? cities.split(',').map((s: string) => s.trim()).filter(Boolean) : [])
+  const gradesArr = Array.from(new Set((Array.isArray(grades) ? grades : (typeof grades === 'string' ? grades.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
+  const subjectsArr = Array.from(new Set((Array.isArray(subjects) ? subjects : (typeof subjects === 'string' ? subjects.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
+  const citiesArr = Array.from(new Set((Array.isArray(cities) ? cities : (typeof cities === 'string' ? cities.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
   const pricingJson = JSON.stringify(Array.isArray(pricing_options) ? pricing_options : [])
   const availabilityJson = JSON.stringify(availability_schedule && typeof availability_schedule === 'object' ? availability_schedule : {})
 
@@ -61,7 +61,10 @@ export async function POST(request: Request) {
       ]
     )
     revalidateTag('teachers')
-    return NextResponse.json({ teacher: rows[0] })
+    revalidatePath('/teacher-training')
+    revalidatePath('/teachers')
+    revalidatePath('/admin/teachers')
+    return NextResponse.json({ teacher: normalizeTeacher(rows[0]) })
   } catch (e: any) {
     return NextResponse.json({ error: 'خطا در دیتابیس: ' + e.message }, { status: 500 })
   }
@@ -82,9 +85,9 @@ export async function PUT(request: Request) {
 
   const modesArr = Array.isArray(teaching_modes) && teaching_modes.length > 0 ? teaching_modes : ['online', 'in_person']
   const highlightsArr = Array.isArray(highlights) ? highlights : (typeof highlights === 'string' ? highlights.split('\n').map((s: string) => s.trim()).filter(Boolean) : [])
-  const gradesArr = Array.isArray(grades) ? grades : (typeof grades === 'string' ? grades.split(',').map((s: string) => s.trim()).filter(Boolean) : [])
-  const subjectsArr = Array.isArray(subjects) ? subjects : (typeof subjects === 'string' ? subjects.split(',').map((s: string) => s.trim()).filter(Boolean) : [])
-  const citiesArr = Array.isArray(cities) ? cities : (typeof cities === 'string' ? cities.split(',').map((s: string) => s.trim()).filter(Boolean) : [])
+  const gradesArr = Array.from(new Set((Array.isArray(grades) ? grades : (typeof grades === 'string' ? grades.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
+  const subjectsArr = Array.from(new Set((Array.isArray(subjects) ? subjects : (typeof subjects === 'string' ? subjects.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
+  const citiesArr = Array.from(new Set((Array.isArray(cities) ? cities : (typeof cities === 'string' ? cities.split(',') : [])).map((s: any) => String(s).trim()).filter(Boolean)))
   const pricingJson = JSON.stringify(Array.isArray(pricing_options) ? pricing_options : [])
   const availabilityJson = JSON.stringify(availability_schedule && typeof availability_schedule === 'object' ? availability_schedule : {})
 
@@ -115,7 +118,10 @@ export async function PUT(request: Request) {
       ]
     )
     revalidateTag('teachers')
-    return NextResponse.json({ teacher: rows[0] })
+    revalidatePath('/teacher-training')
+    revalidatePath('/teachers')
+    revalidatePath('/admin/teachers')
+    return NextResponse.json({ teacher: normalizeTeacher(rows[0]) })
   } catch (e: any) {
     return NextResponse.json({ error: 'خطا در دیتابیس: ' + e.message }, { status: 500 })
   }
@@ -130,5 +136,8 @@ export async function DELETE(request: Request) {
     try { await del(photo) } catch { /* ignore missing blob */ }
   }
   revalidateTag('teachers')
+  revalidatePath('/teacher-training')
+  revalidatePath('/teachers')
+  revalidatePath('/admin/teachers')
   return NextResponse.json({ success: true })
 }

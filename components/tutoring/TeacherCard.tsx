@@ -137,6 +137,32 @@ export function TeacherCard({ teacher, onOpenBooking, onOpenResume }: TeacherCar
           </ul>
         )}
 
+        {/* Grades & Subjects Badges */}
+        {((teacher.grades && teacher.grades.length > 0) || (teacher.subjects && teacher.subjects.length > 0)) && (
+          <div className="flex flex-col gap-2 mb-4 p-3 bg-slate-50 rounded-2xl border-2 border-slate-200">
+            {teacher.grades && teacher.grades.length > 0 && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] font-black text-slate-500">پایه‌ها:</span>
+                {teacher.grades.map(g => (
+                  <span key={g} className="px-2 py-0.5 rounded-lg bg-teal/10 text-teal-900 border border-teal/20 text-xs font-black">
+                    {g}
+                  </span>
+                ))}
+              </div>
+            )}
+            {teacher.subjects && teacher.subjects.length > 0 && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] font-black text-slate-500">دروس:</span>
+                {teacher.subjects.map(s => (
+                  <span key={s} className="px-2 py-0.5 rounded-lg bg-white text-slate-800 border border-slate-300 text-xs font-bold">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Availability Schedule preview */}
         {teacher.availability_schedule?.days && teacher.availability_schedule.days.length > 0 && (
           <div className="flex items-center gap-1.5 text-xs text-slate-600 mb-5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">

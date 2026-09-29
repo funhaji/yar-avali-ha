@@ -56,12 +56,24 @@ export function TutoringDirectory({
 
       // Filter 2: Grade
       if (selectedGrade) {
-        if (!t.grades || !t.grades.includes(selectedGrade)) return false
+        if (!t.grades || t.grades.length === 0) return false
+        const match = t.grades.some(g => {
+          const gNorm = g.trim().replace(/^پایه\s+/, '')
+          const selNorm = selectedGrade.trim().replace(/^پایه\s+/, '')
+          return gNorm === selNorm || g.includes(selectedGrade) || selectedGrade.includes(g)
+        })
+        if (!match) return false
       }
 
       // Filter 3: Subject
       if (selectedSubject) {
-        if (!t.subjects || !t.subjects.includes(selectedSubject)) return false
+        if (!t.subjects || t.subjects.length === 0) return false
+        const match = t.subjects.some(s => {
+          const sNorm = s.trim()
+          const selNorm = selectedSubject.trim()
+          return sNorm === selNorm || s.includes(selNorm) || selNorm.includes(sNorm)
+        })
+        if (!match) return false
       }
 
       // Filter 4: City (if specified)

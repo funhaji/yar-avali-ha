@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import {
   Eye, EyeOff, ImagePlus, Pencil, Plus, Trash2, X, Check, Star,
-  Clock, DollarSign, Calendar, MapPin, Award, BookOpen, Layers, Video
+  Clock, DollarSign, Calendar, MapPin, Award, BookOpen, Layers, Video,
+  AlertCircle, ChevronLeft, ChevronRight, RotateCcw
 } from 'lucide-react'
 import { PricingOption, AvailabilitySchedule } from '@/lib/teachers'
 
@@ -92,10 +93,11 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   // Taxonomies loaded from DB for easy assignment
   const [availableGrades, setAvailableGrades] = useState<{ id: string; name: string }[]>([])
-  const [availableSubjects, setAvailableSubjects] = useState<{ id: string; name: string; grade_name?: string }[]>([])
+  const [availableSubjects, setAvailableSubjects] = useState<{ id: string; name: string; grade_id?: string; grade_name?: string }[]>([])
 
   // Local state for dynamic inputs
   const [newHighlight, setNewHighlight] = useState('')
@@ -103,7 +105,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
   const [newDuration, setNewDuration] = useState<number>(60)
   const [newPrice, setNewPrice] = useState<number>(300000)
 
-  useEffect(() => {
+  function loadTaxonomies() {
     fetch('/api/admin/tutoring/taxonomies')
       .then(res => res.json())
       .then(d => {
@@ -111,6 +113,10 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
         if (d.subjects) setAvailableSubjects(d.subjects)
       })
       .catch(() => {})
+  }
+
+  useEffect(() => {
+    loadTaxonomies()
   }, [])
 
   function reset() {
@@ -180,7 +186,10 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
       if (!r.ok) return setError(d.error || 'خطا در ذخیره استاد')
 
       setTeachers(list => editing ? list.map(t => t.id === d.teacher.id ? d.teacher : t) : [d.teacher, ...list])
+      const wasEditing = editing
       reset()
+      setSuccessMsg(wasEditing ? 'تغییرات استاد با موفقیت به‌روزرسانی شد.' : 'استاد جدید با موفقیت ثبت شد.')
+      setTimeout(() => setSuccessMsg(''), 4500)
     } catch {
       setSaving(false)
       setError('خطا در برقراری ارتباط با سرور')
@@ -279,12 +288,45 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
     setForm(f => ({ ...f, grades: updated }))
   }
 
-  function toggleSubject(subjectName: string) {
-    const current = form.subjects || []
-    const updated = current.includes(subjectName)
-      ? current.filter(s => s !== subjectName)
-      : [...current, subjectName]
-    setForm(f => ({ ...f, subjects: updated }))
+  function selectAllGradeSubjects(gradeId: string, gradeName: string) {
+    const gradeSubjects = availableSubjects.filter(s => s.grade_id === gradeId).map(s => s.name)
+    const currentGrades = form.grades || []
+    const newGrades = currentGrades.includes(gradeName) ? currentGrades : [...currentGrades, gradeName]
+    const currentSubjects = new Set(form.subjects || [])
+    gradeSubjects.forEach(s => currentSubjects.add(s))
+    setForm(f => ({
+      ...f,
+      grades: newGrades,
+      subjects: Array.from(currentSubjects)
+    }))
+  }
+
+  function clearGradeSubjects(gradeId: string) {
+    const gradeSubjects = availableSubjects.filter(s => s.grade_id === gradeId).map(s => s.name)
+    const currentSubjects = form.subjects || []
+    setForm(f => ({
+      ...f,
+      subjects: currentSubjects.filter(s => !gradeSubjects.includes(s))
+    }))
+  }
+
+  function toggleSubjectWithGrade(subjectName: string, gradeName?: string) {
+    const currentSubjects = form.subjects || []
+    const isSelected = currentSubjects.includes(subjectName)
+    const updatedSubjects = isSelected
+      ? currentSubjects.filter(s => s !== subjectName)
+      : [...currentSubjects, subjectName]
+
+    let updatedGrades = form.grades || []
+    if (!isSelected && gradeName && !updatedGrades.includes(gradeName)) {
+      updatedGrades = [...updatedGrades, gradeName]
+    }
+
+    setForm(f => ({
+      ...f,
+      subjects: updatedSubjects,
+      grades: updatedGrades
+    }))
   }
 
   // --- Cities management ---
@@ -339,7 +381,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                 : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
             }`}
           >
-            <span>اطلاعات فردی و رزومه</span>
+            <span>۱. اطلاعات فردی و رزومه</span>
           </button>
           <button
             type="button"
@@ -351,7 +393,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
             }`}
           >
             <Award className="w-4 h-4 text-amber-500" />
-            <span>نشان، سابقه و امتیاز</span>
+            <span>۲. نشان و سوابق</span>
           </button>
           <button
             type="button"
@@ -363,19 +405,30 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
             }`}
           >
             <DollarSign className="w-4 h-4 text-emerald-600" />
-            <span>قیمت‌گذاری و زمان‌بندی</span>
+            <span>۳. تعرفه‌ها و زمان‌بندی ({form.pricing_options?.length || 0})</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveFormTab('taxonomies')}
-            className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 border-2 ${
+            className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-2 border-2 ${
               activeFormTab === 'taxonomies'
                 ? 'bg-teal text-white border-teal-700 shadow-sm font-black'
+                : (form.grades?.length || 0) === 0
+                ? 'bg-amber-50 text-amber-900 border-amber-400 hover:border-amber-500 font-black shadow-xs'
                 : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
             }`}
           >
             <BookOpen className="w-4 h-4 text-tangerine" />
-            <span>پایه‌ها، دروس و شهرها</span>
+            <span>۴. پایه‌ها و دروس تدریس</span>
+            <span className={`px-2 py-0.5 rounded-lg text-[11px] font-black ${
+              activeFormTab === 'taxonomies'
+                ? 'bg-white/20 text-white'
+                : (form.grades?.length || 0) === 0
+                ? 'bg-amber-200 text-amber-900'
+                : 'bg-teal/10 text-teal-800'
+            }`}>
+              {(form.grades?.length || 0) === 0 ? 'تعیین نشده' : `${form.grades?.length} پایه، ${form.subjects?.length} درس`}
+            </span>
           </button>
         </div>
 
@@ -575,6 +628,17 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                   />
                 </div>
               </div>
+
+              <div className="flex justify-end pt-3 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('tutoring')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-black rounded-xl shadow-xs transition-all"
+                >
+                  <span>مرحله بعدی: نشان، سوابق و امتیاز</span>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
 
@@ -698,6 +762,25 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     ))}
                   </div>
                 )}
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('basic')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-black rounded-xl shadow-xs transition-all"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                  <span>مرحله قبل</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('pricing')}
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-black rounded-xl shadow-xs transition-all"
+                >
+                  <span>مرحله بعدی: تعرفه‌ها و زمان‌بندی</span>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
               </div>
             </div>
           )}
@@ -840,87 +923,229 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                   </div>
                 </div>
               </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('tutoring')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-black rounded-xl shadow-xs transition-all"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                  <span>مرحله قبل</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('taxonomies')}
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-teal hover:bg-teal-deep text-white text-xs font-black rounded-xl shadow-xs transition-all"
+                >
+                  <span>مرحله بعدی: انتخاب پایه‌ها و دروس تدریس</span>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
 
           {/* TAB 4: TAXONOMIES (GRADES, SUBJECTS, CITIES) */}
           {activeFormTab === 'taxonomies' && (
             <div className="flex flex-col gap-6">
-              {/* Grades Multi-select */}
-              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex flex-col gap-3 shadow-xs">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-teal" />
-                    <span className="text-xs font-black text-slate-900">پایه‌های تحصیلی تحت تدریس این استاد</span>
-                  </div>
-                  <span className="text-xs text-slate-500 font-medium">استاد در فیلتر این پایه‌ها نشان داده می‌شود</span>
+              {/* Header Box with Refresh Button */}
+              <div className="bg-teal/5 p-4 rounded-2xl border-2 border-teal/20 flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h3 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4 text-teal" />
+                    <span>تعیین پایه‌ها و دروس تحت تدریس این استاد</span>
+                  </h3>
+                  <p className="text-xs text-slate-600 font-medium mt-0.5">
+                    برای هر پایه، دروسی که استاد تدریس می‌کند را انتخاب کنید تا استاد تنها در جستجوهای مربوط به همان درس و پایه نمایش داده شود.
+                  </p>
                 </div>
-
-                {availableGrades.length === 0 ? (
-                  <div className="text-xs text-slate-600 bg-white p-4 rounded-xl border-2 border-dashed border-slate-300 font-medium">
-                    هنوز پایه‌ای در سیستم تعریف نشده است. لطفاً از تب "پایه‌ها و دروس" پایه‌های تحصیلی را اضافه کنید.
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {availableGrades.map(g => {
-                      const selected = form.grades?.includes(g.name)
-                      return (
-                        <button
-                          key={g.id}
-                          type="button"
-                          onClick={() => toggleGrade(g.name)}
-                          className={`px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 border-2 ${
-                            selected
-                              ? 'bg-teal text-white border-teal-700 font-black shadow-xs'
-                              : 'bg-white text-slate-800 border-slate-300 hover:border-teal font-bold shadow-xs'
-                          }`}
-                        >
-                          {selected ? <Check className="w-4 h-4" /> : null}
-                          <span>{g.name}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
+                <button
+                  type="button"
+                  onClick={loadTaxonomies}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border-2 border-slate-300 px-3 py-1.5 rounded-xl shadow-xs transition-colors"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+                  <span>بروزرسانی لیست پایه‌ها</span>
+                </button>
               </div>
 
-              {/* Subjects Multi-select */}
-              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex flex-col gap-3 shadow-xs">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-tangerine" />
-                    <span className="text-xs font-black text-slate-900">دروس و مباحث تحت تدریس این استاد</span>
-                  </div>
-                  <span className="text-xs text-slate-500 font-medium">استاد در فیلتر این دروس نشان داده می‌شود</span>
+              {availableGrades.length === 0 ? (
+                <div className="text-xs text-slate-700 bg-amber-50 p-6 rounded-2xl border-2 border-dashed border-amber-300 font-medium text-center flex flex-col items-center gap-2">
+                  <AlertCircle className="w-8 h-8 text-amber-600" />
+                  <span className="font-black text-sm text-slate-900">هنوز پایه‌ای در سامانه تعریف نشده است</span>
+                  <span className="text-slate-600 max-w-md">
+                    برای فعال‌سازی انتخاب پایه‌ها و دروس برای اساتید، ابتدا از بالای صفحه تب «پایه‌ها و دروس» را انتخاب کنید و پایه‌های تحصیلی و دروس مربوطه را تعریف نمایید.
+                  </span>
                 </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {availableGrades.map(g => {
+                    const isGradeSelected = form.grades?.includes(g.name)
+                    const gradeSubjects = availableSubjects.filter(s => s.grade_id === g.id)
 
-                {availableSubjects.length === 0 ? (
-                  <div className="text-xs text-slate-600 bg-white p-4 rounded-xl border-2 border-dashed border-slate-300 font-medium">
-                    هنوز درسی در سیستم تعریف نشده است. لطفاً از تب "پایه‌ها و دروس" دروس را اضافه کنید.
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {availableSubjects.map(s => {
-                      const selected = form.subjects?.includes(s.name)
-                      return (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onClick={() => toggleSubject(s.name)}
-                          className={`px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 border-2 ${
-                            selected
-                              ? 'bg-tangerine text-white border-tangerine-deep font-black shadow-xs'
-                              : 'bg-white text-slate-800 border-slate-300 hover:border-tangerine font-bold shadow-xs'
-                          }`}
-                        >
-                          {selected ? <Check className="w-4 h-4" /> : null}
-                          <span>{s.name}</span>
-                          {s.grade_name && <span className="opacity-80 text-[11px]">({s.grade_name})</span>}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
+                    return (
+                      <div
+                        key={g.id}
+                        className={`rounded-2xl border-2 transition-all p-5 shadow-xs ${
+                          isGradeSelected
+                            ? 'bg-white border-teal shadow-sm'
+                            : 'bg-slate-50 border-slate-300 opacity-90'
+                        }`}
+                      >
+                        {/* Grade header */}
+                        <div className="flex items-center justify-between flex-wrap gap-3 border-b border-slate-200 pb-3.5 mb-3.5">
+                          <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={isGradeSelected}
+                              onChange={() => toggleGrade(g.name)}
+                              className="w-5 h-5 rounded border-2 border-slate-400 text-teal focus:ring-teal cursor-pointer"
+                            />
+                            <div>
+                              <span className="text-sm font-black text-slate-900 block">{g.name}</span>
+                              <span className="text-xs text-slate-500 font-medium">
+                                {isGradeSelected ? 'تدریس در این پایه فعال است' : 'این پایه برای استاد انتخاب نشده'}
+                              </span>
+                            </div>
+                          </label>
+
+                          <div className="flex items-center gap-2">
+                            {isGradeSelected ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => selectAllGradeSubjects(g.id, g.name)}
+                                  className="text-xs font-bold text-teal-800 bg-teal/10 hover:bg-teal/20 border border-teal/30 px-3 py-1.5 rounded-xl transition-all"
+                                >
+                                  انتخاب همه دروس این پایه
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => clearGradeSubjects(g.id)}
+                                  className="text-xs font-bold text-slate-600 bg-white hover:bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-xl transition-all"
+                                >
+                                  پاک‌سازی دروس
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  toggleGrade(g.name)
+                                  selectAllGradeSubjects(g.id, g.name)
+                                }}
+                                className="text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-xl transition-all"
+                              >
+                                فعال‌سازی و انتخاب همه دروس
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Grade Subjects list */}
+                        {isGradeSelected ? (
+                          <div>
+                            <span className="block text-xs font-black text-slate-800 mb-2.5">
+                              دروس تدریسی در {g.name}:
+                            </span>
+                            {gradeSubjects.length === 0 ? (
+                              <div className="text-xs text-slate-500 bg-slate-100 p-3 rounded-xl border border-dashed border-slate-300 font-medium">
+                                هنوز درسی برای این پایه تعریف نشده است (از تب «پایه‌ها و دروس» می‌توانید اضافه کنید).
+                              </div>
+                            ) : (
+                              <div className="flex flex-wrap gap-2">
+                                {gradeSubjects.map(s => {
+                                  const isSubjectSelected = form.subjects?.includes(s.name)
+                                  return (
+                                    <button
+                                      key={s.id}
+                                      type="button"
+                                      onClick={() => toggleSubjectWithGrade(s.name, g.name)}
+                                      className={`px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 border-2 ${
+                                        isSubjectSelected
+                                          ? 'bg-tangerine text-white border-tangerine-deep font-black shadow-xs'
+                                          : 'bg-white text-slate-800 border-slate-300 hover:border-tangerine font-bold shadow-xs'
+                                      }`}
+                                    >
+                                      {isSubjectSelected ? <Check className="w-4 h-4" /> : <Plus className="w-3.5 h-3.5 opacity-60" />}
+                                      <span>{s.name}</span>
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-slate-500 italic">
+                            برای تعیین دروس تدریس در {g.name}، ابتدا تیک فعال‌سازی این پایه را بزنید.
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+
+                  {/* Subjects without specific grade */}
+                  {availableSubjects.filter(s => !s.grade_id).length > 0 && (
+                    <div className="rounded-2xl border-2 border-slate-300 bg-white p-5 shadow-xs">
+                      <span className="block text-xs font-black text-slate-900 mb-2.5">
+                        سایر دروس و مباحث عمومی / مشترک:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {availableSubjects.filter(s => !s.grade_id).map(s => {
+                          const isSelected = form.subjects?.includes(s.name)
+                          return (
+                            <button
+                              key={s.id}
+                              type="button"
+                              onClick={() => toggleSubjectWithGrade(s.name)}
+                              className={`px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 border-2 ${
+                                isSelected
+                                  ? 'bg-tangerine text-white border-tangerine-deep font-black shadow-xs'
+                                  : 'bg-white text-slate-800 border-slate-300 hover:border-tangerine font-bold shadow-xs'
+                              }`}
+                            >
+                              {isSelected ? <Check className="w-4 h-4" /> : <Plus className="w-3.5 h-3.5 opacity-60" />}
+                              <span>{s.name}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Summary of Selection */}
+              <div className="p-4 bg-slate-100 rounded-2xl border-2 border-slate-200 flex flex-col gap-2.5">
+                <span className="text-xs font-black text-slate-900">خلاصه انتخاب‌ها برای این استاد:</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-slate-600">پایه‌ها:</span>
+                  {form.grades && form.grades.length > 0 ? (
+                    form.grades.map(g => (
+                      <span key={g} className="px-2.5 py-1 rounded-xl bg-teal/15 text-teal-900 border border-teal/30 text-xs font-black">
+                        {g}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-lg border border-amber-300">
+                      هیچ پایه‌ای انتخاب نشده (استاد در فیلتر پایه‌ها نشان داده نمی‌شود)
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-slate-600">دروس:</span>
+                  {form.subjects && form.subjects.length > 0 ? (
+                    form.subjects.map(s => (
+                      <span key={s} className="px-2.5 py-1 rounded-xl bg-white text-slate-800 border border-slate-300 text-xs font-bold">
+                        {s}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-lg border border-amber-300">
+                      هیچ درسی انتخاب نشده (استاد در فیلتر دروس نشان داده نمی‌شود)
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Cities for In-person */}
@@ -930,7 +1155,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     <MapPin className="w-4 h-4 text-rose-500" />
                     <span className="text-xs font-black text-slate-900">شهرهای تحت پوشش تدریس حضوری</span>
                   </div>
-                  <span className="text-xs text-slate-500 font-medium">برای فیلتر تدریس حضوری</span>
+                  <span className="text-xs text-slate-500 font-medium">برای فیلتر تدریس حضوری در شهر دانش‌آموز</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -972,12 +1197,33 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                   </div>
                 )}
               </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('pricing')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 text-xs font-black rounded-xl shadow-xs transition-all"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                  <span>مرحله قبل</span>
+                </button>
+                <span className="text-xs text-slate-500 font-bold">
+                  برای ثبت نهایی، دکمه ذخیره در زیر را کلیک کنید.
+                </span>
+              </div>
             </div>
           )}
 
           {error && (
             <div className="p-4 bg-rose-50 border-2 border-rose-300 text-rose-800 rounded-xl text-xs font-bold">
               {error}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-4 bg-emerald-50 border-2 border-emerald-300 text-emerald-900 rounded-xl text-xs font-black flex items-center gap-2 shadow-xs">
+              <Check className="w-4 h-4 text-emerald-700" />
+              <span>{successMsg}</span>
             </div>
           )}
 
@@ -1089,17 +1335,22 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                       {t.grades && t.grades.length > 0 && (
                         <div className="line-clamp-1">
                           <span className="font-black text-slate-900">پایه‌ها: </span>
-                          <span>{t.grades.join('، ')}</span>
+                          <span className="text-teal-900 font-bold">{t.grades.join('، ')}</span>
                         </div>
                       )}
                       {t.subjects && t.subjects.length > 0 && (
                         <div className="line-clamp-1">
                           <span className="font-black text-slate-900">دروس: </span>
-                          <span>{t.subjects.join('، ')}</span>
+                          <span className="text-slate-800 font-medium">{t.subjects.join('، ')}</span>
                         </div>
                       )}
                     </div>
-                  ) : null}
+                  ) : (
+                    <div className="text-xs text-amber-900 bg-amber-50 p-2.5 rounded-xl border-2 border-amber-300 font-bold mb-4 flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                      <span>پایه و درس هنوز انتخاب نشده (ویرایش را بزنید)</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t-2 border-slate-200">
