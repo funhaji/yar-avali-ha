@@ -1,9 +1,11 @@
 export const revalidate = 120
 
 import { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getStoreItemById, getRelatedStoreItems, getStoreComments } from '@/lib/store'
+import { validateSession } from '@/lib/auth'
 import { ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Download, Image as ImageIcon, MessageSquare } from 'lucide-react'
 import { ProductCard } from '@/components/shop/ProductCard'
 import { ProductImageGallery } from '@/components/shop/ProductImageGallery'
@@ -22,6 +24,9 @@ import { StoreComments } from '@/components/shop/StoreComments'
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const token = (await cookies()).get('session_token')?.value
+  const user = token ? await validateSession(token) : null
+
   const product = await getStoreItemById(id)
   
   if (!product) notFound()
@@ -52,6 +57,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   return (
     <div className="page bg-cream">
       <SiteHeader 
+        userName={user?.name}
+        isAdmin={user?.role === 'admin'}
         siteName={settings.site_name || undefined}
         siteLogo={settings.site_logo_url || undefined}
       />
@@ -71,83 +78,81 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                   <iframe src={getEmbedUrl(product.video_url)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
                 </div>
               )}
-                            <ProductImageGallery 
+              <ProductImageGallery 
                 images={gallery} 
                 title={product.title} 
                 isDigital={product.is_digital} 
               />
             </div>
-
-            {/* Info */}
-            <div className="flex-1 flex flex-col">
-              <div className="mb-2">
-                <Link href={`/shop?category=${product.category}`} className="text-teal font-bold hover:underline">
-                  {product.category || 'بدون دسته'}
-                </Link>
-              </div>
-              
-              <h1 className="display" style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>{product.title}</h1>
-              
-              <div className="flex items-center gap-4 text-sm font-bold text-ink-soft mb-6 pb-6 border-b border-line-soft">
-                {/* Dynamic Badge 1 */}
-                <span className="flex items-center gap-1.5">
-                  <DynamicIcon name={settings?.product_badge_1_icon || 'ShieldCheck'} className="w-4 h-4 text-teal" /> 
-                  {settings?.product_badge_1 || 'تضمین کیفیت'}
-                </span>
-                {product.is_downloadable && (
-                  <span className="flex items-center gap-1.5">
-                    <DynamicIcon name={settings?.product_badge_2_icon || 'Download'} className="w-4 h-4 text-teal" /> 
-                    {settings?.product_badge_2 || 'دانلود فوری'}
-                  </span>
-                )}
-                {/* Dynamic Badge 3 */}
-                <span className="flex items-center gap-1.5">
-                  <DynamicIcon name={settings?.product_badge_3_icon || 'CheckCircle2'} className="w-4 h-4 text-teal" /> 
-                  {product.stock_quantity === 0 && !product.is_digital 
-                    ? <span className="text-berry">{settings?.product_badge_3_outstock || 'تمام شده'}</span> 
-                    : (settings?.product_badge_3_instock || 'موجوده')}
-                </span>
-              </div>
-              
-              <div className="prose prose-slate rtl text-ink/90 leading-relaxed mb-8 max-w-none whitespace-pre-wrap">
-                {product.description || 'هنوز توضیحی برای این محصول نوشته نشده.'}
-                {/* Banner for Books category */}
-                {product.category === 'کتاب' && (
-                  <div className="bg-teal/10 border border-teal text-teal p-4 rounded-xl mb-8 font-medium">
-                    برای ثبت سفارش با آیدی زیر یا شماره زیر مراجعه کنید:
-                    <br />
-                    آیدی تلگرام: <span dir="ltr">{settings.contact_telegram_id || '@yar_avali_ha'}</span>
-                    <br />
-                    تلفن: <span dir="ltr">{settings.contact_phone || '09120000000'}</span>
+            
+            {/* Details */}
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  {product.category && (
+                    <span className="badge badge-accent">{product.category}</span>
+                  )}
+                  {product.subcategory && (
+                    <span className="badge bg-cream border border-line-soft text-ink-soft">{product.subcategory}</span>
+                  )}
+                  {product.is_digital ? (
+                    <span className="badge bg-purple-100 text-purple-700 border-purple-200">فایل دیجیتال (دانلود فوری)</span>
+                  ) : (
+                    <span className="badge bg-teal/10 text-teal-deep border-teal/20">محصول فیزیکی (ارسال پستی)</span>
+                  )}
+                </div>
+                
+                <h1 className="display mb-4" style={{ fontSize: '2rem' }}>{product.title}</h1>
+                
+                {product.description && (
+                  <div className="text-ink-soft leading-relaxed mb-6 whitespace-pre-line text-sm md:text-base">
+                    {product.description}
                   </div>
                 )}
+                
+                {product.category === 'کتاب' && (
+                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-6 text-sm text-amber-900 leading-relaxed font-medium">
+                    برای ثبت سفارش یا مشاوره خرید کتاب می‌توانید با شماره <span className="font-bold font-mono">{settings.contact_phone || '۰۹۳۶۰۰۰۰۰۰۰'}</span> یا آیدی تلگرام <span className="font-bold font-mono" dir="ltr">{settings.contact_telegram_id || '@yaravaliha'}</span> ارتباط برقرار کنید.
+                  </div>
+                )}
+                
+                <div className="space-y-3 mb-8">
+                  {product.is_digital ? (
+                    <div className="flex items-center gap-2 text-sm text-ink-soft">
+                      <Download className="w-4 h-4 text-teal" />
+                      <span>دسترسی آنی به فایل پس از پرداخت</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm text-ink-soft">
+                      <ShieldCheck className="w-4 h-4 text-teal" />
+                      <span>ضمانت اصالت و سلامت فیزیکی کالا</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-sm text-ink-soft">
+                    <CheckCircle2 className="w-4 h-4 text-teal" />
+                    <span>پشتیبانی تخصصی آموزشی</span>
+                  </div>
+                </div>
               </div>
               
-              <div className="mt-auto pt-6 border-t border-line-soft flex flex-col sm:flex-row gap-6 sm:items-center justify-between">
-                {product.price_cents === null ? (
-                  <div className="w-full">
-                    {product.file_url ? (
-                      <div className="flex flex-col gap-2 w-full sm:w-auto">
-                        {product.file_url.split(',').map((url: string, idx: number, arr: string[]) => (
-                          <a key={idx} href={url.startsWith('http') ? url : 'https://' + url} target="_blank" rel="noopener noreferrer" className="button button-primary w-full sm:w-auto justify-center button-lg">
-                            دانلود {arr.length > 1 ? `فایل ${idx + 1}` : 'رایگان'}
-                          </a>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-ink-soft text-lg font-bold">جهت معرفی</div>
-                    )}
+              <div className="border-t border-line-soft pt-6 mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                {product.category === 'کتاب' ? (
+                  <div className="w-full text-center">
+                    <span className="inline-block bg-teal/10 text-teal-deep font-bold px-4 py-2 rounded-xl text-sm">
+                      سفارش از طریق راه‌های ارتباطی درج شده در بالا
+                    </span>
                   </div>
                 ) : (
                   <>
-                    <div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-ink-soft mb-1">قیمت نهایی:</span>
                       {hasDiscount ? (
-                        <div className="flex flex-col">
-                          <span className="text-sm text-ink-soft line-through mb-1">{product.price_cents / 10} تومان</span>
-                          <span className="font-bold text-teal-deep text-3xl">{price / 10} تومان</span>
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-bold text-teal-deep text-3xl">{(price / 10).toLocaleString()} تومان</span>
+                          <span className="text-ink-soft line-through text-lg">{((product.price_cents || 0) / 10).toLocaleString()}</span>
                         </div>
                       ) : (
-                        <span className="font-bold text-ink text-3xl">{product.is_free ? 'رایگان' : (price / 10) + ' تومان'}</span>
+                        <span className="font-bold text-ink text-3xl">{product.is_free ? 'رایگان' : (price / 10).toLocaleString() + ' تومان'}</span>
                       )}
                     </div>
                     
@@ -185,7 +190,6 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     </div>
   )
 }
-
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;

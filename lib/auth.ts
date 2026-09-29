@@ -46,7 +46,7 @@ export function generateSessionToken(): string {
 // Create session for user (24 hours)
 export async function createSession(userId: string): Promise<string> {
   const token = generateSessionToken();
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
   
   await query(
     'INSERT INTO yar_sessions (user_id, token, expires_at) VALUES ($1, $2, $3)',

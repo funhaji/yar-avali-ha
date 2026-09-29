@@ -1,7 +1,8 @@
-import { headers } from 'next/headers'
+import { headers, cookies } from 'next/headers'
 import Link from 'next/link'
 import { query } from '@/lib/db'
 import { getPixeldrainUrl } from '@/lib/video'
+import { validateSession } from '@/lib/auth'
 import VideoPlayer from '@/components/VideoPlayer'
 import SecurePDFViewerCanvas from '@/components/SecurePDFViewerCanvas'
 import { ArrowRight, Lock, Play, FileText, Image as ImageIcon, CheckCircle2, Download } from 'lucide-react'
@@ -82,16 +83,18 @@ export default async function ShopViewPage({ params, searchParams }: { params: P
   const fileIndex = parseInt(sp.file || '0', 10);
 
   const { id } = await params
-  const headersList = await headers()
-  const userId = headersList.get('x-user-id')
-  const userName = headersList.get('x-user-name')
+  const token = (await cookies()).get('session_token')?.value
+  const user = token ? await validateSession(token) : null
+  const userId = user?.id
+  const userName = user?.name
   
   if (!userId) {
     return (
-      <div className="page bg-cream flex items-center justify-center">
+      <div className="page bg-cream flex items-center justify-center min-h-screen">
         <div className="card max-w-sm p-8 text-center shadow-lg">
           <h1 className="font-bold text-2xl mb-4">لطفاً وارد شوید</h1>
-          <Link href="/login" className="button button-primary">
+          <p className="text-sm text-ink-soft mb-6">برای مشاهده و دانلود این محصول ابتدا باید وارد حساب کاربری خود شوید.</p>
+          <Link href={`/login?redirect=/shop/${id}/view`} className="button button-primary w-full justify-center">
             ورود به حساب کاربری
           </Link>
         </div>
@@ -99,11 +102,11 @@ export default async function ShopViewPage({ params, searchParams }: { params: P
     )
   }
   
-  const data = await getStoreContentData(id, userId)
+  const data = await getStoreContentData(id, userId, fileIndex)
   
   if (!data) {
     return (
-      <div className="page bg-cream flex items-center justify-center">
+      <div className="page bg-cream flex items-center justify-center min-h-screen">
         <div className="card max-w-sm p-8 text-center shadow-lg">
           <h1 className="font-bold text-2xl mb-4">محصول یافت نشد</h1>
           <Link href="/dashboard" className="button button-primary">
@@ -159,7 +162,7 @@ export default async function ShopViewPage({ params, searchParams }: { params: P
             <div className="shell max-w-[1400px] mx-auto">
               
                 {content.file_url && content.file_url.split(',').length > 1 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex flex-wrap gap-2 mb-4 pt-4">
                     {content.file_url.split(',').map((u: string, idx: number) => (
                       <a key={idx} href={'?file=' + idx} className={`button ${fileIndex === idx ? 'button-primary' : 'button-ghost bg-white'}`}>
                         فایل {idx + 1}
@@ -168,7 +171,7 @@ export default async function ShopViewPage({ params, searchParams }: { params: P
                   </div>
                 )}
 
-<div className="aspect-video w-full relative bg-black rounded-b-2xl overflow-hidden shadow-2xl">
+              <div className="aspect-video w-full relative bg-black rounded-b-2xl overflow-hidden shadow-2xl">
                 {content.content_type === 'pdf' ? (
                   <div className="w-full h-full bg-cream text-ink">
                     <SecurePDFViewerCanvas
@@ -181,7 +184,7 @@ export default async function ShopViewPage({ params, searchParams }: { params: P
                     <img 
                       src={directVideoUrl} 
                       alt={content.title}
-                      className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
+                      className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" 
                       style={{ 
                         userSelect: 'none',
                         WebkitUserSelect: 'none',

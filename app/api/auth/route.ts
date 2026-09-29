@@ -60,7 +60,14 @@ export async function POST(request: NextRequest) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24, // 24 hours
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        path: '/',
+      })
+      response.cookies.set('is_logged_in', 'true', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
         path: '/',
       })
       
@@ -104,7 +111,14 @@ export async function POST(request: NextRequest) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24,
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        path: '/',
+      })
+      response.cookies.set('is_logged_in', 'true', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
         path: '/',
       })
       
@@ -119,11 +133,12 @@ export async function POST(request: NextRequest) {
       }
       
       const response = NextResponse.json({ 
-        success: true,
+        success: true, 
         message: 'خروج با موفقیت انجام شد'
       })
       
       response.cookies.delete('session_token')
+      response.cookies.delete('is_logged_in')
       return response
     }
     

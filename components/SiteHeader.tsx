@@ -38,7 +38,7 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
     window.addEventListener('scroll', onScroll, { passive: true })
 
     // If userName prop wasn't passed from server component, check session client-side
-    if (!userName && typeof document !== 'undefined' && document.cookie.includes('session_token')) {
+    if (!userName) {
       fetch('/api/auth/session')
         .then(r => r.json())
         .then(data => {
@@ -57,6 +57,7 @@ export function SiteHeader({ userName, isAdmin = false, dark = false, siteLogo: 
 
   async function logout() {
     await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'logout' }) })
+    setSessionUser(null)
     router.push('/')
     router.refresh()
   }

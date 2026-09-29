@@ -8,9 +8,19 @@ export function HeroCta({ defaultText }: { defaultText?: string | null }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
-    if (typeof document !== 'undefined' && document.cookie.includes('session_token')) {
+    if (typeof document !== 'undefined' && document.cookie.includes('is_logged_in')) {
       setIsLoggedIn(true)
     }
+    fetch('/api/auth/session')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.user) {
+          setIsLoggedIn(true)
+        } else {
+          setIsLoggedIn(false)
+        }
+      })
+      .catch(() => {})
   }, [])
 
   const ctaText = defaultText || (isLoggedIn ? 'رفتن به داشبورد' : 'رایگان شروع کن')

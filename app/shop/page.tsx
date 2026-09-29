@@ -1,10 +1,12 @@
 export const revalidate = 120
 
 import { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import { getStoreItems, getCategories } from '@/lib/store'
 import { ProductCard } from '@/components/shop/ProductCard'
 import { PendingOrderBanner } from '@/components/shop/PendingOrderBanner'
 import { getUserPendingOrder } from '@/lib/orders'
+import { validateSession } from '@/lib/auth'
 import { ShopGrid } from '@/components/shop/ShopGrid'
 import { ShopSortSelect } from '@/components/shop/ShopSortSelect'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
@@ -13,6 +15,10 @@ import Link from 'next/link'
 import { getCachedStoreItems, getCachedSettings } from '@/lib/cache'
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
+  const token = (await cookies()).get('session_token')?.value
+  const user = token ? await validateSession(token) : null
+  const pendingOrder = user ? await getUserPendingOrder(user.id) : null
+
   const params = await searchParams
   const category = params.category || 'all'
   const subcategory = params.subcategory || ''
@@ -76,11 +82,19 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   return (
     <div className="page bg-cream">
       <SiteHeader 
+        userName={user?.name}
+        isAdmin={user?.role === 'admin'}
         siteName={settings.site_name || undefined}
         siteLogo={settings.site_logo_url || undefined}
       />
       
       <main className="shell py-8 md:py-12 flex-1">
+        {pendingOrder && (
+          <div className="mb-8">
+            <PendingOrderBanner order={pendingOrder} />
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row gap-8 slide-up">
           
           {/* Sidebar / Filters */}
@@ -173,7 +187,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     </div>
   )
 }
-
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

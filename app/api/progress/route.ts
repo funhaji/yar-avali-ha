@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { query } from '@/lib/db'
+import { validateSession } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = request.headers.get('x-user-id')
+    const token = (await cookies()).get('session_token')?.value
+    const user = token ? await validateSession(token) : null
     
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
         { error: 'احراز هویت نشده' },
         { status: 401 }
@@ -23,20 +26,20 @@ export async function POST(request: NextRequest) {
     
     // Update or insert viewing history
     await query(`
-      INSERT INTO viewing_history (user_id, content_id, progress_seconds, completed, last_watched_at)
+      INSERT INTO yar_viewing_history (user_id, content_id, progress_seconds, completed, last_watched_at)
       VALUES ($1, $2, $3, $4, NOW())
       ON CONFLICT (user_id, content_id)
       DO UPDATE SET
         progress_seconds = $3,
         completed = $4,
         last_watched_at = NOW()
-    `, [userId, contentId, progress, completed || false])
+    `, [user.id, contentId, progress, completed || false])
     
     // Increment view count if this is the first time or if completed
     if (progress < 30 || completed) {
       await query(`
-        UPDATE content_items
-        SET view_count = view_count + 1
+        UPDATE yar_content_items 
+        SET view_count = view_count + 1 
         WHERE id = $1
       `, [contentId])
     }
