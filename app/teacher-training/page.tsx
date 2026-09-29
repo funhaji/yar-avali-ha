@@ -1,104 +1,45 @@
-export const revalidate = 3600
+export const revalidate = 60
 
 import { Metadata } from 'next'
-import Link from 'next/link'
-import { ArrowRight, PlayCircle, GraduationCap, Users } from 'lucide-react'
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
-import { getEmbedUrl } from '@/lib/video'
-
-
+import {
+  getVisibleTeachers,
+  getActiveTutoringGrades,
+  getActiveTutoringSubjects
+} from '@/lib/teachers'
+import { TeacherTrainingClientPage } from '@/components/tutoring/TeacherTrainingClientPage'
 
 export default async function TeacherTrainingPage() {
-  
-  const settingsData = await getSettings([
-    'tt_card1_title', 'tt_card1_desc', 'tt_card1_btn_title', 'tt_card1_btn_desc', 'tt_card1_btn_id',
-    'tt_card2_title', 'tt_card2_desc', 'tt_card2_btn_title', 'tt_card2_btn_desc', 'tt_card2_btn_id',
-    
-    'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone',
-    'tt_video_url', 'tt_video_url_2'
+  const [teachers, grades, subjects, settingsData] = await Promise.all([
+    getVisibleTeachers(),
+    getActiveTutoringGrades(),
+    getActiveTutoringSubjects(),
+    getSettings([
+      'tt_card1_title', 'tt_card1_desc', 'tt_card1_btn_title', 'tt_card1_btn_desc', 'tt_card1_btn_id',
+      'tt_card2_title', 'tt_card2_desc', 'tt_card2_btn_title', 'tt_card2_btn_desc', 'tt_card2_btn_id',
+      'site_logo_url', 'site_name', 'footer_text', 'contact_email', 'contact_phone',
+      'tt_video_url', 'tt_video_url_2'
+    ])
   ])
-  const s = settingsData as Record<string, string | null>
-  
+
+  const s = (settingsData || {}) as Record<string, string | null>
+
   return (
-    <div className="page bg-cream text-ink flex flex-col min-h-screen">
-      <SiteHeader 
+    <div className="page bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+      <SiteHeader
         siteLogo={s?.site_logo_url || undefined}
         siteName={s?.site_name || undefined}
       />
-      
-      <main className="shell flex-1 py-12">
-        <div className="max-w-6xl mx-auto">
-          <Link href="/" className="inline-flex items-center gap-2 text-ink-soft hover:text-teal font-bold mb-8 transition-colors">
-            <ArrowRight className="w-5 h-5" /> بازگشت به صفحه اصلی
-          </Link>
-          
-          <div className="text-center mb-16 slide-up">
-            <h1 className="text-4xl md:text-5xl font-black mb-6 text-ink">آموزش و تدریس خصوصی</h1>
-            <p className="text-xl text-ink-soft max-w-2xl mx-auto leading-relaxed">
-              با استفاده از بهترین متدهای آموزشی و کادری مجرب، آماده ارائه خدمات آموزشی متمایز هستیم.
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* تربیت معلم */}
-            <div className="card p-8 flex flex-col items-center text-center slide-up" style={{ animationDelay: '0.1s' }}>
-              <div className="w-20 h-20 bg-teal/10 text-teal rounded-full flex items-center justify-center mb-6">
-                <GraduationCap className="w-10 h-10" />
-              </div>
-              <h2 className="text-3xl font-black mb-4">{s?.tt_card2_title || 'دوره تربیت معلم'}</h2>
-              <p className="text-ink-soft leading-relaxed mb-8">
-                در دوره‌های تربیت معلم یار اولی‌ها، شما با جدیدترین شیوه‌های تدریس و روانشناسی کودک آشنا می‌شوید. 
-                این دوره مناسب علاقه‌مندان به تدریس مقطع ابتدایی می‌باشد.
-              </p>
-              
-              {s?.tt_video_url && (
-                <div className="w-full aspect-video relative bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
-                  <iframe src={getEmbedUrl(s.tt_video_url)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
-                </div>
-              )}
+      <TeacherTrainingClientPage
+        teachers={teachers}
+        grades={grades}
+        subjects={subjects}
+        settings={s}
+      />
 
-              <div className="bg-teal text-white w-full p-6 rounded-2xl shadow-sm mt-auto">
-                <h3 className="text-xl font-bold mb-2">{s?.tt_card2_btn_title || 'ثبت نام به زودی!'}</h3>
-                <p className="mb-4 text-white/90">{s?.tt_card2_btn_desc || 'ظرفیت دوره محدود است. برای رزرو و پیش‌ثبت‌نام پیام دهید.'}</p>
-                <div className="bg-white/20 p-3 rounded-xl font-mono text-lg font-bold tracking-wider" dir="ltr">
-                  {s?.tt_card2_btn_id || '@yar_avali_ha'}
-                </div>
-                
-              </div>
-            </div>
-
-            {/* معلم خصوصی */}
-            <div className="card p-8 flex flex-col items-center text-center slide-up" style={{ animationDelay: '0.2s' }}>
-              <div className="w-20 h-20 bg-tangerine/10 text-tangerine rounded-full flex items-center justify-center mb-6">
-                <Users className="w-10 h-10" />
-              </div>
-              <h2 className="text-3xl font-black mb-4">{s?.tt_card1_title || 'معلم خصوصی'}</h2>
-              <p className="text-ink-soft leading-relaxed mb-8">
-                درخواست معلم خصوصی برای دانش‌آموزان عزیز. با اساتید مجرب یار اولی‌ها، 
-                یادگیری شیرین‌تر و عمیق‌تری را تجربه کنید. رفع اشکال و تقویت پایه‌ای دروس.
-              </p>
-              
-              {s?.tt_video_url_2 && (
-                <div className="w-full aspect-video relative bg-black rounded-2xl overflow-hidden shadow-lg border-4 border-line-soft mb-8">
-                  <iframe src={getEmbedUrl(s.tt_video_url_2)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
-                </div>
-              )}
-
-              <div className="bg-tangerine text-white w-full p-6 rounded-2xl shadow-sm mt-auto">
-                <h3 className="text-xl font-bold mb-2">{s?.tt_card1_btn_title || 'درخواست معلم'}</h3>
-                <p className="mb-4 text-white/90">{s?.tt_card1_btn_desc || 'برای هماهنگی و درخواست معلم خصوصی با آیدی زیر در ارتباط باشید.'}</p>
-                <div className="bg-white/20 p-3 rounded-xl font-mono text-lg font-bold tracking-wider" dir="ltr">
-                  {s?.tt_card1_btn_id || '@yar_avali_ha'}
-                </div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-      
-      <SiteFooter 
+      <SiteFooter
         footerText={s?.footer_text || undefined}
         contactEmail={s?.contact_email || undefined}
         contactPhone={s?.contact_phone || undefined}
@@ -108,11 +49,10 @@ export default async function TeacherTrainingPage() {
   )
 }
 
-
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: 'دوره تربیت معلم',
-    description: 'دوره‌های تخصصی تربیت معلم پایه اول تا سوم دبستان با ارائه مدرک معتبر.',
+    title: 'معلم خصوصی و دوره تربیت معلم | یار اولی‌ها',
+    description: 'انتخاب معلم خصوصی آنلاین و حضوری برای مقطع دبستان و دوره تخصصی تربیت معلم با ارائه مدرک معتبر.',
     alternates: { canonical: 'https://www.yaravaliha.ir/teacher-training' }
   }
 }

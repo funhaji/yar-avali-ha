@@ -230,6 +230,62 @@ const MIGRATIONS = [
       ADD COLUMN IF NOT EXISTS eitaa_id VARCHAR(255),
       ADD COLUMN IF NOT EXISTS instagram_id VARCHAR(255);
     `
+  },
+  {
+    version: 15,
+    name: 'tutoring_system_and_teacher_improvements',
+    sql: `
+      ALTER TABLE yar_teachers 
+        ADD COLUMN IF NOT EXISTS teaching_modes TEXT[] DEFAULT '{"online", "in_person"}',
+        ADD COLUMN IF NOT EXISTS badge_text VARCHAR(255),
+        ADD COLUMN IF NOT EXISTS star_rating NUMERIC(2,1) DEFAULT 5.0,
+        ADD COLUMN IF NOT EXISTS review_count INT DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS successful_sessions INT DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS highlights TEXT[] DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS pricing_options JSONB DEFAULT '[]',
+        ADD COLUMN IF NOT EXISTS availability_schedule JSONB DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS grades TEXT[] DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS subjects TEXT[] DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS cities TEXT[] DEFAULT '{}';
+
+      CREATE TABLE IF NOT EXISTS yar_tutoring_grades (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(255) UNIQUE NOT NULL,
+        display_order INT DEFAULT 0,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS yar_tutoring_subjects (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(255) NOT NULL,
+        grade_id UUID REFERENCES yar_tutoring_grades(id) ON DELETE CASCADE,
+        display_order INT DEFAULT 0,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS yar_tutoring_requests (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        teacher_id UUID REFERENCES yar_teachers(id) ON DELETE CASCADE,
+        user_id UUID REFERENCES yar_users(id) ON DELETE SET NULL,
+        student_name VARCHAR(255) NOT NULL,
+        phone VARCHAR(50) NOT NULL,
+        teaching_mode VARCHAR(50) NOT NULL,
+        grade VARCHAR(255),
+        subject VARCHAR(255),
+        duration_minutes INT,
+        preferred_time TEXT,
+        city VARCHAR(255),
+        notes TEXT,
+        status VARCHAR(50) DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_yar_tutoring_requests_status ON yar_tutoring_requests(status, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_yar_tutoring_grades_order ON yar_tutoring_grades(display_order, name);
+      CREATE INDEX IF NOT EXISTS idx_yar_tutoring_subjects_grade ON yar_tutoring_subjects(grade_id, display_order);
+    `
   }
 ]
 
