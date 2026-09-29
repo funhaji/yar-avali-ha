@@ -59,7 +59,7 @@ export default async function AdminPage() {
             </div>
             <div>
               <h3 className="font-bold text-ink text-lg">تنظیمات درگاه پرداخت زرین‌پال و کارت به کارت</h3>
-              <p className="text-sm text-ink-soft">تعیین کد مرچنت / اکسس توکن زرین‌پال، حالت آزمایشی (Sandbox) و شماره کارت بانکی فروشگاه</p>
+              <p className="text-sm text-ink-soft">تعیین کد مرچنت / اکسس توکن زرین‌پال و شماره کارت بانکی فروشگاه</p>
             </div>
           </div>
           <span className="text-sm font-bold text-teal flex items-center gap-1 group-hover:translate-x-[-4px] transition-transform">
