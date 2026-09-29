@@ -14,7 +14,7 @@
   --berry: #ff4d8d;
   --sky: #3aa0ff;
   --line: #14131f;
-  --line-soft: #e4e3ee;
+  --line-soft: #cbd5e1;
   --radius: 18px;
   --shadow: 6px 6px 0 var(--ink);
   --shadow-lg: 10px 10px 0 var(--ink);
@@ -254,9 +254,9 @@ video {
 .form-stack label, .form-field label { display: flex; flex-direction: column; gap: .4rem; font-weight: 700; }
 .form-stack input, .form-stack textarea, .form-stack select,
 input.field, textarea.field, select.field {
-  font-family: inherit; font-size: 1rem; padding: .8rem 1rem; border-radius: 12px; border: 1px solid var(--line-soft); background: var(--paper); color: var(--ink); width: 100%;
+  font-family: inherit; font-size: 0.95rem; padding: .75rem 1rem; border-radius: 12px; border: 2px solid var(--line-soft); background: var(--paper); color: var(--ink); width: 100%; transition: border-color .15s ease, box-shadow .15s ease;
 }
-.form-stack input:focus, .form-stack textarea:focus, .field:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(20,184,166,.15); }
+.form-stack input:focus, .form-stack textarea:focus, .form-stack select:focus, .field:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3.5px rgba(20,184,166,.2); }
 .button-row { display: flex; flex-wrap: wrap; gap: .8rem; }
 .form-message { font-weight: 700; padding: .7rem 1rem; border-radius: 12px; background: var(--cream); }
 .alert-error { background: #fde3e3; border-radius: 12px; padding: .8rem 1rem; font-weight: 700; color: #a3231f; }

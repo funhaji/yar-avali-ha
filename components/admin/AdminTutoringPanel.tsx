@@ -16,15 +16,15 @@ export function AdminTutoringPanel({ initialTeachers }: AdminTutoringPanelProps)
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Tab Switcher */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-2 max-w-xl">
+      {/* Master Tab Switcher */}
+      <div className="bg-slate-200/80 p-2 rounded-2xl border-2 border-slate-300 shadow-sm flex items-center gap-2 max-w-xl">
         <button
           type="button"
           onClick={() => setActiveTab('teachers')}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm transition-all border-2 ${
             activeTab === 'teachers'
-              ? 'bg-teal text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-teal text-white border-teal-700 shadow-md font-black'
+              : 'bg-white/80 text-slate-800 border-slate-300 hover:bg-white hover:border-slate-400 hover:text-slate-900 font-bold shadow-xs'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -34,10 +34,10 @@ export function AdminTutoringPanel({ initialTeachers }: AdminTutoringPanelProps)
         <button
           type="button"
           onClick={() => setActiveTab('taxonomies')}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm transition-all border-2 ${
             activeTab === 'taxonomies'
-              ? 'bg-teal text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-teal text-white border-teal-700 shadow-md font-black'
+              : 'bg-white/80 text-slate-800 border-slate-300 hover:bg-white hover:border-slate-400 hover:text-slate-900 font-bold shadow-xs'
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -47,10 +47,10 @@ export function AdminTutoringPanel({ initialTeachers }: AdminTutoringPanelProps)
         <button
           type="button"
           onClick={() => setActiveTab('requests')}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm transition-all border-2 ${
             activeTab === 'requests'
-              ? 'bg-teal text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-teal text-white border-teal-700 shadow-md font-black'
+              : 'bg-white/80 text-slate-800 border-slate-300 hover:bg-white hover:border-slate-400 hover:text-slate-900 font-bold shadow-xs'
           }`}
         >
           <MessageSquareText className="w-4 h-4" />

@@ -181,7 +181,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
 
       setTeachers(list => editing ? list.map(t => t.id === d.teacher.id ? d.teacher : t) : [d.teacher, ...list])
       reset()
-    } catch (err: any) {
+    } catch {
       setSaving(false)
       setError('خطا در برقراری ارتباط با سرور')
     }
@@ -304,37 +304,39 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
   return (
     <div className="flex flex-col gap-8">
       {/* Teacher Form Card */}
-      <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-5 mb-6">
+      <section className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-300 shadow-md">
+        <div className="flex items-center justify-between border-b-2 border-slate-200 pb-5 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-teal/10 text-teal flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-teal/15 text-teal-800 border-2 border-teal/40 flex items-center justify-center font-bold">
               {editing ? <Pencil className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
             </div>
             <div>
               <h2 className="text-lg font-black text-slate-900">
                 {editing ? `ویرایش اطلاعات استاد: ${form.name}` : 'افزودن استاد جدید'}
               </h2>
-              <p className="text-xs text-slate-400">اطلاعات، تعرفه‌ها و زمان‌بندی تدریس خصوصی</p>
+              <p className="text-xs text-slate-600 font-medium">اطلاعات فردی، تعرفه‌های زمانی و زمان‌بندی جلسات تدریس خصوصی</p>
             </div>
           </div>
           {editing && (
             <button
               onClick={reset}
               type="button"
-              className="text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-colors"
+              className="text-xs font-black text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 px-3.5 py-1.5 rounded-xl transition-colors shadow-xs"
             >
-              لغو ویرایش و ایجاد جدید
+              انصراف و افزودن جدید
             </button>
           )}
         </div>
 
         {/* Tab navigation inside form */}
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-6 overflow-x-auto text-xs font-bold">
+        <div className="bg-slate-100 p-1.5 rounded-2xl border-2 border-slate-300 flex items-center gap-2 mb-6 overflow-x-auto text-xs">
           <button
             type="button"
             onClick={() => setActiveFormTab('basic')}
-            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
-              activeFormTab === 'basic' ? 'bg-teal text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 border-2 ${
+              activeFormTab === 'basic'
+                ? 'bg-teal text-white border-teal-700 shadow-sm font-black'
+                : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
             }`}
           >
             <span>اطلاعات فردی و رزومه</span>
@@ -342,31 +344,37 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           <button
             type="button"
             onClick={() => setActiveFormTab('tutoring')}
-            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
-              activeFormTab === 'tutoring' ? 'bg-teal text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 border-2 ${
+              activeFormTab === 'tutoring'
+                ? 'bg-teal text-white border-teal-700 shadow-sm font-black'
+                : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
             }`}
           >
-            <Award className="w-3.5 h-3.5" />
+            <Award className="w-4 h-4 text-amber-500" />
             <span>نشان، سابقه و امتیاز</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveFormTab('pricing')}
-            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
-              activeFormTab === 'pricing' ? 'bg-teal text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 border-2 ${
+              activeFormTab === 'pricing'
+                ? 'bg-teal text-white border-teal-700 shadow-sm font-black'
+                : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
             }`}
           >
-            <DollarSign className="w-3.5 h-3.5" />
+            <DollarSign className="w-4 h-4 text-emerald-600" />
             <span>قیمت‌گذاری و زمان‌بندی</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveFormTab('taxonomies')}
-            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
-              activeFormTab === 'taxonomies' ? 'bg-teal text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+            className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 border-2 ${
+              activeFormTab === 'taxonomies'
+                ? 'bg-teal text-white border-teal-700 shadow-sm font-black'
+                : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5" />
+            <BookOpen className="w-4 h-4 text-tangerine" />
             <span>پایه‌ها، دروس و شهرها</span>
           </button>
         </div>
@@ -377,33 +385,33 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
             <div className="flex flex-col gap-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">نام استاد *</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">نام استاد *</label>
                   <input
                     type="text"
                     value={form.name || ''}
                     onChange={e => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                     placeholder="مثال: مریم مهربان‌فر"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">تخصص / عنوان کوتاه</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">تخصص / عنوان کوتاه</label>
                   <input
                     type="text"
                     value={form.specialty || ''}
                     onChange={e => setForm({ ...form, specialty: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                     placeholder="مثال: مدرس تخصصی اول دبستان"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">مدرک تحصیلی</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">مدرک تحصیلی</label>
                   <input
                     type="text"
                     value={form.education || ''}
                     onChange={e => setForm({ ...form, education: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                     placeholder="مثال: کارشناسی ارشد آموزش ابتدایی"
                   />
                 </div>
@@ -411,32 +419,32 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">استان و شهر سکونت</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">استان و شهر سکونت</label>
                   <input
                     type="text"
                     value={form.location || ''}
                     onChange={e => setForm({ ...form, location: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                     placeholder="مثال: تهران"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">محل خدمت یا مدرسه</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">محل خدمت یا مدرسه</label>
                   <input
                     type="text"
                     value={form.workplace || ''}
                     onChange={e => setForm({ ...form, workplace: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal"
-                    placeholder="مثال: دبستان دکتر حسابی"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
+                    placeholder="مثال: دبستان علامه طباطبایی"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">سابقه کار (سال)</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">سابقه کار (سال)</label>
                   <input
                     type="number"
                     value={form.experience_years ?? ''}
                     onChange={e => setForm({ ...form, experience_years: e.target.value ? Number(e.target.value) : null })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                     placeholder="مثال: ۸"
                   />
                 </div>
@@ -444,34 +452,34 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">شماره تماس (جهت ارتباط مستقیم)</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">شماره تماس (ارتباط مستقیم)</label>
                   <input
                     type="text"
                     value={form.contact_phone || ''}
                     onChange={e => setForm({ ...form, contact_phone: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal text-left"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs text-left"
                     dir="ltr"
                     placeholder="0912..."
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">آیدی تلگرام</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">آیدی تلگرام</label>
                   <input
                     type="text"
                     value={form.telegram_id || ''}
                     onChange={e => setForm({ ...form, telegram_id: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal text-left"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs text-left"
                     dir="ltr"
                     placeholder="@username"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">شماره یا آیدی واتساپ</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">شماره یا آیدی واتساپ</label>
                   <input
                     type="text"
                     value={form.whatsapp_id || ''}
                     onChange={e => setForm({ ...form, whatsapp_id: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal text-left"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs text-left"
                     dir="ltr"
                     placeholder="0912... یا لینک"
                   />
@@ -480,23 +488,23 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">آیدی ایتا</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">آیدی ایتا</label>
                   <input
                     type="text"
                     value={form.eitaa_id || ''}
                     onChange={e => setForm({ ...form, eitaa_id: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal text-left"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs text-left"
                     dir="ltr"
                     placeholder="@username"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">لینک ویدیوی معرفی (آپارات یا مستقیم)</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">لینک ویدیوی معرفی (آپارات یا مستقیم)</label>
                   <input
                     type="url"
                     value={form.video_url || ''}
                     onChange={e => setForm({ ...form, video_url: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal text-left"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs text-left"
                     dir="ltr"
                     placeholder="https://www.aparat.com/v/..."
                   />
@@ -504,37 +512,37 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">بیوگرافی و توضیحات تکمیلی</label>
+                <label className="block text-xs font-black text-slate-900 mb-1.5">بیوگرافی و توضیحات تکمیلی</label>
                 <textarea
                   rows={3}
                   value={form.bio || ''}
                   onChange={e => setForm({ ...form, bio: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal leading-relaxed"
-                  placeholder="توضیحات معرفی استاد جهت نمایش در مودال رزومه..."
+                  className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs leading-relaxed"
+                  placeholder="توضیحات معرفی استاد جهت نمایش در رزومه..."
                 />
               </div>
 
               {/* Photo Upload */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between flex-wrap gap-4">
+              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex items-center justify-between flex-wrap gap-4 shadow-xs">
                 <div className="flex items-center gap-4">
                   {form.photo_url ? (
                     <img
                       src={form.photo_url}
                       alt="عکس استاد"
-                      className="w-16 h-16 rounded-full object-cover border-2 border-teal shadow-sm"
+                      className="w-16 h-16 rounded-full object-cover border-3 border-teal shadow-xs"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center text-slate-400">
-                      <ImagePlus className="w-6 h-6" />
+                    <div className="w-16 h-16 rounded-full bg-slate-200 border-2 border-slate-300 flex items-center justify-center text-slate-500 font-bold">
+                      <ImagePlus className="w-7 h-7" />
                     </div>
                   )}
                   <div>
-                    <span className="block font-bold text-xs text-slate-800">تصویر پرتره استاد</span>
-                    <span className="text-[11px] text-slate-400">فرمت JPG یا PNG، ترجیحاً مربعی</span>
+                    <span className="block font-black text-xs text-slate-900">تصویر پرتره استاد</span>
+                    <span className="text-xs text-slate-500 font-medium">فرمت JPG یا PNG، با نسبت مربعی</span>
                   </div>
                 </div>
 
-                <label className="cursor-pointer px-4 py-2 text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl shadow-sm transition-colors">
+                <label className="cursor-pointer px-4 py-2 text-xs font-black bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300 hover:border-slate-400 rounded-xl shadow-xs transition-all">
                   {uploading ? 'در حال آپلود...' : 'انتخاب عکس جدید'}
                   <input
                     type="file"
@@ -547,23 +555,23 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
               </div>
 
               <div className="flex items-center justify-between pt-2">
-                <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+                <label className="inline-flex items-center gap-2.5 cursor-pointer text-xs font-black text-slate-800">
                   <input
                     type="checkbox"
                     checked={form.is_visible ?? true}
                     onChange={e => setForm({ ...form, is_visible: e.target.checked })}
-                    className="rounded border-slate-300 text-teal focus:ring-teal w-4 h-4"
+                    className="rounded border-2 border-slate-400 text-teal focus:ring-teal w-5 h-5 cursor-pointer"
                   />
                   <span>نمایش در سایت و صفحه اساتید</span>
                 </label>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500 font-bold">ترتیب نمایش:</span>
+                  <span className="text-xs text-slate-700 font-black">ترتیب نمایش:</span>
                   <input
                     type="number"
                     value={form.display_order ?? 0}
                     onChange={e => setForm({ ...form, display_order: Number(e.target.value) })}
-                    className="w-20 px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-center"
+                    className="w-20 px-3 py-1.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-center font-black shadow-xs focus:border-teal focus:outline-none"
                   />
                 </div>
               </div>
@@ -574,24 +582,24 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           {activeFormTab === 'tutoring' && (
             <div className="flex flex-col gap-6">
               {/* Teaching Modes */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <span className="block text-xs font-bold text-slate-800 mb-3">شیوه‌های تدریس مجاز *</span>
-                <div className="flex items-center gap-4">
-                  <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700 bg-white px-4 py-2.5 rounded-xl border border-slate-200 hover:border-teal transition-colors">
+              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 shadow-xs">
+                <span className="block text-xs font-black text-slate-900 mb-3">شیوه‌های تدریس مجاز *</span>
+                <div className="flex items-center gap-4 flex-wrap">
+                  <label className="inline-flex items-center gap-2.5 cursor-pointer text-xs font-bold text-slate-800 bg-white px-4 py-3 rounded-xl border-2 border-slate-300 hover:border-teal transition-all shadow-xs">
                     <input
                       type="checkbox"
                       checked={form.teaching_modes?.includes('online') ?? false}
                       onChange={() => toggleMode('online')}
-                      className="rounded border-slate-300 text-teal focus:ring-teal w-4 h-4"
+                      className="rounded border-2 border-slate-400 text-teal focus:ring-teal w-4 h-4 cursor-pointer"
                     />
-                    <span>تدریس آنلاین (وبینار / تصویری)</span>
+                    <span>تدریس آنلاین (تصویری)</span>
                   </label>
-                  <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700 bg-white px-4 py-2.5 rounded-xl border border-slate-200 hover:border-tangerine transition-colors">
+                  <label className="inline-flex items-center gap-2.5 cursor-pointer text-xs font-bold text-slate-800 bg-white px-4 py-3 rounded-xl border-2 border-slate-300 hover:border-tangerine transition-all shadow-xs">
                     <input
                       type="checkbox"
                       checked={form.teaching_modes?.includes('in_person') ?? false}
                       onChange={() => toggleMode('in_person')}
-                      className="rounded border-slate-300 text-tangerine focus:ring-tangerine w-4 h-4"
+                      className="rounded border-2 border-slate-400 text-tangerine focus:ring-tangerine w-4 h-4 cursor-pointer"
                     />
                     <span>تدریس حضوری</span>
                   </label>
@@ -601,17 +609,17 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
               {/* Badges & Metrics */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">متن نشان ویژه استاد</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">متن نشان ویژه استاد</label>
                   <input
                     type="text"
                     value={form.badge_text || ''}
                     onChange={e => setForm({ ...form, badge_text: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                     placeholder="مثال: استاد تایید شده"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">امتیاز استاد (از ۵)</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">امتیاز استاد (از ۵)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -619,37 +627,37 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     max="5"
                     value={form.star_rating ?? 5.0}
                     onChange={e => setForm({ ...form, star_rating: Number(e.target.value) })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal text-center font-bold"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-black text-center focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">تعداد نظرات ثبت‌شده</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">تعداد نظرات ثبت‌شده</label>
                   <input
                     type="number"
                     min="0"
                     value={form.review_count ?? 0}
                     onChange={e => setForm({ ...form, review_count: Number(e.target.value) })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal text-center"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-bold text-center focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">جلسات موفق برگزار شده</label>
+                  <label className="block text-xs font-black text-slate-900 mb-1.5">جلسات موفق برگزار شده</label>
                   <input
                     type="number"
                     min="0"
                     value={form.successful_sessions ?? 0}
                     onChange={e => setForm({ ...form, successful_sessions: Number(e.target.value) })}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal text-center"
+                    className="w-full px-3.5 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-bold text-center focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
                     placeholder="مثال: ۸۲۰"
                   />
                 </div>
               </div>
 
               {/* Bullet highlights */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-3">
+              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex flex-col gap-4 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800">نکات برجسته و سوابق کلیدی استاد (بولِت‌پوینت‌ها)</span>
-                  <span className="text-[11px] text-slate-400">در کارت استاد و مودال نمایش داده می‌شود</span>
+                  <span className="text-xs font-black text-slate-900">سوابق کلیدی و نکات برجسته (بولِت‌پوینت‌ها)</span>
+                  <span className="text-xs text-slate-500 font-medium">در کارت و مودال رزومه نمایش داده می‌شود</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -659,29 +667,30 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     onChange={e => setNewHighlight(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addHighlight(); } }}
                     placeholder="مثال: سابقه ۱۰ سال تدریس در مدارس غیر انتفاعی"
-                    className="flex-1 px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-teal"
+                    className="flex-1 px-3.5 py-2.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 shadow-xs"
                   />
                   <button
                     type="button"
                     onClick={addHighlight}
-                    className="px-4 py-2 text-xs font-bold text-white bg-teal hover:bg-teal-deep rounded-xl transition-colors whitespace-nowrap"
+                    className="px-5 py-2.5 text-xs font-black text-white bg-teal hover:bg-teal-deep border-2 border-teal-700 rounded-xl transition-all shadow-xs whitespace-nowrap"
                   >
                     افزودن سابقه
                   </button>
                 </div>
 
                 {form.highlights && form.highlights.length > 0 && (
-                  <div className="flex flex-col gap-2 mt-2">
+                  <div className="flex flex-col gap-2 mt-1">
                     {form.highlights.map((h, i) => (
-                      <div key={i} className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200/80 text-xs">
-                        <div className="flex items-center gap-2 text-slate-700 font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-teal"></span>
+                      <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl border-2 border-slate-300 text-xs shadow-xs">
+                        <div className="flex items-center gap-2.5 text-slate-800 font-bold">
+                          <span className="w-2 h-2 rounded-full bg-teal flex-shrink-0"></span>
                           <span>{h}</span>
                         </div>
                         <button
                           type="button"
                           onClick={() => removeHighlight(i)}
-                          className="text-slate-400 hover:text-rose-600 transition-colors"
+                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="حذف"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -697,21 +706,19 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           {activeFormTab === 'pricing' && (
             <div className="flex flex-col gap-6">
               {/* Pricing options list */}
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-800">تعرفه‌های جلسه تدریس بر اساس مدت زمان</h3>
-                    <p className="text-[11px] text-slate-400">مثلاً ۳۰ دقیقه، ۶۰ دقیقه یا ۹۰ دقیقه</p>
-                  </div>
+              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex flex-col gap-4 shadow-xs">
+                <div>
+                  <h3 className="text-xs font-black text-slate-900">تعرفه‌های جلسه بر اساس مدت زمان</h3>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">افزودن گزینه‌های ۳۰، ۶۰ یا ۹۰ دقیقه</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end bg-white p-3 rounded-xl border border-slate-200">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end bg-white p-4 rounded-xl border-2 border-slate-300 shadow-xs">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">مدت زمان جلسه (دقیقه)</label>
+                    <label className="block text-xs font-black text-slate-700 mb-1">مدت زمان جلسه</label>
                     <select
                       value={newDuration}
                       onChange={e => setNewDuration(Number(e.target.value))}
-                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal"
+                      className="w-full px-3 py-2 text-xs bg-white border-2 border-slate-300 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-teal"
                     >
                       <option value={30}>۳۰ دقیقه</option>
                       <option value={45}>۴۵ دقیقه</option>
@@ -721,13 +728,13 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">مبلغ به تومان</label>
+                    <label className="block text-xs font-black text-slate-700 mb-1">مبلغ به تومان</label>
                     <input
                       type="number"
                       step="10000"
                       value={newPrice}
                       onChange={e => setNewPrice(Number(e.target.value))}
-                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-teal"
+                      className="w-full px-3 py-2 text-xs bg-white border-2 border-slate-300 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-teal"
                       placeholder="۳۵۰۰۰۰"
                     />
                   </div>
@@ -735,7 +742,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     <button
                       type="button"
                       onClick={addPricingOption}
-                      className="w-full py-2 text-xs font-bold text-white bg-teal hover:bg-teal-deep rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                      className="w-full py-2.5 text-xs font-black text-white bg-teal hover:bg-teal-deep border-2 border-teal-700 rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-xs"
                     >
                       <Plus className="w-4 h-4" />
                       <span>افزودن به تعرفه‌ها</span>
@@ -748,18 +755,19 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     {form.pricing_options.map((opt, i) => (
                       <div
                         key={i}
-                        className="flex items-center justify-between p-3.5 bg-white rounded-xl border border-teal/20 shadow-xs"
+                        className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-teal/40 shadow-xs"
                       >
                         <div>
-                          <div className="font-bold text-slate-900 text-sm">{opt.duration_minutes} دقیقه</div>
-                          <div className="text-teal font-black text-sm mt-0.5" dir="ltr">
+                          <div className="font-black text-slate-900 text-sm">{opt.duration_minutes} دقیقه</div>
+                          <div className="text-teal-700 font-black text-base mt-1" dir="ltr">
                             {Number(opt.price_toman).toLocaleString('fa-IR')} تومان
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => removePricingOption(i)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="حذف تعرفه"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -767,21 +775,21 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-xs text-amber-700 bg-amber-50 p-3 rounded-xl border border-amber-200">
+                  <div className="text-xs text-amber-900 bg-amber-50 p-4 rounded-xl border-2 border-amber-300 font-bold">
                     هیچ تعرفه‌ای برای این استاد ثبت نشده است. توصیه می‌شود حداقل یک گزینه مدت زمان و قیمت اضافه کنید.
                   </div>
                 )}
               </div>
 
               {/* Availability schedule */}
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-4">
+              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex flex-col gap-4 shadow-xs">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-tangerine" />
-                  <h3 className="text-xs font-bold text-slate-800">برنامه زمان‌بندی و ساعات در دسترس بودن استاد</h3>
+                  <h3 className="text-xs font-black text-slate-900">برنامه زمان‌بندی و ساعات در دسترس بودن استاد</h3>
                 </div>
 
                 <div>
-                  <span className="block text-[11px] font-bold text-slate-600 mb-2">روزهای کاری در هفته:</span>
+                  <span className="block text-xs font-black text-slate-700 mb-2.5">روزهای کاری در هفته:</span>
                   <div className="flex flex-wrap gap-2">
                     {WEEK_DAYS.map(day => {
                       const selected = form.availability_schedule?.days?.includes(day)
@@ -790,10 +798,10 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                           key={day}
                           type="button"
                           onClick={() => toggleDay(day)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                          className={`px-3.5 py-2 rounded-xl text-xs transition-all border-2 ${
                             selected
-                              ? 'bg-tangerine text-white shadow-xs'
-                              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                              ? 'bg-tangerine text-white border-tangerine-deep font-black shadow-xs'
+                              : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
                           }`}
                         >
                           {day}
@@ -805,7 +813,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">بازه ساعات کاری</label>
+                    <label className="block text-xs font-black text-slate-800 mb-1.5">بازه ساعات کاری</label>
                     <input
                       type="text"
                       value={form.availability_schedule?.hours || ''}
@@ -813,12 +821,12 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                         ...form,
                         availability_schedule: { ...(form.availability_schedule || {}), hours: e.target.value }
                       })}
-                      className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-tangerine"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-bold placeholder:text-slate-400 focus:outline-none focus:border-tangerine shadow-xs"
                       placeholder="مثال: ۱۶:۰۰ الی ۲۱:۰۰"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">توضیحات و شرایط هماهنگی</label>
+                    <label className="block text-xs font-black text-slate-800 mb-1.5">توضیحات و شرایط هماهنگی</label>
                     <input
                       type="text"
                       value={form.availability_schedule?.notes || ''}
@@ -826,7 +834,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                         ...form,
                         availability_schedule: { ...(form.availability_schedule || {}), notes: e.target.value }
                       })}
-                      className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-tangerine"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-tangerine shadow-xs"
                       placeholder="مثال: هماهنگی قبلی حداقل ۲۴ ساعت قبل از جلسه"
                     />
                   </div>
@@ -839,18 +847,18 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           {activeFormTab === 'taxonomies' && (
             <div className="flex flex-col gap-6">
               {/* Grades Multi-select */}
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-3">
+              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex flex-col gap-3 shadow-xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Layers className="w-4 h-4 text-teal" />
-                    <span className="text-xs font-bold text-slate-800">پایه‌های تحصیلی تحت تدریس این استاد</span>
+                    <span className="text-xs font-black text-slate-900">پایه‌های تحصیلی تحت تدریس این استاد</span>
                   </div>
-                  <span className="text-[11px] text-slate-400">استاد در فیلتر این پایه‌ها نشان داده می‌شود</span>
+                  <span className="text-xs text-slate-500 font-medium">استاد در فیلتر این پایه‌ها نشان داده می‌شود</span>
                 </div>
 
                 {availableGrades.length === 0 ? (
-                  <div className="text-xs text-slate-400 bg-white p-3 rounded-xl border border-dashed border-slate-200">
-                    هنوز پایه‌ای در سیستم تعریف نشده است. لطفاً از تب "پایه‌ها و دروس" پایه‌های تحصیلی را ایجاد کنید.
+                  <div className="text-xs text-slate-600 bg-white p-4 rounded-xl border-2 border-dashed border-slate-300 font-medium">
+                    هنوز پایه‌ای در سیستم تعریف نشده است. لطفاً از تب "پایه‌ها و دروس" پایه‌های تحصیلی را اضافه کنید.
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2 pt-1">
@@ -861,13 +869,13 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                           key={g.id}
                           type="button"
                           onClick={() => toggleGrade(g.name)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                          className={`px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 border-2 ${
                             selected
-                              ? 'bg-teal text-white shadow-xs'
-                              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                              ? 'bg-teal text-white border-teal-700 font-black shadow-xs'
+                              : 'bg-white text-slate-800 border-slate-300 hover:border-teal font-bold shadow-xs'
                           }`}
                         >
-                          {selected ? <Check className="w-3.5 h-3.5" /> : null}
+                          {selected ? <Check className="w-4 h-4" /> : null}
                           <span>{g.name}</span>
                         </button>
                       )
@@ -877,17 +885,17 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
               </div>
 
               {/* Subjects Multi-select */}
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-3">
+              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex flex-col gap-3 shadow-xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-tangerine" />
-                    <span className="text-xs font-bold text-slate-800">دروس و مباحث تحت تدریس این استاد</span>
+                    <span className="text-xs font-black text-slate-900">دروس و مباحث تحت تدریس این استاد</span>
                   </div>
-                  <span className="text-[11px] text-slate-400">استاد در فیلتر این دروس نشان داده می‌شود</span>
+                  <span className="text-xs text-slate-500 font-medium">استاد در فیلتر این دروس نشان داده می‌شود</span>
                 </div>
 
                 {availableSubjects.length === 0 ? (
-                  <div className="text-xs text-slate-400 bg-white p-3 rounded-xl border border-dashed border-slate-200">
+                  <div className="text-xs text-slate-600 bg-white p-4 rounded-xl border-2 border-dashed border-slate-300 font-medium">
                     هنوز درسی در سیستم تعریف نشده است. لطفاً از تب "پایه‌ها و دروس" دروس را اضافه کنید.
                   </div>
                 ) : (
@@ -899,15 +907,15 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                           key={s.id}
                           type="button"
                           onClick={() => toggleSubject(s.name)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                          className={`px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 border-2 ${
                             selected
-                              ? 'bg-tangerine text-white shadow-xs'
-                              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                              ? 'bg-tangerine text-white border-tangerine-deep font-black shadow-xs'
+                              : 'bg-white text-slate-800 border-slate-300 hover:border-tangerine font-bold shadow-xs'
                           }`}
                         >
-                          {selected ? <Check className="w-3.5 h-3.5" /> : null}
+                          {selected ? <Check className="w-4 h-4" /> : null}
                           <span>{s.name}</span>
-                          {s.grade_name && <span className="opacity-70 text-[10px]">({s.grade_name})</span>}
+                          {s.grade_name && <span className="opacity-80 text-[11px]">({s.grade_name})</span>}
                         </button>
                       )
                     })}
@@ -916,13 +924,13 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
               </div>
 
               {/* Cities for In-person */}
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-3">
+              <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-300 flex flex-col gap-3 shadow-xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-rose-500" />
-                    <span className="text-xs font-bold text-slate-800">شهرهای تحت پوشش تدریس حضوری</span>
+                    <span className="text-xs font-black text-slate-900">شهرهای تحت پوشش تدریس حضوری</span>
                   </div>
-                  <span className="text-[11px] text-slate-400">برای فیلتر تدریس حضوری</span>
+                  <span className="text-xs text-slate-500 font-medium">برای فیلتر تدریس حضوری</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -932,12 +940,12 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     onChange={e => setNewCity(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCity(); } }}
                     placeholder="نام شهر (مثال: تهران، کرج، مشهد...)"
-                    className="flex-1 px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-rose-400"
+                    className="flex-1 px-3.5 py-2.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-rose-400 shadow-xs"
                   />
                   <button
                     type="button"
                     onClick={addCity}
-                    className="px-4 py-2 text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl transition-colors whitespace-nowrap"
+                    className="px-5 py-2.5 text-xs font-black text-white bg-rose-600 hover:bg-rose-700 border-2 border-rose-800 rounded-xl transition-all shadow-xs whitespace-nowrap"
                   >
                     افزودن شهر
                   </button>
@@ -948,16 +956,16 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     {form.cities.map(c => (
                       <span
                         key={c}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-rose-200 rounded-xl text-xs font-bold text-rose-700"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border-2 border-rose-300 rounded-xl text-xs font-bold text-rose-800 shadow-xs"
                       >
-                        <MapPin className="w-3 h-3" />
+                        <MapPin className="w-3.5 h-3.5 text-rose-600" />
                         <span>{c}</span>
                         <button
                           type="button"
                           onClick={() => removeCity(c)}
-                          className="hover:text-rose-900 transition-colors ml-1"
+                          className="hover:text-rose-950 transition-colors ml-1 p-0.5 rounded hover:bg-rose-100"
                         >
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-4 h-4" />
                         </button>
                       </span>
                     ))}
@@ -968,17 +976,17 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           )}
 
           {error && (
-            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold">
+            <div className="p-4 bg-rose-50 border-2 border-rose-300 text-rose-800 rounded-xl text-xs font-bold">
               {error}
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-5 border-t-2 border-slate-200">
             {editing && (
               <button
                 type="button"
                 onClick={reset}
-                className="px-5 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                className="px-5 py-2.5 text-xs font-black text-slate-700 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 rounded-xl transition-all shadow-xs"
               >
                 انصراف
               </button>
@@ -986,7 +994,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2.5 text-xs font-bold text-white bg-teal hover:bg-teal-deep rounded-xl shadow-sm transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-2.5 text-xs font-black text-white bg-teal hover:bg-teal-deep border-2 border-teal-700 rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center gap-2"
             >
               <Check className="w-4 h-4" />
               <span>{saving ? 'در حال ذخیره‌سازی...' : editing ? 'ذخیره تغییرات استاد' : 'ثبت استاد'}</span>
@@ -1001,11 +1009,11 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           <h2 className="text-lg font-black text-slate-900">
             اساتید و معلمان ثبت‌شده ({teachers.length})
           </h2>
-          <span className="text-xs text-slate-400">نمایش کارت‌های اساتید در صفحه عمومی</span>
+          <span className="text-xs text-slate-600 font-bold">پیش‌نمایش کارت‌های اساتید در صفحه عمومی</span>
         </div>
 
         {teachers.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-sm text-slate-400">
+          <div className="bg-white rounded-3xl p-12 text-center border-2 border-slate-300 shadow-sm text-slate-600 font-medium">
             هنوز استادی اضافه نشده است. از فرم بالا اولین استاد را ثبت کنید.
           </div>
         ) : (
@@ -1013,8 +1021,8 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
             {teachers.map(t => (
               <article
                 key={t.id}
-                className={`bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between ${
-                  !t.is_visible ? 'opacity-60 bg-slate-50/70' : ''
+                className={`bg-white rounded-3xl p-6 border-2 border-slate-300 shadow-sm hover:border-slate-400 hover:shadow-md transition-all flex flex-col justify-between ${
+                  !t.is_visible ? 'opacity-60 bg-slate-100/70 border-dashed' : ''
                 }`}
               >
                 <div>
@@ -1023,10 +1031,10 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                       <img
                         src={t.photo_url}
                         alt={t.name}
-                        className="w-16 h-16 rounded-2xl object-cover border border-slate-200"
+                        className="w-16 h-16 rounded-2xl object-cover border-2 border-slate-300 shadow-xs"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-2xl bg-teal/10 text-teal flex items-center justify-center font-bold">
+                      <div className="w-16 h-16 rounded-2xl bg-teal/15 border-2 border-teal/40 text-teal-800 flex items-center justify-center font-bold">
                         <ImagePlus className="w-6 h-6" />
                       </div>
                     )}
@@ -1034,21 +1042,21 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                       <div className="flex items-center gap-2 flex-wrap mb-1">
                         <h3 className="font-black text-slate-900 text-sm truncate">{t.name}</h3>
                         {t.badge_text && (
-                          <span className="px-2 py-0.5 bg-teal/10 text-teal font-bold text-[10px] rounded-lg">
+                          <span className="px-2.5 py-0.5 bg-teal/10 text-teal-800 border border-teal/30 font-black text-[11px] rounded-lg">
                             {t.badge_text}
                           </span>
                         )}
                       </div>
                       {t.specialty && (
-                        <p className="text-xs text-slate-500 line-clamp-1">{t.specialty}</p>
+                        <p className="text-xs text-slate-600 font-medium line-clamp-1">{t.specialty}</p>
                       )}
                       <div className="flex items-center gap-2 mt-2 text-xs">
-                        <div className="flex items-center gap-1 text-amber-500 font-bold">
-                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <div className="flex items-center gap-1 text-amber-500 font-black">
+                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                           <span>{t.star_rating || 5.0}</span>
                         </div>
                         {t.successful_sessions ? (
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-xs text-slate-500 font-medium">
                             • {t.successful_sessions} جلسه
                           </span>
                         ) : null}
@@ -1057,19 +1065,19 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                   </div>
 
                   {/* Teaching modes & pricing tags */}
-                  <div className="flex flex-wrap gap-1.5 mb-3 text-[11px]">
+                  <div className="flex flex-wrap gap-1.5 mb-3 text-xs">
                     {t.teaching_modes?.includes('online') && (
-                      <span className="px-2 py-0.5 rounded-lg bg-teal/5 text-teal border border-teal/15 font-bold">
+                      <span className="px-2.5 py-1 rounded-lg bg-teal/10 text-teal-800 border border-teal/30 font-bold">
                         آنلاین
                       </span>
                     )}
                     {t.teaching_modes?.includes('in_person') && (
-                      <span className="px-2 py-0.5 rounded-lg bg-tangerine/5 text-tangerine border border-tangerine/15 font-bold">
+                      <span className="px-2.5 py-1 rounded-lg bg-tangerine/10 text-tangerine-800 border border-tangerine/30 font-bold">
                         حضوری
                       </span>
                     )}
                     {t.pricing_options && t.pricing_options.length > 0 && (
-                      <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-bold" dir="ltr">
+                      <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 border border-slate-300 font-black" dir="ltr">
                         از {Number(t.pricing_options[0].price_toman).toLocaleString('fa-IR')} ت
                       </span>
                     )}
@@ -1077,16 +1085,16 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
 
                   {/* Grades and subjects summary */}
                   {(t.grades?.length || t.subjects?.length) ? (
-                    <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex flex-col gap-1 mb-4">
+                    <div className="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border-2 border-slate-200 flex flex-col gap-1 mb-4">
                       {t.grades && t.grades.length > 0 && (
                         <div className="line-clamp-1">
-                          <span className="font-bold text-slate-600">پایه‌ها: </span>
+                          <span className="font-black text-slate-900">پایه‌ها: </span>
                           <span>{t.grades.join('، ')}</span>
                         </div>
                       )}
                       {t.subjects && t.subjects.length > 0 && (
                         <div className="line-clamp-1">
-                          <span className="font-bold text-slate-600">دروس: </span>
+                          <span className="font-black text-slate-900">دروس: </span>
                           <span>{t.subjects.join('، ')}</span>
                         </div>
                       )}
@@ -1094,13 +1102,13 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                   ) : null}
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                  <span className="text-[11px] text-slate-400">ترتیب: {t.display_order}</span>
+                <div className="flex items-center justify-between pt-3 border-t-2 border-slate-200">
+                  <span className="text-xs text-slate-500 font-bold">ترتیب: {t.display_order}</span>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => startEdit(t)}
-                      className="p-1.5 text-slate-500 hover:text-teal hover:bg-slate-100 rounded-lg transition-colors"
+                      className="p-2 text-slate-700 hover:text-teal hover:bg-slate-100 border-2 border-slate-200 hover:border-slate-300 rounded-xl transition-all shadow-xs"
                       title="ویرایش"
                     >
                       <Pencil className="w-4 h-4" />
@@ -1108,7 +1116,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     <button
                       type="button"
                       onClick={() => toggle(t)}
-                      className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+                      className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 border-2 border-slate-200 hover:border-slate-300 rounded-xl transition-all shadow-xs"
                       title={t.is_visible ? 'مخفی کردن' : 'نمایش دادن'}
                     >
                       {t.is_visible ? <Eye className="w-4 h-4 text-emerald-600" /> : <EyeOff className="w-4 h-4 text-slate-400" />}
@@ -1116,7 +1124,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                     <button
                       type="button"
                       onClick={() => remove(t.id)}
-                      className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      className="p-2 text-slate-600 hover:text-rose-600 hover:bg-rose-50 border-2 border-slate-200 hover:border-rose-300 rounded-xl transition-all shadow-xs"
                       title="حذف"
                     >
                       <Trash2 className="w-4 h-4" />
