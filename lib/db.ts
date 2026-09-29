@@ -200,6 +200,7 @@ ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS receipt_url VARCHAR(1000);
 ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS payment_authority VARCHAR(255);
 ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS payment_card_pan VARCHAR(50);
 ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP;
+ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS tracking_code VARCHAR(255);
 
 CREATE INDEX IF NOT EXISTS idx_yar_orders_user_status ON yar_orders(user_id, status, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_yar_orders_expiry ON yar_orders(status, paid_at, created_at);

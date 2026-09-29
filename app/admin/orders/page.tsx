@@ -21,8 +21,8 @@ export default async function AdminOrdersPage() {
   `)
 
   // Fetch items for all orders
-  const orderIds = orders.map(o => o.id)
-  let orderItems = []
+  const orderIds = orders.map((o: any) => o.id)
+  let orderItems: any[] = []
   if (orderIds.length > 0) {
     orderItems = await query(`
       SELECT oi.*, s.title, s.thumbnail_url, s.is_digital
@@ -32,16 +32,18 @@ export default async function AdminOrdersPage() {
     `, [orderIds])
   }
 
-  // Combine
-  const ordersWithItems = orders.map(order => ({
+  // Combine and serialize dates
+  const ordersWithItems = orders.map((order: any) => ({
     ...order,
-    items: orderItems.filter(i => i.order_id === order.id)
+    created_at: order.created_at ? new Date(order.created_at).toISOString() : '',
+    paid_at: order.paid_at ? new Date(order.paid_at).toISOString() : null,
+    items: orderItems.filter((i: any) => i.order_id === order.id)
   }))
 
   return (
-    <div className="page fade-in">
+    <div className="page bg-cream min-h-screen">
       <SiteHeader userName={admin.name} isAdmin />
-      <main className="shell section">
+      <main className="shell section py-6 md:py-10 max-w-7xl mx-auto">
         <OrdersManager initialOrders={ordersWithItems} />
       </main>
     </div>

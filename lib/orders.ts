@@ -30,6 +30,7 @@ export type OrderDetail = {
   paid_at: string | Date | null
   created_at: string | Date
   notes: string | null
+  tracking_code?: string | null
   items: OrderItemDetail[]
   has_physical: boolean
   has_digital: boolean
@@ -37,12 +38,12 @@ export type OrderDetail = {
   expires_at: string | Date
 }
 
-// 1. Database Index Initialization
 let indexesEnsured = false
 export async function ensureOrderIndexes() {
   if (indexesEnsured) return
   try {
     await query(`
+      ALTER TABLE yar_orders ADD COLUMN IF NOT EXISTS tracking_code VARCHAR(255);
       CREATE INDEX IF NOT EXISTS idx_yar_orders_user_status ON yar_orders(user_id, status, created_at DESC);
       CREATE INDEX IF NOT EXISTS idx_yar_orders_expiry ON yar_orders(status, paid_at, created_at);
     `)

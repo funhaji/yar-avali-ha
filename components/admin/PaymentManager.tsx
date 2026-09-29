@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CreditCard, Globe, ShieldCheck, Save, Trash2, Clock, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react'
+import { CreditCard, Globe, ShieldCheck, Save, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react'
 
 type Props = {
   initialSettings: Record<string, string>
@@ -16,7 +16,6 @@ export function PaymentManager({ initialSettings }: Props) {
   })
 
   const [saving, setSaving] = useState(false)
-  const [cleaning, setCleaning] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
   const showToast = (text: string, type: 'success' | 'error' = 'success') => {
@@ -53,25 +52,6 @@ export function PaymentManager({ initialSettings }: Props) {
       showToast('خطای ارتباط با سرور', 'error')
     } finally {
       setSaving(false)
-    }
-  }
-
-  const handleManualCleanup = async () => {
-    if (!confirm('آیا مایلید تمام سفارش‌های پرداخت‌نشده قدیمی‌تر از ۳ روز پاکسازی شوند؟')) return
-
-    setCleaning(true)
-    try {
-      const res = await fetch('/api/admin/orders/cleanup', { method: 'POST' })
-      const data = await res.json()
-      if (res.ok) {
-        showToast(`پاکسازی با موفقیت انجام شد: ${data.deletedCount} سفارش منقضی‌شده حذف گردید.`)
-      } else {
-        showToast(data.error || 'خطا در پاکسازی سفارشات', 'error')
-      }
-    } catch {
-      showToast('خطای ارتباط با سرور', 'error')
-    } finally {
-      setCleaning(false)
     }
   }
 
@@ -173,37 +153,6 @@ export function PaymentManager({ initialSettings }: Props) {
                 className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 bg-white text-slate-900 text-sm font-medium outline-none focus:border-teal focus:ring-3 focus:ring-teal/20 transition-all shadow-xs"
               />
             </div>
-          </div>
-        </section>
-
-        {/* Section 3: 3-Day Expiry Policy & Manual Cleanup */}
-        <section className="bg-white p-6 md:p-8 rounded-3xl border-2 border-slate-300 shadow-md space-y-4">
-          <div className="flex items-center gap-3 pb-3 border-b-2 border-slate-200">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-amber-700" />
-            </div>
-            <div>
-              <h2 className="text-lg font-black text-slate-900">سیاست انقضای سفارشات پرداخت‌نشده</h2>
-              <p className="text-xs text-slate-600 font-medium">مدیریت خودکار سفارشات معلق</p>
-            </div>
-          </div>
-
-          <div className="p-4.5 rounded-2xl bg-slate-50 border-2 border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <p className="text-sm font-black text-slate-900">حذف خودکار پس از ۳ روز (۷۲ ساعت)</p>
-              <p className="text-xs text-slate-600 font-medium leading-relaxed">
-                هر سفارشی که در وضعیت در انتظار پرداخت باشد و تا ۳ روز پرداخت نشود، به صورت خودکار از سیستم حذف می‌گردد.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleManualCleanup}
-              disabled={cleaning}
-              className="border-2 border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-950 py-2.5 px-4 text-xs font-black rounded-xl whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-xs transition-all"
-            >
-              {cleaning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4 text-amber-700" />}
-              <span>پاکسازی دستی سفارشات منقضی‌شده</span>
-            </button>
           </div>
         </section>
 

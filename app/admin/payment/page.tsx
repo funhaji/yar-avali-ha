@@ -24,7 +24,7 @@ export default async function AdminPaymentPage() {
         <div className="mb-8">
           <span className="section-kicker"><CreditCard /> مدیریت امور مالی</span>
           <h1 className="section-title text-2xl md:text-3xl font-black text-ink mb-2">تنظیمات درگاه پرداخت و کارت به کارت</h1>
-          <p className="text-sm text-ink-soft">پیکربندی مرچنت کد درگاه زرین‌پال، شماره حساب بانکی و مدیریت سفارشات معلق</p>
+          <p className="text-sm text-ink-soft">پیکربندی مرچنت کد درگاه زرین‌پال و مشخصات حساب بانکی فروشگاه</p>
         </div>
         <PaymentManager initialSettings={settings} />
       </main>
