@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -16,96 +16,127 @@ type Props = {
   slides: Slide[]
 }
 
+const DURATION = 5000   // ms per slide
+const TICK     = 40     // ms per progress tick (~25fps)
+const STEP     = (100 / DURATION) * TICK  // progress units per tick
+
 export function HomepageSlider({ slides }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [prevIndex, setPrevIndex] = useState<number | null>(null)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [progress, setProgress] = useState(0)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const progressRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const DURATION = 5000
+  const timerRef   = useRef<ReturnType<typeof setInterval> | null>(null)
+  const resumeRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const slidesLen  = slides.length
 
-  const startProgress = () => {
-    setProgress(0)
-    if (progressRef.current) clearInterval(progressRef.current)
-    const step = 100 / (DURATION / 50)
-    progressRef.current = setInterval(() => {
-      setProgress(p => {
-        if (p >= 100) { clearInterval(progressRef.current!); return 100 }
-        return p + step
-      })
-    }, 50)
-  }
-
-  const advance = (nextFn: (prev: number) => number) => {
-    setCurrentIndex(prev => {
-      const next = nextFn(prev)
-      setPrevIndex(prev)
-      return next
-    })
-    startProgress()
-  }
-
-  useEffect(() => {
-    startProgress()
-    return () => {
-      if (progressRef.current) clearInterval(progressRef.current)
-    }
+  // Single master tick — progress drives the slide advance
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
   }, [])
 
+  const resetProgress = useCallback(() => {
+    setProgress(0)
+  }, [])
+
+  const nextSlide = useCallback((idx: number) => {
+    return (idx + 1) % slidesLen
+  }, [slidesLen])
+
+  const prevSlide = useCallback((idx: number) => {
+    return (idx - 1 + slidesLen) % slidesLen
+  }, [slidesLen])
+
+  // Start/restart the autoplay timer
+  const startTimer = useCallback(() => {
+    stopTimer()
+    setProgress(0)
+    timerRef.current = setInterval(() => {
+      setProgress(p => {
+        const next = p + STEP
+        if (next >= 100) {
+          // Progress filled — advance slide, reset
+          setCurrentIndex(i => (i + 1) % slidesLen)
+          return 0
+        }
+        return next
+      })
+    }, TICK)
+  }, [stopTimer, slidesLen])
+
+  // Boot autoplay
   useEffect(() => {
-    if (!isAutoPlaying || slides.length <= 1) return
-    intervalRef.current = setInterval(() => {
-      advance(prev => (prev + 1) % slides.length)
-    }, DURATION)
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isAutoPlaying, slides.length, currentIndex])
+    if (slidesLen <= 1) return
+    if (isAutoPlaying) startTimer()
+    return stopTimer
+  }, [isAutoPlaying, slidesLen, startTimer, stopTimer])
 
-  const goToSlide = (index: number) => {
-    setPrevIndex(currentIndex)
+  // Manual nav — pause, then resume after 10s
+  const pauseAndResume = useCallback(() => {
+    stopTimer()
+    setIsAutoPlaying(false)
+    if (resumeRef.current) clearTimeout(resumeRef.current)
+    resumeRef.current = setTimeout(() => setIsAutoPlaying(true), 10000)
+  }, [stopTimer])
+
+  const goToSlide = useCallback((index: number) => {
     setCurrentIndex(index)
-    setIsAutoPlaying(false)
-    startProgress()
-    setTimeout(() => setIsAutoPlaying(true), 10000)
-  }
+    resetProgress()
+    pauseAndResume()
+  }, [resetProgress, pauseAndResume])
 
-  const goToPrevious = () => {
-    advance(prev => (prev - 1 + slides.length) % slides.length)
-    setIsAutoPlaying(false)
-    setTimeout(() => setIsAutoPlaying(true), 10000)
-  }
+  const goToPrevious = useCallback(() => {
+    setCurrentIndex(i => prevSlide(i))
+    resetProgress()
+    pauseAndResume()
+  }, [prevSlide, resetProgress, pauseAndResume])
 
-  const goToNext = () => {
-    advance(prev => (prev + 1) % slides.length)
-    setIsAutoPlaying(false)
-    setTimeout(() => setIsAutoPlaying(true), 10000)
-  }
+  const goToNext = useCallback(() => {
+    setCurrentIndex(i => nextSlide(i))
+    resetProgress()
+    pauseAndResume()
+  }, [nextSlide, resetProgress, pauseAndResume])
 
-  if (!slides || slides.length === 0) return null
+  if (!slides || slidesLen === 0) return null
+
+  const nextIndex = nextSlide(currentIndex)
 
   return (
     <div
       className="relative w-full rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-900 select-none"
       style={{ aspectRatio: '16 / 7', minHeight: '160px' }}
     >
+      {/* Preload next slide image for instant transition */}
+      {slidesLen > 1 && (
+        <link rel="preload" as="image" href={slides[nextIndex].image_url} />
+      )}
+
       {/* All slides stacked — cross-fade via opacity */}
       {slides.map((slide, index) => {
         const isActive = index === currentIndex
         return (
           <div
             key={slide.id}
-            className="absolute inset-0 transition-opacity duration-700 ease-in-out"
-            style={{ opacity: isActive ? 1 : 0, zIndex: isActive ? 2 : 1 }}
+            className="absolute inset-0"
+            style={{
+              opacity: isActive ? 1 : 0,
+              zIndex: isActive ? 2 : 1,
+              transition: 'opacity 0.75s ease-in-out',
+            }}
             aria-hidden={!isActive}
           >
             <img
               src={slide.image_url}
               alt={slide.title || 'اسلاید'}
               className="absolute inset-0 w-full h-full object-cover"
+              // High-res: never downsample, load at full device pixel ratio
               style={{
+                imageRendering: 'high-quality' as any,
                 transform: isActive ? 'scale(1.04)' : 'scale(1)',
                 transition: 'transform 5.5s ease-out',
               }}
+              // Eagerly load active + next slides, lazy-load the rest
+              loading={isActive || index === nextIndex ? 'eager' : 'lazy'}
+              fetchPriority={isActive ? 'high' : index === nextIndex ? 'low' : 'auto'}
+              decoding="async"
             />
             {slide.title && (
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent flex items-end">
@@ -114,7 +145,7 @@ export function HomepageSlider({ slides }: Props) {
                   style={{
                     transform: isActive ? 'translateY(0)' : 'translateY(10px)',
                     opacity: isActive ? 1 : 0,
-                    transition: 'transform 0.6s ease 0.15s, opacity 0.6s ease 0.15s',
+                    transition: 'transform 0.6s ease 0.2s, opacity 0.6s ease 0.2s',
                   }}
                 >
                   <h2 className="text-white text-lg md:text-2xl font-bold drop-shadow-lg">
@@ -123,26 +154,29 @@ export function HomepageSlider({ slides }: Props) {
                 </div>
               </div>
             )}
-            {/* Make it clickable if it has a link */}
             {slide.link_url && (
-              <Link href={slide.link_url} className="absolute inset-0 z-10" aria-label={slide.title || 'مشاهده'} />
+              <Link
+                href={slide.link_url}
+                className="absolute inset-0 z-10"
+                aria-label={slide.title || 'مشاهده'}
+              />
             )}
           </div>
         )
       })}
 
-      {/* Progress bar */}
-      {slides.length > 1 && (
-        <div className="absolute bottom-0 inset-x-0 h-0.5 bg-white/20 z-20">
+      {/* Progress bar — drives the slide advance */}
+      {slidesLen > 1 && (
+        <div className="absolute bottom-0 inset-x-0 h-[3px] bg-white/20 z-20">
           <div
-            className="h-full bg-white/70"
-            style={{ width: `${progress}%`, transition: 'width 0.05s linear' }}
+            className="h-full bg-white/80 rounded-full"
+            style={{ width: `${progress}%`, transition: `width ${TICK}ms linear` }}
           />
         </div>
       )}
 
       {/* Navigation Arrows */}
-      {slides.length > 1 && (
+      {slidesLen > 1 && (
         <>
           <button
             onClick={goToPrevious}
@@ -162,7 +196,7 @@ export function HomepageSlider({ slides }: Props) {
       )}
 
       {/* Dots */}
-      {slides.length > 1 && (
+      {slidesLen > 1 && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
           {slides.map((_, index) => (
             <button
