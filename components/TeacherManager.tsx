@@ -506,37 +506,37 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
   const allowsTeachers = currentScope === 'teachers' || currentScope === 'both'
 
   return (
-    <div className="flex flex-col gap-8 text-slate-800">
+    <div className="flex flex-col gap-6 sm:gap-8 text-slate-800 w-full max-w-full">
       {/* Master Tab Bar: Teachers vs Reviews */}
-      <div className="bg-slate-200/90 p-2 rounded-2xl flex items-center justify-between gap-3 border-2 border-slate-300 shadow-sm flex-wrap">
-        <div className="flex items-center gap-2">
+      <div className="bg-slate-200/90 p-1.5 sm:p-2 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-2 border-slate-300 shadow-sm w-full">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scroll-smooth">
           <button
             type="button"
             onClick={() => setManagerTab('teachers')}
-            className={`px-5 py-3 rounded-xl text-xs sm:text-sm transition-all flex items-center gap-2 border-2 ${
+            className={`flex-1 sm:flex-initial px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 border-2 whitespace-nowrap shrink-0 ${
               managerTab === 'teachers'
                 ? 'bg-teal text-white border-teal-700 shadow-md font-black'
                 : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
             }`}
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4 shrink-0" />
             <span>مدیریت اساتید ({teachers.length})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setManagerTab('reviews')}
-            className={`px-5 py-3 rounded-xl text-xs sm:text-sm transition-all flex items-center gap-2 border-2 ${
+            className={`flex-1 sm:flex-initial px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 border-2 whitespace-nowrap shrink-0 ${
               managerTab === 'reviews'
                 ? 'bg-amber-600 text-white border-amber-800 shadow-md font-black'
                 : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
             }`}
           >
-            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+            <Star className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
             <span>نظرات و امتیازات ({reviews.length})</span>
             {pendingReviewsCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 text-xs font-black animate-pulse">
-                {pendingReviewsCount} بررسی نشده
+              <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 text-[10px] sm:text-xs font-black animate-pulse">
+                {pendingReviewsCount} جدید
               </span>
             )}
           </button>
@@ -546,7 +546,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           <button
             type="button"
             onClick={reset}
-            className="px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-black hover:bg-slate-800 transition-all flex items-center gap-1.5 shadow-xs"
+            className="w-full sm:w-auto justify-center px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-black hover:bg-slate-800 transition-all flex items-center gap-1.5 shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>افزودن استاد جدید</span>
@@ -560,24 +560,26 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
       {managerTab === 'teachers' && (
         <>
           {/* Create / Edit Form Card */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-300 shadow-md">
-            <div className="flex items-center justify-between border-b-2 border-slate-200 pb-5 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-teal/15 text-teal-800 border-2 border-teal/40 flex items-center justify-center font-bold">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border-2 border-slate-300 shadow-md w-full max-w-full">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-200 pb-4 sm:pb-5 mb-5 sm:mb-6">
+              <div className="flex items-start sm:items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-teal/15 text-teal-800 border-2 border-teal/40 flex items-center justify-center font-bold shrink-0 mt-0.5 sm:mt-0">
                   {editing ? <Pencil className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                 </div>
-                <div>
-                  <h2 className="text-lg font-black text-slate-900">
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
                     {editing ? `ویرایش اطلاعات استاد: ${form.name}` : 'افزودن استاد جدید'}
                   </h2>
-                  <p className="text-xs text-slate-600 font-medium">اطلاعات فردی، تعیین دامنه تدریس (دانش‌آموزان / معلمان)، تعرفه‌ها و سوابق</p>
+                  <p className="text-xs text-slate-600 font-medium leading-relaxed mt-0.5">
+                    اطلاعات فردی، تعیین دامنه تدریس (دانش‌آموزان / معلمان)، تعرفه‌ها و سوابق
+                  </p>
                 </div>
               </div>
               {editing && (
                 <button
                   onClick={reset}
                   type="button"
-                  className="text-xs font-black text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 px-3.5 py-1.5 rounded-xl transition-colors shadow-xs"
+                  className="self-start sm:self-auto text-xs font-black text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 px-3.5 py-1.5 rounded-xl transition-colors shadow-xs"
                 >
                   انصراف و فرم جدید
                 </button>
@@ -641,11 +643,11 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
             </div>
 
             {/* Tab navigation inside form */}
-            <div className="bg-slate-100 p-1.5 rounded-2xl border-2 border-slate-300 flex items-center gap-2 mb-6 overflow-x-auto text-xs">
+            <div className="bg-slate-100 p-1.5 rounded-2xl border-2 border-slate-300 flex items-center gap-1.5 sm:gap-2 mb-5 sm:mb-6 overflow-x-auto scroll-smooth w-full max-w-full text-xs">
               <button
                 type="button"
                 onClick={() => setActiveFormTab('basic')}
-                className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 border-2 ${
+                className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 border-2 ${
                   activeFormTab === 'basic'
                     ? 'bg-teal text-white border-teal-700 shadow-sm font-black'
                     : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
@@ -657,13 +659,13 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
               <button
                 type="button"
                 onClick={() => setActiveFormTab('tutoring')}
-                className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 border-2 ${
+                className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 border-2 ${
                   activeFormTab === 'tutoring'
                     ? 'bg-teal text-white border-teal-700 shadow-sm font-black'
                     : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
                 }`}
               >
-                <Award className="w-4 h-4 text-amber-500" />
+                <Award className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>۲. نشان‌ها و افتخارات</span>
               </button>
 
@@ -672,15 +674,15 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                 <button
                   type="button"
                   onClick={() => setActiveFormTab('student_pricing')}
-                  className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-2 border-2 ${
+                  className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 sm:gap-2 border-2 ${
                     activeFormTab === 'student_pricing'
                       ? 'bg-teal text-white border-teal-700 shadow-sm font-black'
                       : 'bg-white text-slate-800 border-slate-300 hover:border-slate-400 font-bold shadow-xs'
                   }`}
                 >
-                  <BookOpen className="w-4 h-4 text-teal" />
+                  <BookOpen className="w-4 h-4 text-teal shrink-0" />
                   <span>۳. پایه‌ها، دروس و تعرفه دانش‌آموزان</span>
-                  <span className="px-2 py-0.5 rounded-md text-[11px] bg-teal/10 text-teal-800 font-black">
+                  <span className="px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] bg-teal/10 text-teal-800 font-black">
                     {form.grades?.length || 0} پایه
                   </span>
                 </button>
@@ -691,15 +693,15 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                 <button
                   type="button"
                   onClick={() => setActiveFormTab('teacher_training')}
-                  className={`px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-2 border-2 ${
+                  className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 sm:gap-2 border-2 ${
                     activeFormTab === 'teacher_training'
                       ? 'bg-purple-700 text-white border-purple-900 shadow-sm font-black'
                       : 'bg-white text-purple-950 border-purple-300 hover:border-purple-400 font-bold shadow-xs'
                   }`}
                 >
-                  <GraduationCap className="w-4 h-4 text-purple-600" />
+                  <GraduationCap className="w-4 h-4 text-purple-600 shrink-0" />
                   <span>۴. تنظیمات و تعرفه تربیت معلم</span>
-                  <span className="px-2 py-0.5 rounded-md text-[11px] bg-purple-100 text-purple-900 font-black">
+                  <span className="px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] bg-purple-100 text-purple-900 font-black">
                     {form.training_topics?.length || 0} سرفصل
                   </span>
                 </button>
@@ -1091,34 +1093,37 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                       تعرفه‌ها و قیمت جلسات تدریس دانش‌آموزان
                     </label>
 
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 mb-3">
                       <input
                         type="text"
                         value={newPricingTitle}
                         onChange={e => setNewPricingTitle(e.target.value)}
                         placeholder="عنوان تعرفه (مثلاً جلسه ۶۰ دقیقه عادی)"
-                        className="px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-teal shadow-xs w-56"
+                        className="w-full sm:w-56 sm:flex-1 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-teal shadow-xs"
                       />
-                      <input
-                        type="number"
-                        value={newDuration}
-                        onChange={e => setNewDuration(Number(e.target.value))}
-                        placeholder="مدت دقیقه"
-                        className="w-28 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-teal shadow-xs"
-                      />
-                      <input
-                        type="number"
-                        value={newPrice}
-                        onChange={e => setNewPrice(Number(e.target.value))}
-                        placeholder="قیمت تومان"
-                        className="w-36 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-teal shadow-xs"
-                      />
+                      <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+                        <input
+                          type="number"
+                          value={newDuration}
+                          onChange={e => setNewDuration(Number(e.target.value))}
+                          placeholder="مدت دقیقه"
+                          className="w-full sm:w-28 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-teal shadow-xs text-center sm:text-right"
+                        />
+                        <input
+                          type="number"
+                          value={newPrice}
+                          onChange={e => setNewPrice(Number(e.target.value))}
+                          placeholder="قیمت تومان"
+                          className="w-full sm:w-36 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-teal shadow-xs text-center sm:text-right"
+                        />
+                      </div>
                       <button
                         type="button"
                         onClick={addPricingOption}
-                        className="px-4 py-2 bg-teal text-white rounded-xl text-xs font-black hover:bg-teal-deep transition-all shadow-xs"
+                        className="w-full sm:w-auto px-4 py-2 bg-teal text-white rounded-xl text-xs font-black hover:bg-teal-deep transition-all shadow-xs flex items-center justify-center gap-1"
                       >
-                        افزودن تعرفه
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>افزودن تعرفه</span>
                       </button>
                     </div>
 
@@ -1332,34 +1337,37 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
                       تعرفه‌ها و پکیج‌های مستقل تربیت معلم (ویژه آموزش به همکاران)
                     </label>
 
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 mb-3">
                       <input
                         type="text"
                         value={newTrainingTitle}
                         onChange={e => setNewTrainingTitle(e.target.value)}
                         placeholder="عنوان دوره یا جلسه (مثلاً کارگاه ۶۰ دقیقه‌ای)"
-                        className="px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-purple-600 shadow-xs w-60"
+                        className="w-full sm:w-60 sm:flex-1 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-purple-600 shadow-xs"
                       />
-                      <input
-                        type="number"
-                        value={newTrainingDuration}
-                        onChange={e => setNewTrainingDuration(Number(e.target.value))}
-                        placeholder="مدت دقیقه"
-                        className="w-28 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-purple-600 shadow-xs"
-                      />
-                      <input
-                        type="number"
-                        value={newTrainingPrice}
-                        onChange={e => setNewTrainingPrice(Number(e.target.value))}
-                        placeholder="قیمت تومان"
-                        className="w-36 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-purple-600 shadow-xs"
-                      />
+                      <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+                        <input
+                          type="number"
+                          value={newTrainingDuration}
+                          onChange={e => setNewTrainingDuration(Number(e.target.value))}
+                          placeholder="مدت دقیقه"
+                          className="w-full sm:w-28 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-purple-600 shadow-xs text-center sm:text-right"
+                        />
+                        <input
+                          type="number"
+                          value={newTrainingPrice}
+                          onChange={e => setNewTrainingPrice(Number(e.target.value))}
+                          placeholder="قیمت تومان"
+                          className="w-full sm:w-36 px-3.5 py-2 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-purple-600 shadow-xs text-center sm:text-right"
+                        />
+                      </div>
                       <button
                         type="button"
                         onClick={addTrainingPricingOption}
-                        className="px-4 py-2 bg-purple-700 text-white rounded-xl text-xs font-black hover:bg-purple-800 transition-all shadow-xs"
+                        className="w-full sm:w-auto px-4 py-2 bg-purple-700 text-white rounded-xl text-xs font-black hover:bg-purple-800 transition-all shadow-xs flex items-center justify-center gap-1"
                       >
-                        افزودن پکیج
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>افزودن پکیج</span>
                       </button>
                     </div>
 
@@ -1399,18 +1407,18 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
               )}
 
               {/* Submit Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-slate-200">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 sm:gap-3 pt-4 border-t-2 border-slate-200">
                 <button
                   type="button"
                   onClick={reset}
-                  className="px-5 py-2.5 rounded-xl border-2 border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100 transition-all"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border-2 border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100 transition-all text-center"
                 >
                   انصراف
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-7 py-2.5 rounded-xl bg-teal hover:bg-teal-deep text-white text-xs font-black shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
+                  className="w-full sm:w-auto px-7 py-2.5 rounded-xl bg-teal hover:bg-teal-deep text-white text-xs font-black shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {saving ? (
                     <span>در حال ذخیره...</span>
@@ -1423,7 +1431,7 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           </div>
 
           {/* Teachers List Table/Cards */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-300 shadow-md">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border-2 border-slate-300 shadow-md w-full max-w-full">
             <h3 className="text-base font-black text-slate-900 mb-4">لیست کلیه اساتید ثبت شده</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {teachers.map(t => (
@@ -1504,21 +1512,21 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
       {/* SECTION 2: REVIEWS MODERATION & RATINGS */}
       {/* ============================================================== */}
       {managerTab === 'reviews' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-300 shadow-md flex flex-col gap-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b-2 border-slate-200 pb-5">
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border-2 border-slate-300 shadow-md flex flex-col gap-5 sm:gap-6 w-full max-w-full">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 border-b-2 border-slate-200 pb-4 sm:pb-5">
             <div>
-              <h2 className="text-lg font-black text-slate-900">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
                 مدیریت نظرات، تجربیات و امتیازات اساتید
               </h2>
-              <p className="text-xs text-slate-600 font-medium">
-                بررسی و تایید نظرات ثبت شده توسط اولیا و معلمان. امتیاز واقعی اساتید با تایید دیدگاه‌ها به‌طور خودکار محاسبه و بروزرسانی می‌شود.
+              <p className="text-xs text-slate-600 font-medium leading-relaxed mt-0.5">
+                بررسی و تایید نظرات ثبت شده توسط اولیا و معلمان. امتیاز واقعی اساتید با تایید دیدگاه‌ها به‌طور خودکار بروزرسانی می‌شود.
               </p>
             </div>
 
             <button
               type="button"
               onClick={loadReviews}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 text-xs font-black text-slate-800 transition-all flex items-center gap-1.5"
+              className="w-full sm:w-auto justify-center px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 text-xs font-black text-slate-800 transition-all flex items-center gap-1.5 shrink-0"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>تازه‌سازی لیست</span>
@@ -1526,96 +1534,98 @@ export function TeacherManager({ initial }: { initial: Teacher[] }) {
           </div>
 
           {/* Filter Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border-2 border-slate-200">
-            {/* Status Filter */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black text-slate-700 ml-1">وضعیت:</span>
-              <button
-                type="button"
-                onClick={() => setReviewStatusFilter('all')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
-                  reviewStatusFilter === 'all'
-                    ? 'bg-slate-900 text-white border-slate-900'
-                    : 'bg-white text-slate-700 border-slate-300'
-                }`}
-              >
-                همه ({reviews.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setReviewStatusFilter('pending')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black border flex items-center gap-1 ${
-                  reviewStatusFilter === 'pending'
-                    ? 'bg-amber-500 text-slate-950 border-amber-600'
-                    : 'bg-white text-amber-800 border-amber-300'
-                }`}
-              >
-                در انتظار تایید ({pendingReviewsCount})
-              </button>
-              <button
-                type="button"
-                onClick={() => setReviewStatusFilter('approved')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
-                  reviewStatusFilter === 'approved'
-                    ? 'bg-emerald-700 text-white border-emerald-900'
-                    : 'bg-white text-emerald-800 border-emerald-300'
-                }`}
-              >
-                تایید شده ({reviews.filter(r => r.is_approved).length})
-              </button>
-            </div>
+          <div className="flex flex-col gap-3 bg-slate-50 p-3 sm:p-4 rounded-2xl border-2 border-slate-200 w-full max-w-full">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              {/* Status Filter */}
+              <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 scroll-smooth">
+                <span className="text-xs font-black text-slate-700 ml-1 shrink-0">وضعیت:</span>
+                <button
+                  type="button"
+                  onClick={() => setReviewStatusFilter('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border shrink-0 whitespace-nowrap ${
+                    reviewStatusFilter === 'all'
+                      ? 'bg-slate-900 text-white border-slate-900'
+                      : 'bg-white text-slate-700 border-slate-300'
+                  }`}
+                >
+                  همه ({reviews.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReviewStatusFilter('pending')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black border flex items-center gap-1 shrink-0 whitespace-nowrap ${
+                    reviewStatusFilter === 'pending'
+                      ? 'bg-amber-500 text-slate-950 border-amber-600'
+                      : 'bg-white text-amber-800 border-amber-300'
+                  }`}
+                >
+                  در انتظار تایید ({pendingReviewsCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReviewStatusFilter('approved')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border shrink-0 whitespace-nowrap ${
+                    reviewStatusFilter === 'approved'
+                      ? 'bg-emerald-700 text-white border-emerald-900'
+                      : 'bg-white text-emerald-800 border-emerald-300'
+                  }`}
+                >
+                  تایید شده ({reviews.filter(r => r.is_approved).length})
+                </button>
+              </div>
 
-            {/* Role Filter */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black text-slate-700 ml-1">نقش ثبت‌کننده:</span>
-              <button
-                type="button"
-                onClick={() => setReviewRoleFilter('all')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
-                  reviewRoleFilter === 'all'
-                    ? 'bg-slate-800 text-white border-slate-800'
-                    : 'bg-white text-slate-700 border-slate-300'
-                }`}
-              >
-                همه
-              </button>
-              <button
-                type="button"
-                onClick={() => setReviewRoleFilter('parent')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
-                  reviewRoleFilter === 'parent'
-                    ? 'bg-emerald-700 text-white border-emerald-900'
-                    : 'bg-white text-emerald-800 border-emerald-300'
-                }`}
-              >
-                والدین دانش‌آموزان
-              </button>
-              <button
-                type="button"
-                onClick={() => setReviewRoleFilter('teacher')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
-                  reviewRoleFilter === 'teacher'
-                    ? 'bg-purple-700 text-white border-purple-900'
-                    : 'bg-white text-purple-900 border-purple-300'
-                }`}
-              >
-                معلمان / همکاران
-              </button>
-            </div>
+              {/* Role Filter */}
+              <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 scroll-smooth">
+                <span className="text-xs font-black text-slate-700 ml-1 shrink-0">نقش:</span>
+                <button
+                  type="button"
+                  onClick={() => setReviewRoleFilter('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border shrink-0 whitespace-nowrap ${
+                    reviewRoleFilter === 'all'
+                      ? 'bg-slate-800 text-white border-slate-800'
+                      : 'bg-white text-slate-700 border-slate-300'
+                  }`}
+                >
+                  همه
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReviewRoleFilter('parent')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border shrink-0 whitespace-nowrap ${
+                    reviewRoleFilter === 'parent'
+                      ? 'bg-emerald-700 text-white border-emerald-900'
+                      : 'bg-white text-emerald-800 border-emerald-300'
+                  }`}
+                >
+                  والدین
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReviewRoleFilter('teacher')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border shrink-0 whitespace-nowrap ${
+                    reviewRoleFilter === 'teacher'
+                      ? 'bg-purple-700 text-white border-purple-900'
+                      : 'bg-white text-purple-900 border-purple-300'
+                  }`}
+                >
+                  معلمان
+                </button>
+              </div>
 
-            {/* Teacher Filter */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black text-slate-700 ml-1">استاد:</span>
-              <select
-                value={reviewTeacherFilter}
-                onChange={e => setReviewTeacherFilter(e.target.value)}
-                className="px-3 py-1.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-bold focus:outline-none focus:border-teal"
-              >
-                <option value="all">همه اساتید</option>
-                {teachers.map(t => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
+              {/* Teacher Filter */}
+              <div className="flex items-center gap-1.5 w-full lg:w-auto">
+                <span className="text-xs font-black text-slate-700 ml-1 shrink-0">استاد:</span>
+                <select
+                  value={reviewTeacherFilter}
+                  onChange={e => setReviewTeacherFilter(e.target.value)}
+                  className="w-full lg:w-auto px-3 py-1.5 text-xs bg-white border-2 border-slate-300 rounded-xl text-slate-900 font-bold focus:outline-none focus:border-teal"
+                >
+                  <option value="all">همه اساتید</option>
+                  {teachers.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

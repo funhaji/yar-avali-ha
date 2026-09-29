@@ -112,10 +112,10 @@ export function TutoringRequestsManager() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 w-full max-w-full">
       {/* Top filters */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-slate-300 shadow-md flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-2 border-slate-300 shadow-md flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4 w-full max-w-full">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 md:pb-0 scroll-smooth w-full md:w-auto">
           <button
             type="button"
             onClick={() => setStatusFilter('all')}
@@ -173,7 +173,7 @@ export function TutoringRequestsManager() {
           </button>
         </div>
 
-        <div className="relative min-w-[260px]">
+        <div className="relative w-full md:w-auto md:min-w-[260px]">
           <Search className="w-4 h-4 text-slate-500 absolute right-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"

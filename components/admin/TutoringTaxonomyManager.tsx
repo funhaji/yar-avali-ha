@@ -237,9 +237,9 @@ export function TutoringTaxonomyManager() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start w-full max-w-full">
         {/* GRADES SECTION */}
-        <section className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-slate-300 shadow-md flex flex-col gap-6">
+        <section className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-7 border-2 border-slate-300 shadow-md flex flex-col gap-5 sm:gap-6 w-full max-w-full">
           <div className="flex items-center justify-between border-b-2 border-slate-200 pb-4">
             <div className="flex items-center gap-2.5 text-slate-900 font-black text-lg">
               <Layers className="w-5 h-5 text-teal" />
@@ -425,7 +425,7 @@ export function TutoringTaxonomyManager() {
         </section>
 
         {/* SUBJECTS SECTION */}
-        <section className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-slate-300 shadow-md flex flex-col gap-6">
+        <section className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-7 border-2 border-slate-300 shadow-md flex flex-col gap-5 sm:gap-6 w-full max-w-full">
           <div className="flex items-center justify-between border-b-2 border-slate-200 pb-4">
             <div className="flex items-center gap-2.5 text-slate-900 font-black text-lg">
               <BookOpen className="w-5 h-5 text-tangerine" />

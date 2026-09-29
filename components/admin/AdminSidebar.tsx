@@ -36,10 +36,11 @@ export function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile toggle */}
+      {/* Mobile toggle button (left side in RTL to prevent covering Persian form inputs) */}
       <button 
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 bg-teal text-white p-4 rounded-full shadow-xl"
+        aria-label="منوی مدیریت"
+        className="lg:hidden fixed bottom-6 left-6 z-50 bg-teal text-white p-3.5 rounded-full shadow-2xl border-2 border-teal-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
       >
         <Menu className="w-6 h-6" />
       </button>
@@ -47,7 +48,7 @@ export function AdminSidebar() {
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 transition-opacity"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -58,7 +59,7 @@ export function AdminSidebar() {
         w-64 h-screen h-[100dvh]
         bg-paper border-l border-line-soft
         transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+        ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0 pointer-events-none invisible lg:visible lg:pointer-events-auto'}
         flex flex-col
       `}>
         <div className="p-4 border-b border-line-soft flex items-center justify-between">
