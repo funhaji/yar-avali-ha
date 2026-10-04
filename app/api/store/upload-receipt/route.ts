@@ -28,8 +28,19 @@ export async function POST(request: Request) {
     }
 
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-')
-    const blob = await put(`store/receipts/${Date.now()}-${safeName}`, file, {
+    const baseName = safeName.replace(/\.[^/.]+$/, '')
+
+    const arrayBuffer = await file.arrayBuffer()
+    const { optimizeImageBuffer } = await import('@/lib/image-optimizer')
+    const optimized = await optimizeImageBuffer(Buffer.from(arrayBuffer), {
+      maxWidth: 1200,
+      maxHeight: 1600,
+      quality: 75
+    })
+
+    const blob = await put(`store/receipts/${Date.now()}-${baseName}.webp`, optimized.buffer, {
       access: 'public',
+      contentType: 'image/webp',
       addRandomSuffix: true,
       token: process.env.BLOB_READ_WRITE_TOKEN,
     })

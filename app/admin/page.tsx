@@ -7,6 +7,7 @@ import { validateSession } from '@/lib/auth'
 import { SiteHeader } from '@/components/SiteHeader'
 import { AccountControls } from '@/components/AccountControls'
 import { DatabaseMigration } from '@/components/admin/DatabaseMigration'
+import { BlobOptimizer } from '@/components/admin/BlobOptimizer'
 
 async function stats() {
   const [users, subs, content, teachers, recentContent, recentLinks] = await Promise.all([
@@ -44,7 +45,10 @@ export default async function AdminPage() {
             <h1 className="text-3xl md:text-4xl font-black text-ink mb-2">داشبورد مدیریت</h1>
             <p className="text-ink-soft">سلام {user.name} عزیز، به پنل مدیریت خوش آمدی!</p>
           </div>
-          <DatabaseMigration />
+          <div className="flex items-center gap-3 flex-wrap">
+            <BlobOptimizer />
+            <DatabaseMigration />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

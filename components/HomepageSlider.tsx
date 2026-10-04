@@ -104,11 +104,6 @@ export function HomepageSlider({ slides }: Props) {
       className="relative w-full rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-900 select-none"
       style={{ aspectRatio: '16 / 7', minHeight: '160px' }}
     >
-      {/* Preload next slide image for instant transition */}
-      {slidesLen > 1 && (
-        <link rel="preload" as="image" href={slides[nextIndex].image_url} />
-      )}
-
       {/* All slides stacked — cross-fade via opacity */}
       {slides.map((slide, index) => {
         const isActive = index === currentIndex
@@ -127,15 +122,12 @@ export function HomepageSlider({ slides }: Props) {
               src={slide.image_url}
               alt={slide.title || 'اسلاید'}
               className="absolute inset-0 w-full h-full object-cover"
-              // High-res: never downsample, load at full device pixel ratio
               style={{
-                imageRendering: 'high-quality' as any,
                 transform: isActive ? 'scale(1.04)' : 'scale(1)',
                 transition: 'transform 5.5s ease-out',
               }}
-              // Eagerly load active + next slides, lazy-load the rest
-              loading={isActive || index === nextIndex ? 'eager' : 'lazy'}
-              fetchPriority={isActive ? 'high' : index === nextIndex ? 'low' : 'auto'}
+              loading={isActive ? 'eager' : 'lazy'}
+              fetchPriority={isActive ? 'high' : 'low'}
               decoding="async"
             />
             {slide.title && (

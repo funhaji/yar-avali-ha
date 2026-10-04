@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { put } from '@vercel/blob'
 import { requireAdmin } from '@/lib/teachers'
+import { optimizeImageBuffer } from '@/lib/image-optimizer'
 
 export async function POST(request: Request) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'دسترسی غیرمجاز' }, { status: 403 })
@@ -11,16 +12,24 @@ export async function POST(request: Request) {
   if (!file) return NextResponse.json({ error: 'فایلی انتخاب نشده است.' }, { status: 400 })
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-')
+  const baseName = safeName.replace(/\.[^/.]+$/, '')
 
   if (kind === 'thumbnail') {
     if (!file.type.startsWith('image/')) return NextResponse.json({ error: 'برای تصویر شاخص فقط فایل تصویر مجاز است.' }, { status: 400 })
-    if (file.size > 8 * 1024 * 1024) return NextResponse.json({ error: 'حجم تصویر باید کمتر از ۸ مگابایت باشد.' }, { status: 400 })
+    if (file.size > 15 * 1024 * 1024) return NextResponse.json({ error: 'حجم تصویر باید کمتر از ۱۵ مگابایت باشد.' }, { status: 400 })
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
       return NextResponse.json({ error: 'آپلود تصویر هنوز تنظیم نشده است. BLOB_READ_WRITE_TOKEN را تنظیم کنید یا لینک تصویر را دستی وارد کنید.' }, { status: 503 })
     }
 
-    const blob = await put(`content/thumbnails/${Date.now()}-${safeName}`, file, {
+    const arrayBuffer = await file.arrayBuffer()
+    const optimized = await optimizeImageBuffer(Buffer.from(arrayBuffer), {
+      maxWidth: 1200,
+      quality: 82
+    })
+
+    const blob = await put(`content/thumbnails/${Date.now()}-${baseName}.webp`, optimized.buffer, {
       access: 'public',
+      contentType: 'image/webp',
       addRandomSuffix: true,
       token: process.env.BLOB_READ_WRITE_TOKEN,
     })
@@ -58,13 +67,20 @@ export async function POST(request: Request) {
 
   if (kind === 'image') {
     if (!file.type.startsWith('image/')) return NextResponse.json({ error: 'Only images are allowed for this type.' }, { status: 400 })
-    if (file.size > 15 * 1024 * 1024) return NextResponse.json({ error: 'File size must be less than 15MB.' }, { status: 400 })
+    if (file.size > 20 * 1024 * 1024) return NextResponse.json({ error: 'File size must be less than 20MB.' }, { status: 400 })
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
       return NextResponse.json({ error: 'BLOB_READ_WRITE_TOKEN is not set.' }, { status: 503 })
     }
 
-    const blob = await put(`gallery/images/${Date.now()}-${safeName}`, file, {
+    const arrayBuffer = await file.arrayBuffer()
+    const optimized = await optimizeImageBuffer(Buffer.from(arrayBuffer), {
+      maxWidth: 1600,
+      quality: 82
+    })
+
+    const blob = await put(`gallery/images/${Date.now()}-${baseName}.webp`, optimized.buffer, {
       access: 'public',
+      contentType: 'image/webp',
       addRandomSuffix: true,
       token: process.env.BLOB_READ_WRITE_TOKEN,
     })

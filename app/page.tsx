@@ -397,7 +397,7 @@ export default async function HomePage() {
               {teachers.map((t) => (
                 <Link href={`/teachers/${t.id}`} key={t.id} className="card card-hover teacher-card max-md:w-[260px] max-md:snap-center shrink-0 block">
                   {t.photo_url ? (
-                    <img src={t.photo_url || "/placeholder.svg"} alt={t.name} className="teacher-photo" />
+                    <img src={t.photo_url || "/placeholder.svg"} alt={t.name} className="teacher-photo" loading="lazy" decoding="async" />
                   ) : (
                     <div className="teacher-photo" style={{ display: 'grid', placeItems: 'center', color: 'var(--ink-soft)' }}><Sparkles style={{ width: 40 }} /></div>
                   )}
