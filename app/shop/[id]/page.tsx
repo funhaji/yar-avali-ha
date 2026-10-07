@@ -193,7 +193,6 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const { getStoreItemById } = require('@/lib/store');
   const product = await getStoreItemById(id);
   if (!product) return {};
   const url = 'https://www.yaravaliha.ir/shop/' + id;

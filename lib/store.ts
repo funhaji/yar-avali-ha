@@ -97,7 +97,10 @@ export async function getUniqueSubcategories(category?: string): Promise<string[
   return result.map(r => r.subcategory)
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function getStoreItemById(id: string): Promise<StoreItem | null> {
+  if (!id || !UUID_REGEX.test(id)) return null
   const items = await query<StoreItem>('SELECT * FROM yar_store_items WHERE id = $1', [id])
   return items[0] || null
 }
@@ -199,6 +202,7 @@ export async function getRelatedStoreItems(id: string, limit: number = 3): Promi
 }
 
 export async function getStoreComments(storeItemId: string) {
+  if (!storeItemId || !UUID_REGEX.test(storeItemId)) return []
   const sql = `
     SELECT c.id, c.comment, c.created_at, u.name as user_name
     FROM yar_store_comments c

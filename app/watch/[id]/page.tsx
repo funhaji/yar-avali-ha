@@ -12,7 +12,10 @@ import { ArrowRight, Lock, Play, FileText, Image as ImageIcon } from 'lucide-rea
 import { SiteHeader, SiteFooter } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 async function getContentData(contentId: string, userId?: string) {
+  if (!contentId || !UUID_REGEX.test(contentId)) return null
   const content = await query(`SELECT * FROM yar_content_items WHERE id = $1 AND published = true`, [contentId])
   if (content.length === 0) return null
   const item = content[0]
@@ -327,7 +330,7 @@ export default async function WatchPage({ params }: { params: Promise<{ id: stri
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const { query } = require('@/lib/db');
+  if (!id || !UUID_REGEX.test(id)) return {};
   const result = await query('SELECT * FROM yar_content_items WHERE id = $1', [id]);
   const item = result[0];
   if (!item) return {};
