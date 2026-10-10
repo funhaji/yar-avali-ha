@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { query } from '@/lib/db'
 import { hasActiveSubscription } from '@/lib/subscriptions'
 import { validateSession } from '@/lib/auth'
-import { getPixeldrainUrl } from '@/lib/video'
+import { getPixeldrainUrl, getGoogleDriveUrl } from '@/lib/video'
 import VideoPlayer from '@/components/VideoPlayer'
 import SecurePDFViewer from '@/components/SecurePDFViewer'
 import { VideoComments } from '@/components/VideoComments'
@@ -49,7 +49,7 @@ async function getContentData(contentId: string, userId?: string) {
       switch (storageProvider) {
         case 'pixeldrain': directVideoUrl = item.pixeldrain_id ? getPixeldrainUrl(item.pixeldrain_id) : ''; break
         case 'youtube': directVideoUrl = item.video_url || ''; break
-        case 'gdrive': directVideoUrl = item.gdrive_id || item.video_url || ''; break
+        case 'gdrive': directVideoUrl = item.gdrive_id ? getGoogleDriveUrl(item.gdrive_id) : (item.video_url ? getGoogleDriveUrl(item.video_url) : ''); break
         case 'mega': directVideoUrl = item.video_url || ''; break
         case 'direct': directVideoUrl = item.video_url || ''; break
         default: directVideoUrl = item.video_url || ''
@@ -136,7 +136,7 @@ export default async function WatchPage({ params }: { params: Promise<{ id: stri
           {!hasAccess && (
             <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-800 border border-amber-500/20 px-3.5 py-1.5 rounded-full text-xs font-bold">
               <Lock className="w-3.5 h-3.5 text-amber-600" />
-              محتوای ویژه — نیازمند اشتراک
+              محتوای ویژه (نیازمند اشتراک)
             </div>
           )}
         </div>

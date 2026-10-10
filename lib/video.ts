@@ -151,10 +151,20 @@ export function getPixeldrainUrl(pixeldrainId: string): string {
   return `https://pixeldrain.com/api/file/${pixeldrainId}`;
 }
 
+// Extract Google Drive ID from URL or raw ID
+export function extractGoogleDriveId(input: string | null | undefined): string | null {
+  if (!input) return null;
+  const match = input.match(/\/d\/([^\/\?]+)/) || input.match(/id=([^\&]+)/);
+  if (match) return match[1];
+  const trimmed = input.trim();
+  if (/^[a-zA-Z0-9_-]{20,}$/.test(trimmed)) return trimmed;
+  return null;
+}
+
 // Get Google Drive streaming URL
-export function getGoogleDriveUrl(driveId: string): string {
-  // Use the preview URL which supports streaming
-  return `https://drive.google.com/uc?export=download&id=${driveId}`;
+export function getGoogleDriveUrl(driveIdOrUrl: string): string {
+  const fileId = extractGoogleDriveId(driveIdOrUrl) || driveIdOrUrl;
+  return `https://drive.usercontent.google.com/download?id=${fileId}&export=download&confirm=t`;
 }
 
 // Add watermark text to video URL (for client-side overlay)

@@ -1,7 +1,7 @@
 import { headers, cookies } from 'next/headers'
 import Link from 'next/link'
 import { query } from '@/lib/db'
-import { getPixeldrainUrl } from '@/lib/video'
+import { getPixeldrainUrl, getGoogleDriveUrl } from '@/lib/video'
 import { validateSession } from '@/lib/auth'
 import VideoPlayer from '@/components/VideoPlayer'
 import SecurePDFViewerCanvas from '@/components/SecurePDFViewerCanvas'
@@ -56,7 +56,7 @@ async function getStoreContentData(contentId: string, userId: string, fileIndex:
         directVideoUrl = (item.file_url || '').split(',')[fileIndex] || (item.file_url || '').split(',')[0] || ''
         break
       case 'gdrive':
-        directVideoUrl = item.gdrive_id || item.file_url || ''
+        directVideoUrl = item.gdrive_id ? getGoogleDriveUrl(item.gdrive_id) : (item.file_url ? getGoogleDriveUrl(item.file_url) : '')
         break
       case 'mega':
         directVideoUrl = (item.file_url || '').split(',')[fileIndex] || (item.file_url || '').split(',')[0] || ''
