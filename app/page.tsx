@@ -281,17 +281,41 @@ export default async function HomePage() {
             <Link href="/entertainment" className="muted" style={{ fontWeight: 700 }}>مشاهده همه <ArrowLeft style={{ width: 16, display: 'inline' }} /></Link>
           </div>
                     {/* CATEGORY CARDS */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {[
-              { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '🎨', bg: s?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${s.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
-              { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '📝', bg: s?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${s.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
-              { id: 'علوم', title: 'علوم', icon: '🔬', bg: s?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${s.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }
+              { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '🎨', img: s?.ent_cat1_image, gradientClass: 'bg-gradient-to-br from-teal-600 to-teal-900' },
+              { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '📝', img: s?.ent_cat2_image, gradientClass: 'bg-gradient-to-br from-amber-500 to-amber-800' },
+              { id: 'ریاضی', title: 'ریاضی', icon: '📐', img: s?.ent_cat4_image, gradientClass: 'bg-gradient-to-br from-indigo-600 to-purple-900' },
+              { id: 'علوم', title: 'علوم', icon: '🔬', img: s?.ent_cat3_image, gradientClass: 'bg-gradient-to-br from-sky-600 to-blue-900' }
             ].map(card => (
-              <Link key={card.id} href={`/entertainment?c=${encodeURIComponent(card.id)}`} className="card card-hover p-6 relative overflow-hidden group flex flex-col justify-end text-right transition-transform hover:-translate-y-1" style={{ minHeight: '200px', background: card.bg, border: 'none', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.2)' }}>
-                <div className="absolute top-4 right-4 text-4xl opacity-80 group-hover:scale-110 transition-transform duration-300">{card.icon}</div>
-                <div className="relative z-10 text-white w-full">
-                  <span className="badge bg-white/20 text-white backdrop-blur-sm mb-2 inline-block px-2 py-1 rounded-full text-xs font-medium">بخش آموزشی</span>
-                  <h3 className="text-xl font-bold mb-1 text-white drop-shadow-md">{card.title}</h3>
+              <Link 
+                key={card.id} 
+                href={`/entertainment?c=${encodeURIComponent(card.id)}`} 
+                className="card card-hover relative overflow-hidden group flex flex-col justify-end text-right rounded-2xl border border-line-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-xl shadow-md min-h-[160px] sm:min-h-[190px] md:min-h-[220px]"
+              >
+                {/* Responsive background image */}
+                {card.img ? (
+                  <img
+                    src={card.img}
+                    alt={card.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : null}
+                {/* Contrast-preserving overlay for WCAG AA compliance */}
+                <div className={`absolute inset-0 ${card.gradientClass} ${card.img ? 'opacity-85 mix-blend-multiply group-hover:opacity-75' : ''} transition-opacity duration-300`} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+                
+                {/* Icon top-right */}
+                <div className="absolute top-3 right-3 sm:top-4 sm:right-4 text-2xl sm:text-3xl md:text-4xl drop-shadow-md group-hover:scale-110 transition-transform duration-300 select-none">
+                  {card.icon}
+                </div>
+
+                {/* Card footer details */}
+                <div className="relative z-10 text-white w-full p-3.5 sm:p-5">
+                  <span className="badge bg-white/20 text-white backdrop-blur-sm mb-1.5 sm:mb-2 inline-block px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold">بخش آموزشی</span>
+                  <h3 className="text-base sm:text-lg md:text-xl font-black text-white drop-shadow-md leading-snug">{card.title}</h3>
                 </div>
               </Link>
             ))}

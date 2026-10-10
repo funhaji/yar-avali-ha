@@ -21,9 +21,10 @@ type Props = {
 
 export function EntertainmentContent({ byType, hasSubscription, initialQuery, initialCategory, types, typeNames, categoryMedia }: Props) {
   const CATEGORY_CARDS = [
-    { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '📝', bg: categoryMedia?.ent_cat1_image ? `linear-gradient(135deg, rgba(20,184,166,0.6), rgba(15,118,110,0.8)), url(${categoryMedia.ent_cat1_image}) center/cover` : 'linear-gradient(135deg, #14b8a6, #0f766e)' },
-    { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '🔤', bg: categoryMedia?.ent_cat2_image ? `linear-gradient(135deg, rgba(245,158,11,0.6), rgba(180,83,9,0.8)), url(${categoryMedia.ent_cat2_image}) center/cover` : 'linear-gradient(135deg, #f59e0b, #b45309)' },
-    { id: 'علوم', title: 'علوم', icon: '🔬', bg: categoryMedia?.ent_cat3_image ? `linear-gradient(135deg, rgba(59,130,246,0.6), rgba(29,78,216,0.8)), url(${categoryMedia.ent_cat3_image}) center/cover` : 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }
+    { id: 'لوحه نویسی', title: 'لوحه نویسی', icon: '🎨', img: categoryMedia?.ent_cat1_image, gradientClass: 'bg-gradient-to-br from-teal-600 to-teal-900' },
+    { id: 'نشانه های ۱/۲', title: 'نشانه های ۱/۲', icon: '📝', img: categoryMedia?.ent_cat2_image, gradientClass: 'bg-gradient-to-br from-amber-500 to-amber-800' },
+    { id: 'ریاضی', title: 'ریاضی', icon: '📐', img: categoryMedia?.ent_cat4_image, gradientClass: 'bg-gradient-to-br from-indigo-600 to-purple-900' },
+    { id: 'علوم', title: 'علوم', icon: '🔬', img: categoryMedia?.ent_cat3_image, gradientClass: 'bg-gradient-to-br from-sky-600 to-blue-900' }
   ]
   const [searchQuery, setSearchQuery] = useState(initialQuery || '')
   const [tierFilter, setTierFilter] = useState<FilterOption>('all')
@@ -63,25 +64,31 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
   // If no category is selected, show the 4 big cards
   if (!initialCategory && !initialQuery) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
         {CATEGORY_CARDS.map((card) => (
           <button
             key={card.id}
             onClick={() => handleCategoryClick(card.id)}
-            className="card card-hover p-8 relative overflow-hidden group min-h-[250px] flex flex-col justify-end text-right transition-transform hover:-translate-y-1"
-            style={{ 
-              background: card.bg,
-              border: 'none',
-              boxShadow: '0 10px 30px -10px rgba(0,0,0,0.2)'
-            }}
+            className="card card-hover p-6 sm:p-8 relative overflow-hidden group min-h-[180px] sm:min-h-[240px] flex flex-col justify-end text-right transition-transform hover:-translate-y-1 rounded-2xl border border-line-soft shadow-lg"
           >
-            <div className="absolute top-6 right-6 text-5xl opacity-80 group-hover:scale-110 transition-transform duration-300">
+            {card.img ? (
+              <img
+                src={card.img}
+                alt={card.title}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : null}
+            <div className={`absolute inset-0 ${card.gradientClass} ${card.img ? 'opacity-85 mix-blend-multiply group-hover:opacity-75' : ''} transition-opacity duration-300`} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 text-3xl sm:text-5xl opacity-80 group-hover:scale-110 transition-transform duration-300 select-none drop-shadow-md">
               {card.icon}
             </div>
             <div className="relative z-10 text-white w-full">
-              <span className="badge bg-white/20 text-white backdrop-blur-sm mb-3 inline-block px-3 py-1 rounded-full text-sm font-medium">بخش آموزشی</span>
-              <h3 className="text-3xl font-bold mb-2 text-white drop-shadow-md">{card.title}</h3>
-              <p className="text-white/90 line-clamp-2">
+              <span className="badge bg-white/20 text-white backdrop-blur-sm mb-2 sm:mb-3 inline-block px-3 py-1 rounded-full text-xs sm:text-sm font-medium">بخش آموزشی</span>
+              <h3 className="text-2xl sm:text-3xl font-black mb-1 sm:mb-2 text-white drop-shadow-md">{card.title}</h3>
+              <p className="text-white/90 line-clamp-2 text-xs sm:text-sm">
                 مشاهده ویدیوها و محتوای مربوط به {card.title}
               </p>
             </div>
@@ -114,6 +121,8 @@ export function EntertainmentContent({ byType, hasSubscription, initialQuery, in
               <iframe src={getEmbedUrl(categoryMedia.ent_cat1_video)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
             ) : initialCategory === 'نشانه های ۱/۲' && categoryMedia?.ent_cat2_video ? (
               <iframe src={getEmbedUrl(categoryMedia.ent_cat2_video)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
+            ) : initialCategory === 'ریاضی' && categoryMedia?.ent_cat4_video ? (
+              <iframe src={getEmbedUrl(categoryMedia.ent_cat4_video)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
             ) : initialCategory === 'علوم' && categoryMedia?.ent_cat3_video ? (
               <iframe src={getEmbedUrl(categoryMedia.ent_cat3_video)} className="absolute inset-0 w-full h-full border-none" allowFullScreen allow="autoplay; fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
             ) : (

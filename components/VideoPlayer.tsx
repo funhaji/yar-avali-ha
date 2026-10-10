@@ -132,6 +132,8 @@ export default function VideoPlayer({
     
     youtubePlayerRef.current = new window.YT.Player(youtubeContainerRef.current, {
       videoId: youtubeVideoId,
+      width: '100%',
+      height: '100%',
       playerVars: {
         controls: 0,           // Hide YouTube controls
         modestbranding: 1,     // Minimal branding
@@ -366,12 +368,59 @@ export default function VideoPlayer({
     }
   }
   
+  const handleUserActivity = () => {
+    setShowControls(true)
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current)
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      if (isPlaying) {
+        setShowControls(false)
+        setShowSettings(false)
+      }
+    }, 3500)
+  }
+
+  const handleContainerTap = () => {
+    if (!showControls) {
+      setShowControls(true)
+      handleUserActivity()
+    } else {
+      togglePlay()
+    }
+  }
+
   const toggleFullscreen = () => {
-    if (containerRef.current) {
-      if (!document.fullscreenElement) {
-        containerRef.current.requestFullscreen()
-      } else {
-        document.exitFullscreen()
+    const container = containerRef.current as any
+    const video = videoRef.current as any
+    if (!container) return
+
+    const isFs = document.fullscreenElement || 
+                 (document as any).webkitFullscreenElement || 
+                 (document as any).mozFullScreenElement || 
+                 (document as any).msFullscreenElement
+
+    if (!isFs) {
+      if (container.requestFullscreen) {
+        container.requestFullscreen().catch(() => {})
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen()
+      } else if (container.mozRequestFullScreen) {
+        container.mozRequestFullScreen()
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen()
+      } else if (video && video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen()
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {})
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen()
+      } else if ((document as any).mozCancelFullScreen) {
+        (document as any).mozCancelFullScreen()
+      } else if ((document as any).msExitFullscreen) {
+        (document as any).msExitFullscreen()
       }
     }
   }
@@ -397,9 +446,11 @@ export default function VideoPlayer({
   return (
     <div 
       ref={containerRef}
-      className="relative bg-black" 
+      className="relative bg-black w-full h-full max-w-full overflow-hidden select-none video-player-container" 
       style={{ aspectRatio: '16/9' }}
-      onMouseMove={() => setShowControls(true)}
+      onMouseMove={handleUserActivity}
+      onTouchStart={handleUserActivity}
+      onClick={handleContainerTap}
     >
       {/* YouTube Player with Custom Controls */}
       {isYouTube && youtubeVideoId ? (
@@ -407,17 +458,17 @@ export default function VideoPlayer({
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-teal-500 border-t-transparent mb-4"></div>
-                <p className="text-white text-lg">در حال بارگذاری...</p>
+                <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-teal-500 border-t-transparent mb-4"></div>
+                <p className="text-white text-sm sm:text-lg">در حال بارگذاری...</p>
               </div>
             </div>
           )}
           
           {error && (
             <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
-              <div className="text-center max-w-md p-8">
-                <AlertCircle className="mx-auto mb-4 text-red-500" size={48} />
-                <p className="text-white text-lg mb-6">{error}</p>
+              <div className="text-center max-w-md p-6">
+                <AlertCircle className="mx-auto mb-4 text-red-500" size={40} />
+                <p className="text-white text-base mb-6">{error}</p>
               </div>
             </div>
           )}
@@ -430,8 +481,9 @@ export default function VideoPlayer({
           
           {/* Custom Controls Overlay */}
           <div 
-            className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6 transition-opacity duration-300 ${showControls || !isPlaying ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2 sm:p-4 md:p-6 transition-opacity duration-300 ${showControls || !isPlaying ? 'opacity-100' : 'opacity-0'}`}
             style={{ pointerEvents: showControls || !isPlaying ? 'auto' : 'none' }}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Progress Bar */}
             <input
@@ -440,55 +492,55 @@ export default function VideoPlayer({
               max={duration || 0}
               value={currentTime}
               onChange={handleSeek}
-              className="w-full mb-4 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
+              className="w-full mb-1.5 sm:mb-3 h-1.5 sm:h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
               style={{
                 background: `linear-gradient(to right, #14b8a6 0%, #14b8a6 ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) 100%)`,
               }}
             />
             
             {/* Controls Row */}
-            <div className="flex items-center justify-between text-white">
-              <div className="flex items-center gap-6">
+            <div className="flex items-center justify-between text-white gap-2 w-full max-w-full">
+              <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0 min-w-0">
                 <button 
                   onClick={togglePlay} 
-                  className="hover:text-teal-400 transition-colors p-2 hover:bg-white/10 rounded-full"
+                  className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center hover:text-teal-400 transition-colors hover:bg-white/10 rounded-full"
                   aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
-                  {isPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" />}
+                  {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" />}
                 </button>
                 
                 <button 
                   onClick={toggleMute} 
-                  className="hover:text-teal-400 transition-colors p-2 hover:bg-white/10 rounded-full"
+                  className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:text-teal-400 transition-colors hover:bg-white/10 rounded-full"
                   aria-label={isMuted ? 'Unmute' : 'Mute'}
                 >
-                  {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+                  {isMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
                 
-                <span className="text-sm font-medium">
-                  {formatTime(currentTime)} / {formatTime(duration)}
+                <span className="text-[11px] sm:text-xs md:text-sm font-medium tracking-tight whitespace-nowrap">
+                  {formatTime(currentTime)} <span className="opacity-60">/</span> {formatTime(duration)}
                 </span>
               </div>
               
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <div className="relative">
                   <button 
                     onClick={() => setShowSettings(!showSettings)}
-                    className="hover:text-teal-400 transition-colors flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg"
+                    className="h-8 sm:h-10 px-2 sm:px-2.5 flex items-center gap-1 hover:text-teal-400 transition-colors hover:bg-white/10 rounded-lg text-xs sm:text-sm font-medium"
                   >
-                    <Settings size={20} />
-                    <span className="text-sm font-medium">{playbackRate}x</span>
+                    <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span>{playbackRate}x</span>
                   </button>
                   
                   {showSettings && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-gray-900/95 backdrop-blur-sm rounded-xl py-2 min-w-[140px] shadow-2xl border border-white/10">
-                      <div className="px-4 py-2 text-xs text-gray-400 font-medium">سرعت پخش</div>
+                    <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 bg-gray-900/95 backdrop-blur-sm rounded-xl py-1.5 min-w-[120px] shadow-2xl border border-white/10 z-30">
+                      <div className="px-3 py-1 text-[11px] text-gray-400 font-medium">سرعت پخش</div>
                       {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(rate => (
                         <button
                           key={rate}
                           onClick={() => changePlaybackRate(rate)}
-                          className={`w-full px-4 py-2.5 text-sm text-right hover:bg-teal-600/20 transition-colors ${
-                            playbackRate === rate ? 'text-teal-400 bg-teal-600/10' : 'text-white'
+                          className={`w-full px-3 py-2 text-xs sm:text-sm text-right hover:bg-teal-600/20 transition-colors ${
+                            playbackRate === rate ? 'text-teal-400 bg-teal-600/10 font-bold' : 'text-white'
                           }`}
                         >
                           {rate === 1 ? 'عادی' : `${rate}x`}
@@ -500,10 +552,10 @@ export default function VideoPlayer({
                 
                 <button 
                   onClick={toggleFullscreen} 
-                  className="hover:text-teal-400 transition-colors p-2 hover:bg-white/10 rounded-full"
+                  className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:text-teal-400 transition-colors hover:bg-white/10 rounded-full"
                   aria-label="Fullscreen"
                 >
-                  <Maximize size={22} />
+                  <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
@@ -594,9 +646,9 @@ export default function VideoPlayer({
           
           {/* Custom Controls Overlay */}
           <div 
-            className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6 transition-opacity duration-300 ${showControls || !isPlaying ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2 sm:p-4 md:p-6 transition-opacity duration-300 ${showControls || !isPlaying ? 'opacity-100' : 'opacity-0'}`}
             style={{ pointerEvents: showControls || !isPlaying ? 'auto' : 'none' }}
-            onMouseMove={() => setShowControls(true)}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Progress Bar */}
             <input
@@ -605,55 +657,55 @@ export default function VideoPlayer({
               max={duration || 0}
               value={currentTime}
               onChange={handleSeek}
-              className="w-full mb-4 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
+              className="w-full mb-1.5 sm:mb-3 h-1.5 sm:h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
               style={{
                 background: `linear-gradient(to right, #14b8a6 0%, #14b8a6 ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) 100%)`,
               }}
             />
             
             {/* Controls Row */}
-            <div className="flex items-center justify-between text-white">
-              <div className="flex items-center gap-6">
+            <div className="flex items-center justify-between text-white gap-2 w-full max-w-full">
+              <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0 min-w-0">
                 <button 
                   onClick={togglePlay} 
-                  className="hover:text-teal-400 transition-colors p-2 hover:bg-white/10 rounded-full"
+                  className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center hover:text-teal-400 transition-colors hover:bg-white/10 rounded-full"
                   aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
-                  {isPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" />}
+                  {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" />}
                 </button>
                 
                 <button 
                   onClick={toggleMute} 
-                  className="hover:text-teal-400 transition-colors p-2 hover:bg-white/10 rounded-full"
+                  className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:text-teal-400 transition-colors hover:bg-white/10 rounded-full"
                   aria-label={isMuted ? 'Unmute' : 'Mute'}
                 >
-                  {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+                  {isMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
                 
-                <span className="text-sm font-medium">
-                  {formatTime(currentTime)} / {formatTime(duration)}
+                <span className="text-[11px] sm:text-xs md:text-sm font-medium tracking-tight whitespace-nowrap">
+                  {formatTime(currentTime)} <span className="opacity-60">/</span> {formatTime(duration)}
                 </span>
               </div>
               
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <div className="relative">
                   <button 
                     onClick={() => setShowSettings(!showSettings)}
-                    className="hover:text-teal-400 transition-colors flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg"
+                    className="h-8 sm:h-10 px-2 sm:px-2.5 flex items-center gap-1 hover:text-teal-400 transition-colors hover:bg-white/10 rounded-lg text-xs sm:text-sm font-medium"
                   >
-                    <Settings size={20} />
-                    <span className="text-sm font-medium">{playbackRate}x</span>
+                    <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span>{playbackRate}x</span>
                   </button>
                   
                   {showSettings && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-gray-900/95 backdrop-blur-sm rounded-xl py-2 min-w-[140px] shadow-2xl border border-white/10">
-                      <div className="px-4 py-2 text-xs text-gray-400 font-medium">سرعت پخش</div>
+                    <div className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 bg-gray-900/95 backdrop-blur-sm rounded-xl py-1.5 min-w-[120px] shadow-2xl border border-white/10 z-30">
+                      <div className="px-3 py-1 text-[11px] text-gray-400 font-medium">سرعت پخش</div>
                       {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(rate => (
                         <button
                           key={rate}
                           onClick={() => changePlaybackRate(rate)}
-                          className={`w-full px-4 py-2.5 text-sm text-right hover:bg-teal-600/20 transition-colors ${
-                            playbackRate === rate ? 'text-teal-400 bg-teal-600/10' : 'text-white'
+                          className={`w-full px-3 py-2 text-xs sm:text-sm text-right hover:bg-teal-600/20 transition-colors ${
+                            playbackRate === rate ? 'text-teal-400 bg-teal-600/10 font-bold' : 'text-white'
                           }`}
                         >
                           {rate === 1 ? 'عادی' : `${rate}x`}
@@ -665,10 +717,10 @@ export default function VideoPlayer({
                 
                 <button 
                   onClick={toggleFullscreen} 
-                  className="hover:text-teal-400 transition-colors p-2 hover:bg-white/10 rounded-full"
+                  className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:text-teal-400 transition-colors hover:bg-white/10 rounded-full"
                   aria-label="Fullscreen"
                 >
-                  <Maximize size={22} />
+                  <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>

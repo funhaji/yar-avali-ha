@@ -131,9 +131,11 @@ const DEFAULT_SETTINGS = [
   { key: 'ent_cat1_video', label: 'لینک ویدیوی لوحه نویسی (آپارات)', type: 'url', category: 'entertainment' },
   { key: 'ent_cat2_image', label: 'کاور دسته نشانه های ۱/۲ (URL)', type: 'url', category: 'entertainment' },
   { key: 'ent_cat2_video', label: 'لینک ویدیوی نشانه های ۱/۲ (آپارات)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat4_image', label: 'کاور دسته ریاضی (URL)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat4_video', label: 'لینک ویدیوی ریاضی (آپارات)', type: 'url', category: 'entertainment' },
   { key: 'ent_cat3_image', label: 'کاور دسته علوم (URL)', type: 'url', category: 'entertainment' },
   { key: 'ent_cat3_video', label: 'لینک ویدیوی علوم (آپارات)', type: 'url', category: 'entertainment' },
-  { key: 'ent_cat4_image', label: 'کاور دسته سایر محتوا (URL)', type: 'url', category: 'entertainment' },
+  { key: 'ent_cat5_image', label: 'کاور دسته سایر محتوا (URL)', type: 'url', category: 'entertainment' },
   
   // About Us Page
   { key: 'about_title', label: 'عنوان صفحه درباره ما', type: 'text', placeholder: 'درباره یار اولی‌ها', category: 'about' },

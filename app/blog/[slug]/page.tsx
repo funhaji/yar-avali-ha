@@ -6,6 +6,7 @@ import { query } from '@/lib/db'
 import { SiteHeader } from '@/components/SiteHeader'
 import { getSettings } from '@/lib/settings'
 import VideoPlayer from '@/components/VideoPlayer'
+import { getEmbedUrl } from '@/lib/video'
 
 async function getBlogPost(slug: string, incrementView = false) {
   const posts = await query(`
@@ -168,12 +169,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     frameBorder="0"
                     allowFullScreen
                   />
-                ) : post.video_provider === 'gdrive' || post.video_provider === 'aparat' ? (
-                  <VideoPlayer 
-                    src={post.video_url}
-                    provider={post.video_provider}
+                ) : post.video_provider === 'aparat' ? (
+                  <iframe
+                    src={getEmbedUrl(post.video_url)}
                     title={post.title}
-                    poster={post.thumbnail_url || undefined}
+                    className="w-full h-full border-none"
+                    allowFullScreen
+                    allow="autoplay; fullscreen"
+                  />
+                ) : post.video_provider === 'gdrive' ? (
+                  <VideoPlayer 
+                    contentId={post.id?.toString() || 'blog'}
+                    storageProvider="gdrive"
+                    videoUrl={post.video_url}
+                    startPosition={0}
+                    title={post.title}
                   />
                 ) : (
                   <video 

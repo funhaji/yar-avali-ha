@@ -33,6 +33,7 @@ async function getEntertainmentContent(userId?: string, searchQuery?: string) {
   const byCategory: Record<string, any[]> = {
     'لوحه نویسی': [],
     'نشانه های ۱/۲': [],
+    'ریاضی': [],
     'علوم': [],
     'سایر': []
   }
@@ -43,7 +44,9 @@ async function getEntertainmentContent(userId?: string, searchQuery?: string) {
       byCategory['لوحه نویسی'].push(item)
     } else if (cat === 'نشانه های 1/2' || cat === 'نشانه های ۱/۲' || cat.includes('نشانه')) {
       byCategory['نشانه های ۱/۲'].push(item)
-    } else if (cat === 'علوم') {
+    } else if (cat === 'ریاضی' || cat.includes('ریاضی')) {
+      byCategory['ریاضی'].push(item)
+    } else if (cat === 'علوم' || cat.includes('علوم')) {
       byCategory['علوم'].push(item)
     } else {
       byCategory['سایر'].push(item)
@@ -68,15 +71,16 @@ export default async function EntertainmentPage({ searchParams }: { searchParams
   
   const [{ byCategory, hasSubscription }, settings] = await Promise.all([
     getEntertainmentContent(user?.id, searchQuery),
-    getSettings(['site_logo_url', 'site_name', 'ent_cat1_image', 'ent_cat2_image', 'ent_cat3_image', 'ent_cat4_image', 'ent_cat1_video', 'ent_cat2_video', 'ent_cat3_video']),
+    getSettings(['site_logo_url', 'site_name', 'ent_cat1_image', 'ent_cat2_image', 'ent_cat3_image', 'ent_cat4_image', 'ent_cat1_video', 'ent_cat2_video', 'ent_cat3_video', 'ent_cat4_video']),
   ])
   
   const siteName = settings.site_name || 'یار اولی‌ها'
   
-  const types = ['لوحه نویسی', 'نشانه های ۱/۲', 'علوم', 'سایر']
+  const types = ['لوحه نویسی', 'نشانه های ۱/۲', 'ریاضی', 'علوم', 'سایر']
   const typeNames = {
     'لوحه نویسی': 'لوحه نویسی',
     'نشانه های ۱/۲': 'نشانه های ۱/۲',
+    'ریاضی': 'ریاضی',
     'علوم': 'علوم',
     'سایر': 'سایر'
   }
@@ -89,6 +93,7 @@ export default async function EntertainmentPage({ searchParams }: { searchParams
     ent_cat1_video: settings.ent_cat1_video,
     ent_cat2_video: settings.ent_cat2_video,
     ent_cat3_video: settings.ent_cat3_video,
+    ent_cat4_video: settings.ent_cat4_video,
   }
   
   return (

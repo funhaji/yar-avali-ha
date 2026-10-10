@@ -146,8 +146,8 @@ export default async function WatchPage({ params }: { params: Promise<{ id: stri
           <div className="lg:col-span-2 flex flex-col gap-8">
             
             {/* Media Player / Locked Viewer */}
-            <div className="card p-2 shadow-lg slide-up overflow-hidden" style={{ height: content.content_type === 'pdf' && hasAccess ? 'calc(100vh - 140px)' : 'auto', minHeight: content.content_type === 'pdf' && hasAccess ? '600px' : 'auto' }}>
-              <div className={`w-full h-full relative rounded-lg overflow-hidden ${content.content_type !== 'pdf' || !hasAccess ? 'aspect-video bg-black' : ''}`}>
+            <div className="card p-1 sm:p-2 shadow-lg slide-up overflow-hidden w-full max-w-full" style={{ height: content.content_type === 'pdf' && hasAccess ? 'calc(100vh - 140px)' : 'auto', minHeight: content.content_type === 'pdf' && hasAccess ? '600px' : 'auto' }}>
+              <div className={`w-full relative rounded-lg overflow-hidden ${content.content_type !== 'pdf' || !hasAccess ? 'aspect-video bg-black' : 'h-full'}`}>
                 {hasAccess ? (
                   content.content_type === 'pdf' ? (
                     <SecurePDFViewer pdfUrl={directVideoUrl} title={content.title} />
